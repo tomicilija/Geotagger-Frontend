@@ -13,6 +13,7 @@ import {
   AddMobile,
   BorderlessButton,
   IconWrapper,
+  Wrapper,
 } from "./Navbar.style";
 import { useLocation, Link } from "react-router-dom";
 import { ReactComponent as LogoIcon } from "../../assets/icons/navbar-logo.svg";
@@ -64,98 +65,99 @@ const Navbar = () => {
 
   return (
     <Container>
-      <Logo className={isBurgerMenuOpen ? "hideLogo" : "showLogo"}>
-        <Link to="/" style={{ textDecoration: "none" }}>
-          <LogoIcon />
-        </Link>
-      </Logo>
-      <BurgerMenu onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}>
-        <span className={isBurgerMenuOpen ? "xmark" : "burger"}></span>
-        <span className={isBurgerMenuOpen ? "xmark" : "burger"}></span>
-        <span className={isBurgerMenuOpen ? "xmark" : "burger"}></span>
-      </BurgerMenu>
-      {isLoggedIn ? (
-        <>
-          <AddMobile
-            onClick={openQuoteModal}
-            className={isBurgerMenuOpen ? "hideButton" : "showButton"}
-          >
-            <AddPicture />
-          </AddMobile>
-          <Menu className={isBurgerMenuOpen ? "showMenuNav" : "hideMenuNav"}>
-            <ButtonWrapper>
-              <Link
-                to="/profile"
-                onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}
-                style={{ textDecoration: "none" }}
-              >
-                <MobileLink>
-                  <DefaultProfileIcon />
-                  <h5>
-                    {firstName} {lastName}
-                  </h5>
-                </MobileLink>
-              </Link>
-              <br/>
-              <div>
+      <Wrapper>
+        <Logo className={isBurgerMenuOpen ? "hideLogo" : "showLogo"}>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <LogoIcon />
+          </Link>
+        </Logo>
+        <BurgerMenu onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}>
+          <span className={isBurgerMenuOpen ? "xmark" : "burger"}></span>
+          <span className={isBurgerMenuOpen ? "xmark" : "burger"}></span>
+          <span className={isBurgerMenuOpen ? "xmark" : "burger"}></span>
+        </BurgerMenu>
+        {isLoggedIn ? (
+          <>
+            <AddMobile
+              onClick={openQuoteModal}
+              className={isBurgerMenuOpen ? "hideButton" : "showButton"}
+            >
+              <AddPicture />
+            </AddMobile>
+            <Menu className={isBurgerMenuOpen ? "showMenuNav" : "hideMenuNav"}>
+              <ButtonWrapper>
                 <Link
-                  to="/"
+                  to="/profile"
                   onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}
                   style={{ textDecoration: "none" }}
                 >
                   <MobileLink>
-                    <h5>Home</h5>
-                    <RightArrow />
+                    <DefaultProfileIcon />
+                    <h5>
+                      {firstName} {lastName}
+                    </h5>
                   </MobileLink>
                 </Link>
-              </div>
-              <div onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}>
-                <MobileLink onClick={openSettingsModal}>
-                  <h5>Profile settings</h5>
-                  <RightArrow />
+                <br />
+                <div>
+                  <Link
+                    to="/"
+                    onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <MobileLink>
+                      <h5>Home</h5>
+                      <RightArrow />
+                    </MobileLink>
+                  </Link>
+                </div>
+                <div onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}>
+                  <MobileLink onClick={openSettingsModal}>
+                    <h5>Profile settings</h5>
+                    <RightArrow />
+                  </MobileLink>
+                </div>
+                <MobileLink
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.href = "/";
+                  }}
+                >
+                  <h5>
+                    <span>Logout</span>
+                  </h5>
+                  <RightArrowGreen />
                 </MobileLink>
-              </div>
-              <MobileLink
-                onClick={() => {
-                  localStorage.clear();
-                  window.location.href = "/";
-                }}
-              >
-                <h5>
-                  <span>Logout</span>
-                </h5>
-                <RightArrowGreen />
-              </MobileLink>
 
-              <Link to="/" style={{ textDecoration: "none" }}>
-                <DesktopLink>
-                  <p>Home</p>
-                </DesktopLink>
-              </Link>
-              <DesktopLink onClick={openSettingsModal}>
-                <p>Profile settings</p>
-              </DesktopLink>
-              <DesktopLink
-                onClick={() => {
-                  localStorage.clear();
-                  window.location.href = "/";
-                }}
-              >
-                <p>Logout</p>
-              </DesktopLink>
-              <IconWrapper>
-                <Link to="/profile" style={{ textDecoration: "none" }}>
-                  <ButtonLoggedin>
-                    <DefaultProfileIcon />
-                  </ButtonLoggedin>
+                <Link to="/" style={{ textDecoration: "none" }}>
+                  <DesktopLink>
+                    <p>Home</p>
+                  </DesktopLink>
                 </Link>
-                <ButtonLoggedin onClick={openQuoteModal}>
-                  <AddPicture />
-                </ButtonLoggedin>
-              </IconWrapper>
-            </ButtonWrapper>
-          </Menu>
-          {/* 
+                <DesktopLink onClick={openSettingsModal}>
+                  <p>Profile settings</p>
+                </DesktopLink>
+                <DesktopLink
+                  onClick={() => {
+                    localStorage.clear();
+                    window.location.href = "/";
+                  }}
+                >
+                  <p>Logout</p>
+                </DesktopLink>
+                <IconWrapper>
+                  <Link to="/profile" style={{ textDecoration: "none" }}>
+                    <ButtonLoggedin>
+                      <DefaultProfileIcon />
+                    </ButtonLoggedin>
+                  </Link>
+                  <ButtonLoggedin onClick={openQuoteModal}>
+                    <AddPicture />
+                  </ButtonLoggedin>
+                </IconWrapper>
+              </ButtonWrapper>
+            </Menu>
+            {/* 
           <ProfileSettings
             isSettingsOpen={isSettingsModalOpen}
             setIsSettingsOpen={setIsSettingsModalOpen}
@@ -165,34 +167,35 @@ const Navbar = () => {
             setIsQuoteOpen={setIsQuoteModalOpen}
           />
           */}
-        </>
-      ) : (
-        <Menu className={isBurgerMenuOpen ? "showMenuNav" : "hideMenuNav"}>
-          <ButtonWrapper>
-            <Link to="/" style={{ textDecoration: "none" }}>
-              <Home onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}>
-                <h5>Home</h5>
-                <RightArrow />
-              </Home>
-            </Link>
-            {location.pathname === "/" ? (
-              <>
-                <Link to="/signin" style={{ textDecoration: "none" }}>
-                  <BorderlessButton className="signin">
-                    Sign in
-                  </BorderlessButton>
-                </Link>
-                <p>or</p>
-                <Link to="/signup" style={{ textDecoration: "none" }}>
-                  <Button className="signup">Sign up</Button>
-                </Link>
-              </>
-            ) : (
-              <></>
-            )}
-          </ButtonWrapper>
-        </Menu>
-      )}
+          </>
+        ) : (
+          <Menu className={isBurgerMenuOpen ? "showMenuNav" : "hideMenuNav"}>
+            <ButtonWrapper>
+              <Link to="/" style={{ textDecoration: "none" }}>
+                <Home onClick={() => setIsBurgerMenuOpen(!isBurgerMenuOpen)}>
+                  <h5>Home</h5>
+                  <RightArrow />
+                </Home>
+              </Link>
+              {location.pathname === "/" ? (
+                <>
+                  <Link to="/signin" style={{ textDecoration: "none" }}>
+                    <BorderlessButton className="signin">
+                      Sign in
+                    </BorderlessButton>
+                  </Link>
+                  <p>or</p>
+                  <Link to="/signup" style={{ textDecoration: "none" }}>
+                    <Button className="signup">Sign up</Button>
+                  </Link>
+                </>
+              ) : (
+                <></>
+              )}
+            </ButtonWrapper>
+          </Menu>
+        )}
+      </Wrapper>
     </Container>
   );
 };

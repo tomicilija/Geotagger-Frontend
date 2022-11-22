@@ -2,7 +2,17 @@ import styled from "styled-components";
 
 /* Navigation */
 export const Container = styled.div`
-  z-index: 1;
+  position: relative;
+  z-index: 5;
+  width: 100%;
+
+  @media (max-width: 900px) {
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.15);
+    background-color: white;
+  }
+`;
+
+export const Wrapper = styled.div`
   position: absolute;
   display: flex;
   justify-content: space-between;
@@ -16,8 +26,10 @@ export const Container = styled.div`
   @media (max-width: 900px) {
     position: relative;
     padding: 30px 35px;
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.15);
-    background-color: white;
+  }
+  @media (max-width: 350px) {
+    justify-content: flex-start;
+    padding: 20px;
   }
 `;
 
@@ -30,16 +42,16 @@ export const Logo = styled.div`
   &.hideLogo {
     display: none;
   }
-
   @media (max-width: 900px) {
-    position: absolute;
-    justify-content: center;
-    width: 100%;
-    margin-left: -35px;
+    padding-right: 40%;
   }
-
-  @media (max-width: 330px) {
-    transform: scale(0.5);
+  @media (max-width: 500px) {
+    padding-right: 25%;
+  }
+  @media (max-width: 350px) {
+    padding-right: 40%;
+    transform: scale(0.7);
+    width: 50%;
   }
 `;
 
@@ -48,8 +60,10 @@ export const Menu = styled.div`
   justify-content: space-between;
   align-items: center;
   position: relative;
+  margin-left: -100px;
   @media (max-width: 900px) {
     margin-top: 30px;
+    margin-left: 0px;
     padding: 22px;
     border-radius: 1rem;
     overflow: hidden;
@@ -250,6 +264,9 @@ export const AddMobile = styled.div`
       display: none;
     }
   }
+  @media (max-width: 370px) {
+    width: 30px;
+  }
 `;
 
 export const ButtonLoggedin = styled.button`
@@ -297,7 +314,7 @@ export const MobileLink = styled.div`
   display: none;
   padding: 0px;
   width: 100%;
-  
+
   cursor: pointer;
   color: #233d4d;
 
