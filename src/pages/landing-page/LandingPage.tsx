@@ -3,14 +3,12 @@ import {
   Container,
   Wrapper,
   HeroWrapper,
-  Quote,
   MostUpvoated,
   Tittle,
   HeroTittle,
   SloganWrapper,
   Slogan,
   Button,
-  SeeMore,
   BgMap,
 } from "./LandingPage.style";
 //import Card from "../../components/card/Card";
@@ -20,6 +18,10 @@ import { Link } from "react-router-dom";
 import { UpdateContext } from "../../utils/UpdateContext";
 //import { QuoteResponse } from "../../interfaces/QuoteInterfaces";
 import { ReactComponent as BackgroundWorldMap } from "../../assets/background/background-world-map.svg";
+import CardNew from "../../components/cards/card-new/CardNew";
+import LocationImg from "../../assets/s6L0uQyprpE.png";
+import CardGuessed from "../../components/cards/card-guessed/CardGuessed";
+import CardLocked from "../../components/cards/card-locked/CardLocked";
 
 // One version of landing page can be shown to anyone, logged in user sees different version, same for mobile users
 
@@ -115,6 +117,13 @@ const LandingPage = () => {
                 your personal records or set a new one!
               </p>
             </Tittle>
+
+            <CardGuessed
+              locationid={"1"}
+              image={`${LocationImg}`}
+              distance={255}
+            />
+
             {/*
             {isThreeCollumnSizeGrid ? (
               <>
@@ -139,7 +148,11 @@ const LandingPage = () => {
                 New uploads from users. Try to guess all the locations by
                 pressing on a picture.
               </p>
-            </Tittle>{/*
+            </Tittle>
+
+            <CardNew locationid={"1"} image={`${LocationImg}`} />
+
+            {/*
             {isThreeCollumnSizeGrid ? (
               <>
                 <CardGrid
@@ -183,14 +196,15 @@ const LandingPage = () => {
               </p>
             </Slogan>
           </SloganWrapper>
-          <MostUpvoated>
-            <Tittle>
-              <h4>3 random locations</h4>
-            </Tittle>
-            <Link to="/signup" style={{ textDecoration: "none" }}>
-              <Button>Sign up</Button>
-            </Link>
-          </MostUpvoated>
+          <Wrapper>
+            <MostUpvoated>
+              <CardLocked image={`${LocationImg}`} />
+
+              <Link to="/signup" style={{ textDecoration: "none" }}>
+                <Button>Sign up</Button>
+              </Link>
+            </MostUpvoated>
+          </Wrapper>
         </>
       )}
     </Container>

@@ -39,8 +39,9 @@ export const Wrapper = styled.div`
     align-items: center;
     align-content: center;
     gap: 20px;
+    padding: 0;
 
-    margin-top: 50px;
+    margin-top: 30px;
   }
 `;
 
@@ -58,15 +59,7 @@ export const HeroWrapper = styled.div`
   margin-top: 250px;
 
   @media (max-width: 900px) {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    gap: 100px;
-
-    margin-top: -50px;
+    margin-top: 20px;
   }
 `;
 
@@ -81,51 +74,26 @@ export const BgMap = styled.div`
     width: 80%;
   }
   @media (max-width: 900px) {
-    display: none;
-  }
-`;
-
-export const Quote = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px 32px;
-  gap: 40px;
-  margin-bottom: 100px;
-
-  font-family: "Raleway";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 35px;
-  line-height: 41px;
-  letter-spacing: 0.25px;
-
-  color: #de8667;
-
-  span {
-    font-family: "Raleway";
-    font-style: normal;
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 19px;
-
-    margin-top: -30px;
-
-    color: #000000;
-  }
-
-  @media (max-width: 900px) {
-    margin-bottom: auto;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    padding: 10px;
+    svg {
+      height: 100%;
+      width: 100%;
+    }
   }
 `;
 
 export const MostUpvoated = styled.div`
   position: relative;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
   flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
   margin-bottom: 100px;
 
   @media (max-width: 900px) {
@@ -136,35 +104,38 @@ export const MostUpvoated = styled.div`
 export const Tittle = styled.div`
   position: relative;
   width: 100%;
+  margin-bottom: 30px;
   h4 {
     text-align: start;
-    color: #619B8A;
+    color: #619b8a;
     margin-bottom: 20px;
   }
   p {
     text-align: start;
   }
   @media (max-width: 900px) {
+    width: 100%;
+    padding: 30px;
+
     display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
+    align-content: center;
+    gap: 20px;
+
     h4 {
-      font-family: "Raleway";
+      font-family: "Roboto";
       font-style: normal;
       font-weight: 400;
-      font-size: 24px;
-      line-height: 28px;
+      font-size: 34px;
+      line-height: 40px;
       text-align: center;
-      color: #e59967;
+      letter-spacing: 0.25px;
     }
+
     p {
-      width: 300px;
-      font-family: "Raleway";
-      font-style: normal;
-      font-weight: 400;
-      font-size: 16px;
-      line-height: 19px;
       text-align: center;
     }
   }
@@ -184,8 +155,8 @@ export const HeroTittle = styled.div`
   }
 
   @media (max-width: 900px) {
-    margin-top: 100px;
     width: 100%;
+    padding: 30px;
 
     display: flex;
     flex-wrap: wrap;
@@ -195,12 +166,18 @@ export const HeroTittle = styled.div`
     align-content: center;
     gap: 20px;
 
-    a {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      align-self: flex-start;
+    h2 {
+      font-family: "Roboto";
+      font-style: normal;
+      font-weight: 400;
+      font-size: 34px;
+      line-height: 40px;
+      text-align: center;
+      letter-spacing: 0.25px;
+    }
+
+    p {
+      text-align: center;
     }
   }
 `;
@@ -251,47 +228,21 @@ export const Slogan = styled.div`
   }
 
   @media (max-width: 900px) {
-    padding: 20px;
-    margin-top: 40px;
-  }
-`;
+    padding: 0;
+    margin-top: 10px;
+    width: 100%;
 
-export const SeeMore = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin: 50px;
+    h4 {
+      font-family: "Roboto";
+      font-style: normal;
+      font-weight: 400;
+      font-size: 24px;
+      line-height: 28px;
+      text-align: center;
+    }
 
-  width: 200px;
-  height: 40px;
-
-  background: #ffffff;
-  /* Orange */
-
-  border: 2px solid #de8667;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 32px;
-
-  /* P desktop */
-
-  font-family: "Raleway";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 19px;
-  /* identical to box height */
-
-  text-align: center;
-
-  /* Orange */
-
-  color: #de8667;
-  cursor: pointer;
-
-  :hover {
-    border-bottom: 5px solid #e59967;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+    p {
+      text-align: center;
+    }
   }
 `;

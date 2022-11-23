@@ -14,6 +14,9 @@ import {
 import CardGrid from "../../components/card-grid/CardGrid";*/
 import { Link, useParams } from "react-router-dom";
 import { ReactComponent as DefaultProfileIcon } from "../../assets/icons/profile.svg";
+import CardGuessed from "../../components/cards/card-guessed/CardGuessed";
+import LocationImg from "../../assets/s6L0uQyprpE.png";
+import CardEdit from "../../components/cards/card-edit/CardEdit";
 /*import { getSignedInUser, getUserById, getUserVotes } from "../../api/UserApi";
 import { getMyQuote, getUserQuote } from "../../api/QuoteApi";
 import { UpdateContext } from "../../utils/UpdateContext";
@@ -28,27 +31,29 @@ const Profile = () => {
   const [lastName, setLastName] = useState("");
   const [userQquote, setUserQquote] = useState("");
   const [userKarma, setUserKarma] = useState(0);
- // const [userVotes, setUserVotes] = useState<QuoteResponse[]>([]);
+  // const [userVotes, setUserVotes] = useState<QuoteResponse[]>([]);
   const [userHasLikes, setUserHasLikes] = useState(false);
   const [showedQuotesDesktop, setShowedQuotesDesktop] = useState(9);
   const [showedQuotesMobile, setShowedQuotesMobile] = useState(4);
-  const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(window.innerWidth > 1340);
+  const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
+    window.innerWidth > 1340
+  );
   //const { updated } = useContext(UpdateContext);
   const { id } = useParams();
 
   /*
    * Profile page shows profile of logged in user when clicked on profile icon in navbar
    * or profile of other usr when clicked on name on quote card
-   * 
+   *
    * Quote cards can be shown in grid of 3, 2, or 1 columns, depending on screen width
    * 3 column grid shows max of 9 cards and lods by 9 cards
    * 2 and 1 column shows max of 4 cards, and loads by 4 cards
    */
-  
+
   const updateScreenSize = () => {
     setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
   };
-  
+
   useEffect(() => {
     window.addEventListener("resize", updateScreenSize);
     return () => window.removeEventListener("resize", updateScreenSize);
@@ -61,7 +66,7 @@ const Profile = () => {
   const loadQuotesMobile = () => {
     setShowedQuotesMobile((prevValue) => prevValue + 4);
   };
-/*
+  /*
   useEffect(() => {
     if (isLoggedIn) {
       if (id){
@@ -124,20 +129,29 @@ const Profile = () => {
         <>
           <ProfileBanner>
             <ProfilePicture>
-                <DefaultProfileIcon />
+              <DefaultProfileIcon />
             </ProfilePicture>
             <ProfileInfo>
               <ProfileName>
-                <h4>Name Surname{firstName} {lastName}</h4>
+                <h4>
+                  Name Surname{firstName} {lastName}
+                </h4>
               </ProfileName>
             </ProfileInfo>
           </ProfileBanner>
-        <Wrapper>
-          <MostUpvoated>
-            <Tittle>
-              <h5>My best guesses</h5>
-            </Tittle>
-            {/*
+          <Wrapper>
+            <MostUpvoated>
+              <Tittle>
+                <h5>My best guesses</h5>
+              </Tittle>
+
+              <CardGuessed
+                locationid={"1"}
+                image={`${LocationImg}`}
+                distance={255}
+              />
+
+              {/*
             {isThreeCollumnSizeGrid ? (
               <>
                 <CardGrid
@@ -153,11 +167,18 @@ const Profile = () => {
                 <SeeMore onClick={loadLikedQuotesMobile}>Load more</SeeMore>
               </>
             )}*/}
-          </MostUpvoated>
-          <MostUpvoated>
-            <Tittle>
-              <h5>My uploads</h5>
-            </Tittle>{/*
+            </MostUpvoated>
+            <MostUpvoated>
+              <Tittle>
+                <h5>My uploads</h5>
+              </Tittle>
+
+              <CardEdit
+                locationid={"1"}
+                image={`${LocationImg}`}
+              />
+
+              {/*
             {isThreeCollumnSizeGrid ? (
               <>
                 <CardGrid
@@ -173,8 +194,8 @@ const Profile = () => {
                 <SeeMore onClick={loadRecentQuotesMobile}>Load more</SeeMore>
               </>
             )}*/}
-          </MostUpvoated>
-        </Wrapper>
+            </MostUpvoated>
+          </Wrapper>
         </>
       ) : (
         <NotFound>

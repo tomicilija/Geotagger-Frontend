@@ -30,13 +30,10 @@ export const Wrapper = styled.div`
   @media (max-width: 900px) {
     display: flex;
     flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    gap: 20px;
+    gap: 30px;
 
-    margin-top: 50px;
+    margin: 0;
+    padding: 30px;
   }
 `;
 
@@ -57,9 +54,9 @@ export const MostUpvoated = styled.div`
 export const Tittle = styled.div`
   position: relative;
   width: 100%;
-  h4 {
+  h5 {
     text-align: start;
-    color: #619b8a;
+    color: #233D4D;
     margin-bottom: 20px;
   }
   p {
@@ -67,26 +64,16 @@ export const Tittle = styled.div`
   }
   @media (max-width: 900px) {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start;
+    align-items: flex-start;
     flex-direction: column;
-    h4 {
-      font-family: "Raleway";
+    h5 {
+      font-family: "Roboto";
       font-style: normal;
       font-weight: 400;
       font-size: 24px;
       line-height: 28px;
-      text-align: center;
-      color: #e59967;
-    }
-    p {
-      width: 300px;
-      font-family: "Raleway";
-      font-style: normal;
-      font-weight: 400;
-      font-size: 16px;
-      line-height: 19px;
-      text-align: center;
+      color: #619b8a;
     }
   }
 `;
@@ -108,6 +95,8 @@ export const ProfileBanner = styled.div`
   text-align: center;
 
   @media (max-width: 900px) {
+    margin-top: 20px;
+    padding: 30px;
   }
 `;
 
@@ -123,6 +112,8 @@ export const ProfilePicture = styled.div`
     width: 70px;
   }
   @media (max-width: 900px) {
+    height: 60px;
+    width: 60px;
   }
 `;
 
@@ -135,6 +126,11 @@ export const ProfileInfo = styled.div`
 export const ProfileName = styled.div`
   letter-spacing: 0.25px;
   @media (max-width: 900px) {
+    h4 {
+      font-weight: 400;
+      font-size: 24px;
+      line-height: 28px;
+    }
   }
 `;
 
