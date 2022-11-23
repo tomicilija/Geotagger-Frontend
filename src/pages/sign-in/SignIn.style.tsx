@@ -47,7 +47,7 @@ export const BackgroundIcon = styled.div`
   }
 `;
 
-export const SignUpFormWrapper = styled.div`
+export const SignInFormWrapper = styled.div`
   position: relative;
   width: 50%;
   //min-height: 750px;
@@ -59,7 +59,7 @@ export const SignUpFormWrapper = styled.div`
 
   //margin: 100px;
 
-  gap: 16px;
+  gap: 26px;
 
   @media (max-width: 900px) {
     height: 600px;
@@ -69,7 +69,7 @@ export const SignUpFormWrapper = styled.div`
   }
 `;
 
-export const SignUpHeader = styled.div`
+export const SignInHeader = styled.div`
   position: relative;
   width: 100%;
   text-align: center;
@@ -81,7 +81,7 @@ export const SignUpHeader = styled.div`
   }
 `;
 
-export const SignUpForm = styled.div`
+export const SignInForm = styled.div`
   position: relative;
   width: 420px;
   display: flex;
@@ -96,7 +96,7 @@ export const SignUpForm = styled.div`
   }
 `;
 
-export const SignUpFormSection = styled.div`
+export const SignInFormSection = styled.div`
   position: relative;
   width: 100%;
   display: flex;

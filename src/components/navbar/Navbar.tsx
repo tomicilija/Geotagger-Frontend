@@ -28,7 +28,7 @@ import { getSignedInUser } from "../../api/UserApi";
 */
 /*
  * Navigation bar switches pages, opens modals, and is shown in few different views:
- * Signup and Login pages
+ * Signup and Signin pages
  * Landing page with and without logged in user
  * Profile page with white quotastic logo
  * Mobile page with and without logged in user

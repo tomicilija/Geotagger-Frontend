@@ -1,22 +1,21 @@
 import {
   Container,
   Background,
-  SignUpFormWrapper,
-  SignUpHeader,
-  SignUpForm,
-  SignUpFormSection,
+  SignInFormWrapper,
+  SignInHeader,
+  SignInForm,
+  SignInFormSection,
   TwoInRow,
   SigninText,
   BackgroundIcon,
-} from "./SignUp.style";
+} from "./SignIn.style";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ReactComponent as DefaultProfilePicture } from "../../assets/default-avatar.svg";
 //import { signUp } from "../../api/UserApi";
 import Backgroundimg from "../../assets/background/background-signup-map.svg";
 import BackgroundIconImg from "../../assets/icons/logo-icon-border.svg";
 
-const SignUp = () => {
+const SignIn = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -43,17 +42,16 @@ const SignUp = () => {
 */
   return (
     <Container>
-      <SignUpFormWrapper>
-        <SignUpHeader>
-          <h3>Sign up</h3>
-          <p>Your name will appear on posts and your public profle.</p>
+      <SignInFormWrapper>
+        <SignInHeader>
+          <h3>Sign in</h3>
+          <p>Welcome back to Geotagger. We are glad that you are back.</p>
           <h5>{ErrorMessage}</h5>
-        </SignUpHeader>
-        <DefaultProfilePicture />
+        </SignInHeader>
         <form>
           {/*onSubmit={handleSubmit}*/}
-          <SignUpForm>
-            <SignUpFormSection>
+          <SignInForm>
+            <SignInFormSection>
               <label htmlFor="email">Email</label>
               <input
                 type="email"
@@ -61,28 +59,8 @@ const SignUp = () => {
                 required
                 onChange={(e) => setEmail(e.target.value)}
               />
-            </SignUpFormSection>
-            <TwoInRow>
-              <SignUpFormSection>
-                <label htmlFor="firstName">First Name</label>
-                <input
-                  type="firstname"
-                  value={firstName}
-                  required
-                  onChange={(e) => setFirstName(e.target.value)}
-                />
-              </SignUpFormSection>
-              <SignUpFormSection>
-                <label htmlFor="lastName">Last Name</label>
-                <input
-                  type="lastname"
-                  value={lastName}
-                  required
-                  onChange={(e) => setLastName(e.target.value)}
-                />
-              </SignUpFormSection>
-            </TwoInRow>
-            <SignUpFormSection>
+            </SignInFormSection>
+            <SignInFormSection>
               <label htmlFor="password">Password</label>
               <input
                 type="password"
@@ -90,28 +68,19 @@ const SignUp = () => {
                 required
                 onChange={(e) => setPassword(e.target.value)}
               />
-            </SignUpFormSection>
-            <SignUpFormSection>
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type="password"
-                value={passwordConfirm}
-                required
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-              />
-            </SignUpFormSection>
-            <SignUpFormSection>
-              <button type="submit">Sign up</button>
-            </SignUpFormSection>
-          </SignUpForm>
+            </SignInFormSection>
+            <SignInFormSection>
+              <button type="submit">Sign in</button>
+            </SignInFormSection>
+          </SignInForm>
           <SigninText>
-            Already have an account?
-            <Link to="/signin" style={{ textDecoration: "none" }}>
-              <p>Sign In</p>
+          Do you want to create an account?
+            <Link to="/signup" style={{ textDecoration: "none" }}>
+              <p>Sign Up</p>
             </Link>
           </SigninText>
         </form>
-      </SignUpFormWrapper>
+      </SignInFormWrapper>
       <Background style={{ backgroundImage: `url(${Backgroundimg})` }}>
         <BackgroundIcon
           style={{ backgroundImage: `url(${BackgroundIconImg})` }}
@@ -121,4 +90,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default SignIn;
