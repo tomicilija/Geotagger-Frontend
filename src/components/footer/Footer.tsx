@@ -1,6 +1,6 @@
 import { Container, LogoIcon, LogoText, Rights } from "./Footer.style";
 import { ReactComponent as LogoImageText } from "../../assets/icons/logo-text.svg";
-import { ReactComponent as LogoImageicon } from "../../assets/icons/logo-icon.svg";
+import { ReactComponent as LogoImageicon } from "../../assets/icons/logo-icon-filled.svg";
 
 const Footer = () => {
   return (

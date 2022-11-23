@@ -35,7 +35,7 @@ import { getSignedInUser } from "../../api/UserApi";
  */
 
 const Navbar = () => {
-  const isLoggedIn = true; ///localStorage.getItem("accessToken");
+  const isLoggedIn = false; ///localStorage.getItem("accessToken");
   let location = useLocation();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

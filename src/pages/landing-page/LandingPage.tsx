@@ -19,7 +19,7 @@ import { Link } from "react-router-dom";
 //import { getMostUpvoatedQuotes, getMostRecentQuotes } from "../../api/QuoteApi";
 import { UpdateContext } from "../../utils/UpdateContext";
 //import { QuoteResponse } from "../../interfaces/QuoteInterfaces";
-import { ReactComponent as BackgroundWorldMap } from "../../assets/background-world-map.svg";
+import { ReactComponent as BackgroundWorldMap } from "../../assets/background/background-world-map.svg";
 
 // One version of landing page can be shown to anyone, logged in user sees different version, same for mobile users
 
@@ -32,7 +32,7 @@ const quote = {
 };
 
 const LandingPage = () => {
-  const isLoggedIn = true; //localStorage.getItem("accessToken");
+  const isLoggedIn = false; //localStorage.getItem("accessToken");
   /*
   const [mostLikedQuotes, setMostLikedQuotes] = useState<QuoteResponse[]>([]);
   const [recentQuotes, setRecentQuotes] = useState<QuoteResponse[]>([]);
