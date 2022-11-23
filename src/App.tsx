@@ -4,6 +4,7 @@ import './App.css';
 import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import LandingPage from './pages/landing-page/LandingPage';
+import Profile from './pages/profile/Profile';
 import SignIn from './pages/sign-in/SignIn';
 import SignUp from './pages/sign-up/SignUp';
 import { UpdateProvider } from './utils/UpdateContext';
@@ -18,6 +19,7 @@ class App extends React.Component {
             <Route path="/" element={<LandingPage />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/profile" element={<Profile />} />
           </Routes>
           <Footer />
         </BrowserRouter>

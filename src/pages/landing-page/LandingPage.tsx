@@ -32,7 +32,7 @@ const quote = {
 };
 
 const LandingPage = () => {
-  const isLoggedIn = false; //localStorage.getItem("accessToken");
+  const isLoggedIn = true; //localStorage.getItem("accessToken");
   /*
   const [mostLikedQuotes, setMostLikedQuotes] = useState<QuoteResponse[]>([]);
   const [recentQuotes, setRecentQuotes] = useState<QuoteResponse[]>([]);

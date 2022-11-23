@@ -115,7 +115,7 @@ const SignUp = () => {
       <Background style={{ backgroundImage: `url(${Backgroundimg})` }}>
         <BackgroundIcon
           style={{ backgroundImage: `url(${BackgroundIconImg})` }}
-        ></BackgroundIcon>
+        />
       </Background>
     </Container>
   );

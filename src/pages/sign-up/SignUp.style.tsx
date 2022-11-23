@@ -20,7 +20,6 @@ export const Container = styled.div`
 export const Background = styled.div`
   z-index: -3;
   background: no-repeat;
-  background-color: red;
   background-size: cover;
   background-position: center;
   margin: 0px;

@@ -74,7 +74,7 @@ const SignIn = () => {
             </SignInFormSection>
           </SignInForm>
           <SigninText>
-          Do you want to create an account?
+            Do you want to create an account?
             <Link to="/signup" style={{ textDecoration: "none" }}>
               <p>Sign Up</p>
             </Link>
@@ -84,7 +84,7 @@ const SignIn = () => {
       <Background style={{ backgroundImage: `url(${Backgroundimg})` }}>
         <BackgroundIcon
           style={{ backgroundImage: `url(${BackgroundIconImg})` }}
-        ></BackgroundIcon>
+        />
       </Background>
     </Container>
   );
