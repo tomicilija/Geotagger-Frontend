@@ -79,10 +79,11 @@ const Navbar = () => {
         {isLoggedIn ? (
           <>
             <AddMobile
-              onClick={openQuoteModal}
               className={isBurgerMenuOpen ? "hideButton" : "showButton"}
             >
-              <AddPicture />
+              <Link to="/location/add" style={{ textDecoration: "none" }}>
+                <AddPicture />
+              </Link>
             </AddMobile>
             <Menu className={isBurgerMenuOpen ? "showMenuNav" : "hideMenuNav"}>
               <ButtonWrapper>
@@ -151,9 +152,11 @@ const Navbar = () => {
                       <DefaultProfileIcon />
                     </ButtonLoggedin>
                   </Link>
-                  <ButtonLoggedin onClick={openQuoteModal}>
-                    <AddPicture />
-                  </ButtonLoggedin>
+                  <Link to="/location/add" style={{ textDecoration: "none" }}>
+                    <ButtonLoggedin onClick={openQuoteModal}>
+                      <AddPicture />
+                    </ButtonLoggedin>
+                  </Link>
                 </IconWrapper>
               </ButtonWrapper>
             </Menu>

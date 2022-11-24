@@ -1,0 +1,160 @@
+import { useState, useEffect, useContext } from "react";
+import {
+  Container,
+  NotFound,
+  Wrapper,
+  Tittle,
+  UploadImage,
+  Image,
+  Buttons,
+  MapLocation,
+  Map,
+  Button,
+  Icon,
+} from "./AddLocation.style";
+import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
+/*import Card from "../../components/card/Card";
+import CardGrid from "../../components/card-grid/CardGrid";*/
+import { Link, useParams } from "react-router-dom";
+import { ReactComponent as DefaultProfileIcon } from "../../../assets/icons/profile.svg";
+import LocationImg from "../../assets/s6L0uQyprpE.png";
+/*import { getSignedInUser, getUserById, getUserVotes } from "../../api/UserApi";
+import { getMyQuote, getUserQuote } from "../../api/QuoteApi";
+import { UpdateContext } from "../../utils/UpdateContext";
+import { QuoteResponse } from "../../interfaces/QuoteInterfaces";*/
+import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
+import PlaceholderImage from "../../../assets/placeholder-location-image.png";
+import { preProcessFile } from "typescript";
+
+// On profile page user quote, karma, and liked quotes is displayed
+
+const AddLocation = () => {
+  const isLoggedIn = true; //localStorage.getItem("accessToken");
+  const [userid, setUserId] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [userQquote, setUserQquote] = useState("");
+  const [userKarma, setUserKarma] = useState(0);
+  // const [userVotes, setUserVotes] = useState<QuoteResponse[]>([]);
+  const [userHasLikes, setUserHasLikes] = useState(false);
+  const [showedQuotesDesktop, setShowedQuotesDesktop] = useState(9);
+  const [showedQuotesMobile, setShowedQuotesMobile] = useState(4);
+  const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
+    window.innerWidth > 1340
+  );
+  //const { updated } = useContext(UpdateContext);
+  const { id } = useParams();
+
+  const [coordinates, setCoordinates] = useState({
+    lat: 37.77414,
+    lng: -122.420052,
+  });
+
+  const mapsApiKey: string = process.env
+    .REACT_APP_GOOGLE_MAPS_API_KEY as string;
+
+  /*
+   * Profile page shows profile of logged in user when clicked on profile icon in navbar
+   * or profile of other usr when clicked on name on quote card
+   *
+   * Quote cards can be shown in grid of 3, 2, or 1 columns, depending on screen width
+   * 3 column grid shows max of 9 cards and lods by 9 cards
+   * 2 and 1 column shows max of 4 cards, and loads by 4 cards
+   */
+
+  const updateScreenSize = () => {
+    setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", updateScreenSize);
+    return () => window.removeEventListener("resize", updateScreenSize);
+  });
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: mapsApiKey,
+  });
+
+  useEffect(() => {
+    console.log(coordinates);
+  }, [coordinates]);
+
+  return (
+    <Container>
+      {isLoggedIn ? (
+        <>
+          <Wrapper>
+            <Tittle>
+              <h4>
+                Add a new <span>location</span>.
+              </h4>
+            </Tittle>
+            <form>
+              {/*onSubmit={handleSubmit}*/}
+              <UploadImage>
+                <Image>
+                  <img src={PlaceholderImage} alt="location" />
+                </Image>
+                <Buttons>
+                  <Button type="button" onClick={() => {}}>
+                    {" "}
+                    {/*{openDeleteModal}}*/}
+                    Upload image
+                  </Button>
+                  <Button type="button" onClick={() => {}}>
+                    {/*{openDeleteModal}}*/}
+                    <Icon
+                      style={{ backgroundImage: `url(${DeleteIconImg})` }}
+                    />
+                  </Button>
+                </Buttons>
+              </UploadImage>
+              <MapLocation>
+                {isLoaded ? (
+                  <Map>
+                    <GoogleMap
+                      zoom={10}
+                      center={coordinates}
+                      mapContainerClassName="map-container"
+                      options={{
+                        zoomControl: false,
+                        fullscreenControl: false,
+                        mapTypeControl: false,
+                        streetViewControl: false,
+                      }}
+                      onClick={(e: any) => {
+                        setCoordinates({
+                          lat: e.latLng?.lat() as number,
+                          lng: e.latLng?.lng() as number,
+                        });
+                      }}
+                    >
+                      <Marker position={{ lat: 37.77414, lng: -122.420052 }} />
+                    </GoogleMap>
+                  </Map>
+                ) : (
+                  <h3>Loading...</h3>
+                )}
+                <label htmlFor="location">Location</label>
+                <input type="location" required placeholder="Test" />
+                <button type="submit">Add new</button>
+              </MapLocation>
+            </form>
+          </Wrapper>
+        </>
+      ) : (
+        <NotFound>
+          <h3>
+            Error 402! <span>Unauthorized</span>.
+          </h3>
+          <p>You are not logged in. Please log in to add a new locaton.</p>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            Go to homepage
+          </Link>
+        </NotFound>
+      )}
+    </Container>
+  );
+};
+
+export default AddLocation;

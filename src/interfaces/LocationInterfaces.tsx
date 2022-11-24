@@ -38,14 +38,14 @@ export interface LoginResponse {
 }
 
 export interface CardNewProps {
-  locationid: string;
-  image: string;
+  locationid?: string;
+  image?: string;
 }
 
 export interface CardGuessedProps {
-  locationid: string;
-  image: string;
-  distance: number;
+  locationid?: string;
+  image?: string;
+  distance?: number;
 }
 
 export interface CardLockedProps {
@@ -58,12 +58,10 @@ export interface CardEditProps {
 }
 
 export interface GridProps {
-  quotes: {
-    userid: string;
-    karma: number;
-    text: string;
-    name: string;
-    surname: string;
+  locations: {
+    locationid?: string;
+    image?: string;
+    distance?: number;
   }[];
 }
 

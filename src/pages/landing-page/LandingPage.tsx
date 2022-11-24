@@ -22,6 +22,7 @@ import CardNew from "../../components/cards/card-new/CardNew";
 import LocationImg from "../../assets/s6L0uQyprpE.png";
 import CardGuessed from "../../components/cards/card-guessed/CardGuessed";
 import CardLocked from "../../components/cards/card-locked/CardLocked";
+import CardGrid from "../../components/card-grid/CardGrid";
 
 // One version of landing page can be shown to anyone, logged in user sees different version, same for mobile users
 
@@ -42,6 +43,25 @@ const LandingPage = () => {
   const [heroQuote1, setHeroQuote1] = useState<QuoteResponse>(quote);
   const [heroQuote2, setHeroQuote2] = useState<QuoteResponse>(quote);
   const [heroQuote3, setHeroQuote3] = useState<QuoteResponse>(quote);*/
+
+  const [newLocations, setNewLocations] = useState([
+    { locationid: "1", image: `${LocationImg}` },
+    { locationid: "2", image: `${LocationImg}` },
+    { locationid: "3", image: `${LocationImg}` },
+    { locationid: "4", image: `${LocationImg}` },
+    { locationid: "5", image: `${LocationImg}` },
+    { locationid: "6", image: `${LocationImg}` },
+  ]);
+
+  const [guessedLocations, setGuessedLocations] = useState([
+    { locationid: "1", image: `${LocationImg}`, distance: 222 },
+    { locationid: "2", image: `${LocationImg}`, distance: 87  },
+    { locationid: "3", image: `${LocationImg}`, distance: 1007077  },
+    { locationid: "4", image: `${LocationImg}`, distance: 1  },
+    { locationid: "5", image: `${LocationImg}`, distance: 544  },
+    { locationid: "6", image: `${LocationImg}`, distance: 833  },
+  ]);
+
   const [showedLikedQuotesDesktop, setShowedLikedQuotesDesktop] = useState(9);
   const [showedRecentQuotesDesktop, setShowedRecentQuotesDesktop] = useState(9);
   const [showedLikedQuotesMobile, setShowedLikedQuotesMobile] = useState(4);
@@ -117,6 +137,8 @@ const LandingPage = () => {
                 your personal records or set a new one!
               </p>
             </Tittle>
+            <CardGrid locations={guessedLocations} />
+            {/*
 
             <CardGuessed
               locationid={"1"}
@@ -124,7 +146,6 @@ const LandingPage = () => {
               distance={255}
             />
 
-            {/*
             {isThreeCollumnSizeGrid ? (
               <>
                 <CardGrid
@@ -150,9 +171,12 @@ const LandingPage = () => {
               </p>
             </Tittle>
 
+            <CardGrid locations={newLocations} />
+            {/*
+
             <CardNew locationid={"1"} image={`${LocationImg}`} />
 
-            {/*
+            
             {isThreeCollumnSizeGrid ? (
               <>
                 <CardGrid
