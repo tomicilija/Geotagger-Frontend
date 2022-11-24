@@ -123,7 +123,13 @@ export const MapLocation = styled.div`
 
 export const Image = styled.div`
   position: relative;
-  width: 100%;
+  width: 60vw;
+  height: 350px;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
   @media (max-width: 900px) {
   }
 `;
@@ -176,7 +182,7 @@ export const Icon = styled.div`
 
 export const Map = styled.div`
   position: relative;
-  height: 300px;
+  height: 200px;
   width: 100%;
 
   .map-container {

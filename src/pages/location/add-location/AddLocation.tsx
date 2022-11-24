@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import {
   Container,
   NotFound,
@@ -24,6 +24,7 @@ import { UpdateContext } from "../../utils/UpdateContext";
 import { QuoteResponse } from "../../interfaces/QuoteInterfaces";*/
 import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
+import  * as img from "../../../assets/placeholder-location-image.png";
 import { preProcessFile } from "typescript";
 
 // On profile page user quote, karma, and liked quotes is displayed
@@ -79,6 +80,34 @@ const AddLocation = () => {
     console.log(coordinates);
   }, [coordinates]);
 
+  const [image, setImage] = useState<File>();
+  const [preview, setPreview] = useState<string>(PlaceholderImage);
+
+  useEffect(() => {
+  if (image) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(image);
+  }
+}, [image]);
+
+  const handleUpload = async () => {
+    document.getElementById("selectImages")!.click();
+  };
+
+  const handleDiscard = async () => {
+    setPreview(PlaceholderImage)
+    document.getElementById("selectImages")!.blur();
+    setImage(undefined)
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files![0];
+    setImage(file);
+  };
+
   return (
     <Container>
       {isLoggedIn ? (
@@ -93,20 +122,24 @@ const AddLocation = () => {
               {/*onSubmit={handleSubmit}*/}
               <UploadImage>
                 <Image>
-                  <img src={PlaceholderImage} alt="location" />
+                  <img src={preview} alt="location" style={{ objectFit: "cover" }} />
                 </Image>
                 <Buttons>
-                  <Button type="button" onClick={() => {}}>
-                    {" "}
-                    {/*{openDeleteModal}}*/}
+                  <Button type="button" onClick={handleUpload}>
                     Upload image
                   </Button>
-                  <Button type="button" onClick={() => {}}>
-                    {/*{openDeleteModal}}*/}
+                  <Button type="button" onClick={handleDiscard}>
                     <Icon
                       style={{ backgroundImage: `url(${DeleteIconImg})` }}
                     />
                   </Button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="selectImages"
+                    onChange={(e) => handleChange(e)}
+                    style={{ display: "none" }}
+                  />
                 </Buttons>
               </UploadImage>
               <MapLocation>
