@@ -5,6 +5,7 @@ import Footer from './components/footer/Footer';
 import Navbar from './components/navbar/Navbar';
 import LandingPage from './pages/landing-page/LandingPage';
 import AddLocation from './pages/location/add-location/AddLocation';
+import EditLocation from './pages/location/edit-location/EditLocation';
 import Profile from './pages/profile/Profile';
 import SignIn from './pages/sign-in/SignIn';
 import SignUp from './pages/sign-up/SignUp';
@@ -22,6 +23,7 @@ class App extends React.Component {
             <Route path="/signin" element={<SignIn />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/location/add" element={<AddLocation />} />
+            <Route path="/location/edit/*" element={<EditLocation />} />
           </Routes>
           <Footer />
         </BrowserRouter>

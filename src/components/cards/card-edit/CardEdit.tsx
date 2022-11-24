@@ -110,7 +110,7 @@ const CardEdit: React.FC<CardEditProps> = ({
           <img src={image} alt="location" />
           <Edit>
             <Link
-              to={`/location/${locationid}`}
+              to={`/location/edit/${locationid}`}
               style={{ textDecoration: "none" }}
             >
               <Button>

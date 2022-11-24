@@ -11,7 +11,7 @@ import {
   Map,
   Button,
   Icon,
-} from "./AddLocation.style";
+} from "./EditLocation.style";
 import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 /*import Card from "../../components/card/Card";
 import CardGrid from "../../components/card-grid/CardGrid";*/
@@ -24,12 +24,12 @@ import { UpdateContext } from "../../utils/UpdateContext";
 import { QuoteResponse } from "../../interfaces/QuoteInterfaces";*/
 import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
-import  * as img from "../../../assets/placeholder-location-image.png";
+import * as img from "../../../assets/placeholder-location-image.png";
 import { preProcessFile } from "typescript";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
-const AddLocation = () => {
+const EditLocation = () => {
   const isLoggedIn = true; //localStorage.getItem("accessToken");
   const [userid, setUserId] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -50,6 +50,8 @@ const AddLocation = () => {
     lat: 37.77414,
     lng: -122.420052,
   });
+
+  const locationName = "Liegue St 523, Monaco";
 
   const mapsApiKey: string = process.env
     .REACT_APP_GOOGLE_MAPS_API_KEY as string;
@@ -84,23 +86,23 @@ const AddLocation = () => {
   const [preview, setPreview] = useState<string>(PlaceholderImage);
 
   useEffect(() => {
-  if (image) {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result as string);
-    };
-    reader.readAsDataURL(image);
-  }
-}, [image]);
+    if (image) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(image);
+    }
+  }, [image]);
 
   const handleUpload = async () => {
     document.getElementById("selectImages")!.click();
   };
 
   const handleDiscard = async () => {
-    setPreview(PlaceholderImage)
+    setPreview(PlaceholderImage);
     document.getElementById("selectImages")!.blur();
-    setImage(undefined)
+    setImage(undefined);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,24 +117,30 @@ const AddLocation = () => {
           <Wrapper>
             <Tittle>
               <h4>
-                Add a new <span>location</span>.
+                Edit <span>location</span>.
               </h4>
             </Tittle>
             <form>
               {/*onSubmit={handleSubmit}*/}
               <UploadImage>
                 <Image>
-                  <img src={preview} alt="location" style={{ objectFit: "cover" }} />
+                  <img
+                    src={preview}
+                    alt="location"
+                    style={{ objectFit: "cover" }}
+                  />
                 </Image>
+                <p>Location: {locationName}</p>
                 <Buttons>
                   <Button type="button" onClick={handleUpload}>
                     Upload image
                   </Button>
-                  <Button type="button" onClick={handleDiscard}>
-                    <Icon
-                      style={{ backgroundImage: `url(${DeleteIconImg})` }}
-                    />
-                  </Button>
+                  <div>
+                    <Button type="button">Save</Button>
+                    <Button type="button" onClick={handleDiscard}>
+                      Cancel
+                    </Button>
+                  </div>
                   <input
                     type="file"
                     accept="image/*"
@@ -142,6 +150,7 @@ const AddLocation = () => {
                   />
                 </Buttons>
               </UploadImage>
+              {/*
               <MapLocation>
                 {isLoaded ? (
                   <Map>
@@ -171,7 +180,7 @@ const AddLocation = () => {
                 <label htmlFor="location">Location</label>
                 <input type="location" required placeholder="Test" />
                 <button type="submit">Add new</button>
-              </MapLocation>
+                </MapLocation>*/}
             </form>
           </Wrapper>
         </>
@@ -190,4 +199,4 @@ const AddLocation = () => {
   );
 };
 
-export default AddLocation;
+export default EditLocation;
