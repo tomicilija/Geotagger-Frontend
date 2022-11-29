@@ -77,61 +77,6 @@ export const UploadImage = styled.div`
   }
 `;
 
-export const MapLocation = styled.div`
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: column;
-
-  justify-content: center;
-  align-items: center;
-  align-content: center;
-  text-align: center;
-
-  width: 100%;
-  padding: 20px;
-
-  label {
-    width: 100%;
-    margin-top: 20px;
-    font-family: "Roboto";
-    font-style: normal;
-    font-weight: 400;
-    font-size: 16px;
-    color: #000000;
-
-    text-align: start;
-  }
-
-  input {
-    width: 100%;
-    height: 50px;
-    margin-top: 15px;
-    padding: 10px;
-
-    border: 1px solid rgba(0, 0, 0, 0.23);
-    border-radius: 4px;
-
-    font-family: "Roboto";
-    font-style: normal;
-    font-weight: 400;
-    font-size: 16px;
-    color: #000000;
-
-    text-align: start;
-  }
-
-  button {
-    align-self: flex-end;
-    margin-top: 15px;
-    width: 140px;
-    height: 40px;
-  }
-
-  @media (max-width: 900px) {
-  }
-`;
-
 export const Image = styled.div`
   position: relative;
   width: 60vw;
@@ -206,29 +151,6 @@ export const Button = styled.button`
 
   :hover {
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
-  }
-`;
-
-export const Icon = styled.div`
-  position: relative;
-  background: no-repeat;
-  background-size: cover;
-  display: flex;
-  width: 15px;
-  height: 15px;
-`;
-
-export const Map = styled.div`
-  position: relative;
-  height: 200px;
-  width: 100%;
-
-  .map-container {
-    height: 300px;
-    width: 100%;
-  }
-
-  @media (max-width: 900px) {
   }
 `;
 

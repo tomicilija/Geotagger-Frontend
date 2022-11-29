@@ -99,7 +99,7 @@ const CardNew: React.FC<CardNewProps> = ({
       <Location>
         <Image>
           <img src={image} alt="location" />
-          <Link to={`/guess/${locationid}`} style={{ textDecoration: "none" }}>
+          <Link to={`/location/${locationid}`} style={{ textDecoration: "none" }}>
             <Guess>
               <Button>Guess</Button>
             </Guess>

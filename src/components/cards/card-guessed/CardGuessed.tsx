@@ -110,7 +110,7 @@ const CardGuessed: React.FC<CardGuessedProps> = ({
           <Overlay>
             <p>{distance} m</p>
           </Overlay>
-          <Link to={`/guess/${locationid}`} style={{ textDecoration: "none" }}>
+          <Link to={`/location/${locationid}`} style={{ textDecoration: "none" }}>
             <Guess>
               <Button>Guess</Button>
             </Guess>

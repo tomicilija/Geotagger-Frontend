@@ -169,7 +169,7 @@ const AddLocation = () => {
                   <h3>Loading...</h3>
                 )}
                 <label htmlFor="location">Location</label>
-                <input type="location" required placeholder="Test" />
+                <input type="location" required />
                 <button type="submit">Add new</button>
               </MapLocation>
             </form>

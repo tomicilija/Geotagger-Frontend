@@ -7,10 +7,7 @@ import {
   UploadImage,
   Image,
   Buttons,
-  MapLocation,
-  Map,
   Button,
-  Icon,
 } from "./EditLocation.style";
 import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 /*import Card from "../../components/card/Card";
@@ -150,37 +147,6 @@ const EditLocation = () => {
                   />
                 </Buttons>
               </UploadImage>
-              {/*
-              <MapLocation>
-                {isLoaded ? (
-                  <Map>
-                    <GoogleMap
-                      zoom={11}
-                      center={coordinates}
-                      mapContainerClassName="map-container"
-                      options={{
-                        zoomControl: false,
-                        fullscreenControl: false,
-                        mapTypeControl: false,
-                        streetViewControl: false,
-                      }}
-                      onClick={(e: any) => {
-                        setCoordinates({
-                          lat: e.latLng?.lat() as number,
-                          lng: e.latLng?.lng() as number,
-                        });
-                      }}
-                    >
-                      <Marker position={{ lat: 37.77414, lng: -122.420052 }} />
-                    </GoogleMap>
-                  </Map>
-                ) : (
-                  <h3>Loading...</h3>
-                )}
-                <label htmlFor="location">Location</label>
-                <input type="location" required placeholder="Test" />
-                <button type="submit">Add new</button>
-                </MapLocation>*/}
             </form>
           </Wrapper>
         </>
