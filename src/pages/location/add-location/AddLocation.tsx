@@ -11,6 +11,7 @@ import {
   Map,
   Button,
   Icon,
+  Form,
 } from "./AddLocation.style";
 import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 /*import Card from "../../components/card/Card";
@@ -24,7 +25,7 @@ import { UpdateContext } from "../../utils/UpdateContext";
 import { QuoteResponse } from "../../interfaces/QuoteInterfaces";*/
 import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
-import  * as img from "../../../assets/placeholder-location-image.png";
+import * as img from "../../../assets/placeholder-location-image.png";
 import { preProcessFile } from "typescript";
 
 // On profile page user quote, karma, and liked quotes is displayed
@@ -84,23 +85,23 @@ const AddLocation = () => {
   const [preview, setPreview] = useState<string>(PlaceholderImage);
 
   useEffect(() => {
-  if (image) {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result as string);
-    };
-    reader.readAsDataURL(image);
-  }
-}, [image]);
+    if (image) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(image);
+    }
+  }, [image]);
 
   const handleUpload = async () => {
     document.getElementById("selectImages")!.click();
   };
 
   const handleDiscard = async () => {
-    setPreview(PlaceholderImage)
+    setPreview(PlaceholderImage);
     document.getElementById("selectImages")!.blur();
-    setImage(undefined)
+    setImage(undefined);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,58 +121,64 @@ const AddLocation = () => {
             </Tittle>
             <form>
               {/*onSubmit={handleSubmit}*/}
-              <UploadImage>
-                <Image>
-                  <img src={preview} alt="location" style={{ objectFit: "cover" }} />
-                </Image>
-                <Buttons>
-                  <Button type="button" onClick={handleUpload}>
-                    Upload image
-                  </Button>
-                  <Button type="button" onClick={handleDiscard}>
-                    <Icon
-                      style={{ backgroundImage: `url(${DeleteIconImg})` }}
+              <Form>
+                <UploadImage>
+                  <Image>
+                    <img
+                      src={preview}
+                      alt="location"
+                      style={{ objectFit: "cover" }}
                     />
-                  </Button>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    id="selectImages"
-                    onChange={(e) => handleChange(e)}
-                    style={{ display: "none" }}
-                  />
-                </Buttons>
-              </UploadImage>
-              <MapLocation>
-                {isLoaded ? (
-                  <Map>
-                    <GoogleMap
-                      zoom={11}
-                      center={coordinates}
-                      mapContainerClassName="map-container"
-                      options={{
-                        zoomControl: false,
-                        fullscreenControl: false,
-                        mapTypeControl: false,
-                        streetViewControl: false,
-                      }}
-                      onClick={(e: any) => {
-                        setCoordinates({
-                          lat: e.latLng?.lat() as number,
-                          lng: e.latLng?.lng() as number,
-                        });
-                      }}
-                    >
-                      <Marker position={{ lat: 37.77414, lng: -122.420052 }} />
-                    </GoogleMap>
-                  </Map>
-                ) : (
-                  <h3>Loading...</h3>
-                )}
-                <label htmlFor="location">Location</label>
-                <input type="location" required />
-                <button type="submit">Add new</button>
-              </MapLocation>
+                  </Image>
+                  <Buttons>
+                    <Button type="button" onClick={handleUpload}>
+                      Upload image
+                    </Button>
+                    <Button type="button" onClick={handleDiscard}>
+                      <Icon
+                        style={{ backgroundImage: `url(${DeleteIconImg})` }}
+                      />
+                    </Button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="selectImages"
+                      onChange={(e) => handleChange(e)}
+                      style={{ display: "none" }}
+                    />
+                  </Buttons>
+                </UploadImage>
+                <MapLocation>
+                  {isLoaded ? (
+                    <Map>
+                      <GoogleMap
+                        zoom={11}
+                        center={coordinates}
+                        mapContainerClassName="map-container"
+                        options={{
+                          keyboardShortcuts: false,
+                          disableDefaultUI: true,
+                        }}
+                        onClick={(e: any) => {
+                          setCoordinates({
+                            lat: e.latLng?.lat() as number,
+                            lng: e.latLng?.lng() as number,
+                          });
+                        }}
+                      >
+                        <Marker
+                          position={{ lat: 37.77414, lng: -122.420052 }}
+                        />
+                      </GoogleMap>
+                    </Map>
+                  ) : (
+                    <h3>Loading...</h3>
+                  )}
+                  <label htmlFor="location">Location</label>
+                  <input type="location" required />
+                  <button type="submit">Add new</button>
+                </MapLocation>
+              </Form>
             </form>
           </Wrapper>
         </>

@@ -22,6 +22,7 @@ import {
   GuessTime,
   GuessForm,
   GuessFormSection,
+  Form,
 } from "./GuessLocation.style";
 import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 /*import Card from "../../components/card/Card";
@@ -57,8 +58,7 @@ const GuessLocation = () => {
   //const { updated } = useContext(UpdateContext);
   const { id } = useParams();
 
-  
-  const isLocationGuessed = true; 
+  const isLocationGuessed = true;
 
   const [coordinates, setCoordinates] = useState({
     lat: 37.77414,
@@ -133,54 +133,56 @@ const GuessLocation = () => {
               </h4>
             </Tittle>
             <form>
-              {/*onSubmit={handleSubmit}*/}
-              <UploadImage>
-                <Image>
-                  <img
-                    src={preview}
-                    alt="location"
-                    style={{ objectFit: "cover" }}
-                  />
-                </Image>
-              </UploadImage>
-              <MapLocation>
-                {isLoaded ? (
-                  <Map>
-                    <GoogleMap
-                      zoom={11}
-                      center={coordinates}
-                      mapContainerClassName="map-container"
-                      options={{
-                        zoomControl: false,
-                        fullscreenControl: false,
-                        mapTypeControl: false,
-                        streetViewControl: false,
-                      }}
-                      onClick={(e: any) => {
-                        setCoordinates({
-                          lat: e.latLng?.lat() as number,
-                          lng: e.latLng?.lng() as number,
-                        });
-                      }}
-                    >
-                      <Marker position={{ lat: 37.77414, lng: -122.420052 }} />
-                    </GoogleMap>
-                  </Map>
-                ) : (
-                  <h3>Loading...</h3>
-                )}
-                <GuessForm>
-                  <GuessFormSection>
-                    <label htmlFor="errDist">Error distance</label>
-                    <input type="errDist" required />
-                  </GuessFormSection>
-                  <GuessFormSection>
-                    <label htmlFor="location">Location</label>
-                    <input type="location" required />
-                  </GuessFormSection>
-                </GuessForm>
-                <button type="submit">Guess</button>
-              </MapLocation>
+              <Form>
+                {/*onSubmit={handleSubmit}*/}
+                <UploadImage>
+                  <Image>
+                    <img
+                      src={preview}
+                      alt="location"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </Image>
+                </UploadImage>
+                <MapLocation>
+                  {isLoaded ? (
+                    <Map>
+                      <GoogleMap
+                        zoom={11}
+                        center={coordinates}
+                        mapContainerClassName="map-container"
+                        options={{
+                          keyboardShortcuts: false,
+                          disableDefaultUI: true,
+                        }}
+                        onClick={(e: any) => {
+                          setCoordinates({
+                            lat: e.latLng?.lat() as number,
+                            lng: e.latLng?.lng() as number,
+                          });
+                        }}
+                      >
+                        <Marker
+                          position={{ lat: 37.77414, lng: -122.420052 }}
+                        />
+                      </GoogleMap>
+                    </Map>
+                  ) : (
+                    <h3>Loading...</h3>
+                  )}
+                  <GuessForm>
+                    <GuessFormSection>
+                      <label htmlFor="errDist">Error distance</label>
+                      <input type="errDist" required />
+                    </GuessFormSection>
+                    <GuessFormSection>
+                      <label htmlFor="location">Location</label>
+                      <input type="location" required />
+                    </GuessFormSection>
+                  </GuessForm>
+                  <button type="submit">Guess</button>
+                </MapLocation>
+              </Form>
             </form>
           </Wrapper>
           <Leaderboard>

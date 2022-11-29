@@ -23,17 +23,14 @@ export const Wrapper = styled.div`
   align-items: center; //  stretch | flex-start | flex-end | center | baseline | first baseline | last baseline
   align-content: center; //  flex-start | flex-end | center | space-between | space-around | space-evenly | stretch
   text-align: start;
-  margin-top: 200px;
-  padding: 50px;
+  margin-top: 150px;
+  gap: 32px;
   width: 100%;
 
   @media (max-width: 900px) {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-
-    margin: 0;
+    margin-top: 10px;
     padding: 30px;
+    gap: 32px;
   }
 `;
 
@@ -60,11 +57,13 @@ export const Tittle = styled.div`
 
 export const UploadImage = styled.div`
   position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
   width: 100%;
-  padding: 20px;
+  gap: 23px;
 
   p {
-    margin-top: 25px;
     font-family: "Roboto";
     font-style: normal;
     font-weight: 400;
@@ -74,19 +73,24 @@ export const UploadImage = styled.div`
     opacity: 0.7;
   }
   @media (max-width: 900px) {
+    padding: 0;
   }
 `;
 
 export const Image = styled.div`
   position: relative;
   width: 60vw;
-  height: 350px;
+  height: 35vh;
+  min-height: 350px;
   img {
     width: 100%;
     height: 100%;
+    border-radius: 4px;
     object-fit: cover;
   }
   @media (max-width: 900px) {
+    width: 100%;
+    min-height: 200px;
   }
 `;
 
@@ -132,6 +136,14 @@ export const Buttons = styled.div`
     }
   }
   @media (max-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0px;
+    gap: 23px;
+    div{
+    justify-content: space-between;
+    }
   }
 `;
 
@@ -143,9 +155,8 @@ export const Button = styled.button`
   align-self: flex-start;
 
   padding: 8px 16px;
-  width: 200px;
+  width: 100%;
   height: 40px;
-  margin: 20px 0 0 0;
 
   cursor: pointer;
 

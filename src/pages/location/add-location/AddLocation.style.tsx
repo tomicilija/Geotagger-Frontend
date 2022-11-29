@@ -26,14 +26,24 @@ export const Wrapper = styled.div`
   margin-top: 100px;
   padding: 50px;
   width: 100%;
+  gap: 16px;
 
   @media (max-width: 900px) {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-
-    margin: 0;
+    margin-top: 10px;
     padding: 30px;
+    gap: 32px;
+  }
+`;
+
+export const Form = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0px;
+  gap: 23px;
+
+  @media (max-width: 900px) {
+    gap: 16px;
   }
 `;
 
@@ -60,9 +70,13 @@ export const Tittle = styled.div`
 
 export const UploadImage = styled.div`
   position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
   width: 100%;
-  padding: 20px;
+  gap: 20px;
   @media (max-width: 900px) {
+    padding: 0;
   }
 `;
 
@@ -78,11 +92,10 @@ export const MapLocation = styled.div`
   text-align: center;
 
   width: 100%;
-  padding: 20px;
+  gap: 20px;
 
   label {
     width: 100%;
-    margin-top: 20px;
     font-family: "Roboto";
     font-style: normal;
     font-weight: 400;
@@ -95,7 +108,6 @@ export const MapLocation = styled.div`
   input {
     width: 100%;
     height: 50px;
-    margin-top: 15px;
     padding: 10px;
 
     border: 1px solid rgba(0, 0, 0, 0.23);
@@ -112,25 +124,34 @@ export const MapLocation = styled.div`
 
   button {
     align-self: flex-end;
-    margin-top: 15px;
     width: 140px;
     height: 40px;
   }
 
   @media (max-width: 900px) {
+    padding: 0;
+    gap: 16px;
+
+    button {
+      width: 100%;
+    }
   }
 `;
 
 export const Image = styled.div`
   position: relative;
   width: 60vw;
-  height: 350px;
+  height: 25vh;
+  min-height: 250px;
   img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 4px;
   }
   @media (max-width: 900px) {
+    width: 100%;
+    min-height: 200px;
   }
 `;
 
@@ -142,6 +163,7 @@ export const Buttons = styled.div`
   align-items: flex-end;
   align-self: flex-end;
   width: 100%;
+  gap: 20px;
   @media (max-width: 900px) {
   }
 `;
@@ -156,7 +178,6 @@ export const Button = styled.button`
   padding: 8px 16px;
   width: 200px;
   height: 40px;
-  margin: 20px 0 0 20px;
 
   :nth-child(2) {
     width: 40px;
@@ -168,6 +189,9 @@ export const Button = styled.button`
 
   :hover {
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+  }
+  @media (max-width: 900px) {
+    width: 90%;
   }
 `;
 
@@ -182,15 +206,20 @@ export const Icon = styled.div`
 
 export const Map = styled.div`
   position: relative;
-  height: 200px;
+  height: 20vh;
+  min-height: 200px;
   width: 100%;
 
   .map-container {
-    height: 300px;
+    height: 20vh;
+    min-height: 200px;
     width: 100%;
+    border-radius: 4px;
   }
 
   @media (max-width: 900px) {
+    width: 100%;
+    min-height: 200px;
   }
 `;
 

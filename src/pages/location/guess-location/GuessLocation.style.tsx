@@ -37,10 +37,21 @@ export const Wrapper = styled.div`
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    gap: 30px;
+    gap: 23px;
 
     margin: 0;
-    padding: 30px;
+    padding: 20px;
+  }
+`;
+
+export const Form = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0px;
+
+  @media (max-width: 900px) {
+    gap: 16px;
   }
 `;
 
@@ -67,6 +78,7 @@ export const UploadImage = styled.div`
   width: 100%;
   padding: 20px;
   @media (max-width: 900px) {
+    padding: 0;
   }
 `;
 
@@ -92,6 +104,7 @@ export const MapLocation = styled.div`
   }
 
   @media (max-width: 900px) {
+    padding: 0;
   }
 `;
 
@@ -103,6 +116,7 @@ export const Image = styled.div`
   img {
     width: 100%;
     height: 100%;
+    border-radius: 4px;
     object-fit: cover;
   }
 
@@ -127,6 +141,7 @@ export const Map = styled.div`
     height: 25vh;
     min-height: 250px;
     width: 100%;
+    border-radius: 4px;
   }
 
   @media (max-width: 900px) {
@@ -143,6 +158,9 @@ export const GuessForm = styled.div`
   gap: 30px;
   width: 100%;
   @media (max-width: 900px) {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
   }
 `;
 
@@ -189,6 +207,13 @@ export const GuessFormSection = styled.div`
     text-align: start;
   }
   @media (max-width: 900px) {
+    width: 100%;
+    :nth-child(1) {
+      width: 100%;
+    }
+    :nth-child(2) {
+      width: 100%;
+    }
   }
 `;
 
@@ -210,13 +235,16 @@ export const Leaderboard = styled.div`
   min-height: 650px;
 
   @media (max-width: 900px) {
-    width: 100%;
     display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
     margin: 0;
-    padding: 10px;
+    gap: 32px;
+    height: 100%;
+    min-height: 0;
+    width: 100%;
+    min-width: 280px;
   }
 `;
 
@@ -231,6 +259,9 @@ export const Table = styled.div`
   .true {
     background: #619b8a;
     border-radius: 4px;
+  }
+
+  @media (max-width: 900px) {
   }
 `;
 
@@ -256,6 +287,9 @@ export const Row = styled.div`
     .rank {
       background: linear-gradient(41.75deg, #956956 22.78%, #d79376 87.18%);
     }
+  }
+
+  @media (max-width: 900px) {
   }
 `;
 
