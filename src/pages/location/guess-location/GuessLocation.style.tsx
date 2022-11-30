@@ -228,7 +228,8 @@ export const Leaderboard = styled.div`
   align-content: flex-start;
   text-align: start;
   margin-top: 150px;
-  padding: 10px;
+  gap: 16px;
+  padding: 0 10px 0 10px;
   width: 20%;
   min-width: 420px;
   height: 80vh;

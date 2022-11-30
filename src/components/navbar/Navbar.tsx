@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Container,
   Logo,
@@ -21,6 +21,10 @@ import { ReactComponent as RightArrow } from "../../assets/arrows/rightArrow.svg
 import { ReactComponent as RightArrowGreen } from "../../assets/arrows/rightArrow-green.svg";
 import { ReactComponent as DefaultProfileIcon } from "../../assets/icons/profile.svg";
 import { ReactComponent as AddPicture } from "../../assets/icons/add.svg";
+import ProfileSettings from "../modals/profile-settings/ProfileSettings";
+import DeleteQuote from "../modals/delete-location/DeleteLocation";
+import { UpdateContext } from "../../utils/UpdateContext";
+import DeleteLocation from "../modals/delete-location/DeleteLocation";
 /*
 import ProfileSettings from "../modals/profile-settings/ProfileSettings";
 import CreateQuote from "../modals/create-quote/CreateQuote";
@@ -40,13 +44,9 @@ const Navbar = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState<boolean>(false);
-  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);
 
-  const openQuoteModal = () => {
-    setIsQuoteModalOpen((prev) => !prev);
-  };
   const openSettingsModal = () => {
     setIsSettingsModalOpen((prev) => !prev);
   };
@@ -153,23 +153,18 @@ const Navbar = () => {
                     </ButtonLoggedin>
                   </Link>
                   <Link to="/location/add" style={{ textDecoration: "none" }}>
-                    <ButtonLoggedin onClick={openQuoteModal}>
+                    <ButtonLoggedin>
                       <AddPicture />
                     </ButtonLoggedin>
                   </Link>
                 </IconWrapper>
               </ButtonWrapper>
             </Menu>
-            {/* 
-          <ProfileSettings
-            isSettingsOpen={isSettingsModalOpen}
-            setIsSettingsOpen={setIsSettingsModalOpen}
-          />
-          <CreateQuote
-            isQuoteOpen={isQuoteModalOpen}
-            setIsQuoteOpen={setIsQuoteModalOpen}
-          />
-          */}
+            <ProfileSettings
+              isSettingsOpen={isSettingsModalOpen}
+              setIsSettingsOpen={setIsSettingsModalOpen}
+            />
+            <DeleteLocation />
           </>
         ) : (
           <Menu className={isBurgerMenuOpen ? "showMenuNav" : "hideMenuNav"}>

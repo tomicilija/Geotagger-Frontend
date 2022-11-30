@@ -39,6 +39,13 @@ const CardEdit: React.FC<CardEditProps> = ({
   const [quoteVoteStatus, setQuoteVoteStatus] = useState("");
   const [userKarma, setUserKarma] = useState(0);
   const { updated, setUpdated } = useContext(UpdateContext);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+
+  const openDeleteModal = () => {
+    localStorage.setItem("isDeleteModalOpen", "true");
+    setUpdated(!updated);
+  };
+
   /*
   useEffect(() => {
     setUserKarma(karma);
@@ -104,27 +111,30 @@ const CardEdit: React.FC<CardEditProps> = ({
   };*/
 
   return (
-    <Container>
-      <Location>
-        <Image>
-          <img src={image} alt="location" />
-          <Edit>
-            <Link
-              to={`/location/edit/${locationid}`}
-              style={{ textDecoration: "none" }}
-            >
-              <Button>
-                <Icon style={{ backgroundImage: `url(${EditIconImg})` }} />
+    <>
+      <Container>
+        <Location>
+          <Image>
+            <img src={image} alt="location" />
+            <Edit>
+              <Link
+                to={`/location/edit/${locationid}`}
+                style={{ textDecoration: "none" }}
+              >
+                <Button>
+                  <Icon style={{ backgroundImage: `url(${EditIconImg})` }} />
+                </Button>
+              </Link>
+              <Button
+                onClick={openDeleteModal}
+              >
+                <Icon style={{ backgroundImage: `url(${DeleteIconImg})` }} />
               </Button>
-            </Link>
-            <Button onClick={() => {}}>
-              {/*{openDeleteModal}}*/}
-              <Icon style={{ backgroundImage: `url(${DeleteIconImg})` }} />
-            </Button>
-          </Edit>
-        </Image>
-      </Location>
-    </Container>
+            </Edit>
+          </Image>
+        </Location>
+      </Container>
+    </>
   );
 };
 

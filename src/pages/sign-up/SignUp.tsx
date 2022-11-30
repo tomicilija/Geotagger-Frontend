@@ -49,6 +49,7 @@ const SignUp = () => {
           <p>Your name will appear on posts and your public profle.</p>
           <h5>{ErrorMessage}</h5>
         </SignUpHeader>
+        {/*TODO: select and upload progile picture*/}
         <DefaultProfilePicture />
         <form>
           {/*onSubmit={handleSubmit}*/}
@@ -83,6 +84,7 @@ const SignUp = () => {
               </SignUpFormSection>
             </TwoInRow>
             <SignUpFormSection>
+              {/*TODO: sadd peak password button*/}
               <label htmlFor="password">Password</label>
               <input
                 type="password"

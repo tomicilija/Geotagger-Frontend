@@ -65,9 +65,9 @@ export interface GridProps {
   }[];
 }
 
-export interface CreateQuoteProps {
-  isQuoteOpen: boolean;
-  setIsQuoteOpen: (isQuoteOpen: boolean) => void;
+export interface DeleteLocationProps {
+  isDeleteOpen: boolean;
+  setIsDeleteOpen: (isQuoteOpen: boolean) => void;
 }
 
 export interface ProfileSettingsProps {
