@@ -352,3 +352,30 @@ export const DesktopLink = styled.div`
     display: none;
   }
 `;
+
+export const ProfilePicture = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+
+  background: #ffffff;
+  border-radius: 40px;
+  border: none;
+  img {
+    height: 40px;
+    width: 40px;
+    border-radius: 40px;
+    object-fit: cover;
+  }
+  @media (max-width: 900px) {
+    height: 40px;
+    width: 40px!important;
+    img {
+      height: 40px;
+      width: 40px!important;
+    }
+  }
+`;

@@ -11,8 +11,6 @@ import {
   Button,
   BgMap,
 } from "./LandingPage.style";
-//import Card from "../../components/card/Card";
-//import CardGrid from "../../components/card-grid/CardGrid";
 import { Link } from "react-router-dom";
 //import { getMostUpvoatedQuotes, getMostRecentQuotes } from "../../api/QuoteApi";
 import { UpdateContext } from "../../utils/UpdateContext";
@@ -35,7 +33,7 @@ const quote = {
 };
 
 const LandingPage = () => {
-  const isLoggedIn = true; //localStorage.getItem("accessToken");
+  const isLoggedIn = localStorage.getItem("accessToken");
   /*
   const [mostLikedQuotes, setMostLikedQuotes] = useState<QuoteResponse[]>([]);
   const [recentQuotes, setRecentQuotes] = useState<QuoteResponse[]>([]);
@@ -55,11 +53,11 @@ const LandingPage = () => {
 
   const [guessedLocations, setGuessedLocations] = useState([
     { locationid: "1", image: `${LocationImg}`, distance: 222 },
-    { locationid: "2", image: `${LocationImg}`, distance: 87  },
-    { locationid: "3", image: `${LocationImg}`, distance: 1007077  },
-    { locationid: "4", image: `${LocationImg}`, distance: 1  },
-    { locationid: "5", image: `${LocationImg}`, distance: 544  },
-    { locationid: "6", image: `${LocationImg}`, distance: 833  },
+    { locationid: "2", image: `${LocationImg}`, distance: 87 },
+    { locationid: "3", image: `${LocationImg}`, distance: 1007077 },
+    { locationid: "4", image: `${LocationImg}`, distance: 1 },
+    { locationid: "5", image: `${LocationImg}`, distance: 544 },
+    { locationid: "6", image: `${LocationImg}`, distance: 833 },
   ]);
 
   const [showedLikedQuotesDesktop, setShowedLikedQuotesDesktop] = useState(9);
@@ -220,15 +218,12 @@ const LandingPage = () => {
               </p>
             </Slogan>
           </SloganWrapper>
-          <Wrapper>
-            <MostUpvoated>
-              <CardLocked image={`${LocationImg}`} />
-
-              <Link to="/signup" style={{ textDecoration: "none" }}>
-                <Button>Sign up</Button>
-              </Link>
-            </MostUpvoated>
-          </Wrapper>
+          <MostUpvoated>
+            <CardLocked image={`${LocationImg}`} />
+            <Link to="/signup" style={{ textDecoration: "none" }}>
+              <Button>Sign up</Button>
+            </Link>
+          </MostUpvoated>
         </>
       )}
     </Container>

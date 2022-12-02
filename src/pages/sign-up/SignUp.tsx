@@ -8,13 +8,17 @@ import {
   TwoInRow,
   SigninText,
   BackgroundIcon,
+  Image,
+  Button,
+  Icon,
 } from "./SignUp.style";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ReactComponent as DefaultProfilePicture } from "../../assets/default-avatar.svg";
-//import { signUp } from "../../api/UserApi";
+import ProfilePicture from "../../assets/DefaultAvatar.png";
+import { signUp } from "../../api/UserApi";
 import Backgroundimg from "../../assets/background/background-signup-map.svg";
 import BackgroundIconImg from "../../assets/icons/logo-icon-border.svg";
+import UploadIconImg from "../../assets/icons/upload-white-icon.png";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -24,23 +28,46 @@ const SignUp = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
-  /*
+
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>(ProfilePicture);
+
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
     (async () => {
       await signUp({
         email: email,
-        pass: password,
-        passConfirm: passwordConfirm,
+        password: password,
+        passwordConfirm: passwordConfirm,
         name: firstName,
         surname: lastName,
+        profilePicture: image!,
       });
       return navigate("/signin");
     })().catch((err) => {
       setErrorMessage(err.response.data.message);
     });
   };
-*/
+
+  useEffect(() => {
+    if (image) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(image);
+    }
+  }, [image]);
+
+  const handleUpload = async () => {
+    document.getElementById("selectImages")!.click();
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files![0];
+    setImage(file);
+  };
+
   return (
     <Container>
       <SignUpFormWrapper>
@@ -49,11 +76,21 @@ const SignUp = () => {
           <p>Your name will appear on posts and your public profle.</p>
           <h5>{ErrorMessage}</h5>
         </SignUpHeader>
-        {/*TODO: select and upload progile picture*/}
-        <DefaultProfilePicture />
-        <form>
-          {/*onSubmit={handleSubmit}*/}
+        <form onSubmit={handleSubmit}>
           <SignUpForm>
+            <Image>
+              <img src={`${preview}`} alt="pp" />
+              <Button type="button" onClick={handleUpload}>
+              <Icon style={{ backgroundImage: `url(${UploadIconImg})` }} />
+              </Button>
+              <input
+                type="file"
+                accept="image/*"
+                id="selectImages"
+                onChange={(e) => handleChange(e)}
+                style={{ display: "none" }}
+              />
+            </Image>
             <SignUpFormSection>
               <label htmlFor="email">Email</label>
               <input
@@ -67,7 +104,7 @@ const SignUp = () => {
               <SignUpFormSection>
                 <label htmlFor="firstName">First Name</label>
                 <input
-                  type="firstname"
+                  type="text"
                   value={firstName}
                   required
                   onChange={(e) => setFirstName(e.target.value)}
@@ -76,7 +113,7 @@ const SignUp = () => {
               <SignUpFormSection>
                 <label htmlFor="lastName">Last Name</label>
                 <input
-                  type="lastname"
+                  type="text"
                   value={lastName}
                   required
                   onChange={(e) => setLastName(e.target.value)}

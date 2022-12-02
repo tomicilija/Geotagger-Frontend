@@ -17,6 +17,7 @@ import {
   ConfirmationWrapper,
 } from "./ProfileSettings.style";
 import PlaceholderImage from "../../../assets/default-avatar.svg";
+import { getSignedInUser } from "../../../api/UserApi";
 
 // Updating loggedin user information and deleteing loggedin user using modal, that overlays whole page
 
@@ -51,7 +52,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
     setIsUserInfoOpen(isSettingsOpen);
   }, [isSettingsOpen]);
 
-  /*
   useEffect(() => {
     getSignedInUser(JSON.parse(isLoggedIn!))
       .then(({ email, name, surname, id }) => {
@@ -62,7 +62,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
       .catch((e) => {
         console.log("Error: Cant get user. \n" + e);
       });
-  });*/
+  });
 
   const handleSubmitUserInfo = async (e: { preventDefault: () => void }) => {
     e.preventDefault(); // To prevent refreshing the page on form submit

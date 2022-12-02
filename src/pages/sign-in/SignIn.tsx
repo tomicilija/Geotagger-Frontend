@@ -5,13 +5,12 @@ import {
   SignInHeader,
   SignInForm,
   SignInFormSection,
-  TwoInRow,
   SigninText,
   BackgroundIcon,
 } from "./SignIn.style";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-//import { signUp } from "../../api/UserApi";
+import { signIn } from "../../api/UserApi";
 import Backgroundimg from "../../assets/background/background-signup-map.svg";
 import BackgroundIconImg from "../../assets/icons/logo-icon-border.svg";
 
@@ -19,27 +18,22 @@ const SignIn = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
-  /*
+
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
     (async () => {
-      await signUp({
-        email: email,
-        pass: password,
-        passConfirm: passwordConfirm,
-        name: firstName,
-        surname: lastName,
-      });
-      return navigate("/signin");
+      const result = await signIn({ email: email, password: password });
+      localStorage.setItem(
+        "accessToken",
+        JSON.stringify(result["accessToken"])
+      );
+      return navigate("/profile");
     })().catch((err) => {
       setErrorMessage(err.response.data.message);
     });
   };
-*/
+
   return (
     <Container>
       <SignInFormWrapper>
@@ -48,8 +42,7 @@ const SignIn = () => {
           <p>Welcome back to Geotagger. We are glad that you are back.</p>
           <h5>{ErrorMessage}</h5>
         </SignInHeader>
-        <form>
-          {/*onSubmit={handleSubmit}*/}
+        <form onSubmit={handleSubmit}>
           <SignInForm>
             <SignInFormSection>
               <label htmlFor="email">Email</label>

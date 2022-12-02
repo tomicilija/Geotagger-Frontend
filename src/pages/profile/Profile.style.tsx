@@ -56,7 +56,7 @@ export const Tittle = styled.div`
   width: 100%;
   h5 {
     text-align: start;
-    color: #233D4D;
+    color: #233d4d;
     margin-bottom: 20px;
   }
   p {
@@ -101,19 +101,29 @@ export const ProfileBanner = styled.div`
 `;
 
 export const ProfilePicture = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   height: 70px;
   width: 70px;
 
   background: #ffffff;
-  border-radius: 60px;
+  border-radius: 64px;
   border: none;
-  svg {
+  img {
     height: 70px;
     width: 70px;
+    border-radius: 64px;
+    object-fit: cover;
   }
   @media (max-width: 900px) {
     height: 60px;
     width: 60px;
+    img {
+      height: 60px;
+      width: 60px;
+    }
   }
 `;
 

@@ -56,7 +56,7 @@ export const HeroWrapper = styled.div`
   align-content: center;
 
   width: 100%;
-  margin-top: 250px;
+  margin-top: 200px;
 
   @media (max-width: 900px) {
     margin-top: 20px;
@@ -207,7 +207,7 @@ export const SloganWrapper = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
-  margin: 150px;
+  margin: 50px;
 
   @media (max-width: 900px) {
     margin: 20px;
@@ -217,7 +217,7 @@ export const Slogan = styled.div`
   position: relative;
   width: 620px;
   height: 150px;
-  margin-top: 200px;
+  margin-top: 20px;
   text-align: center;
 
   h4 {

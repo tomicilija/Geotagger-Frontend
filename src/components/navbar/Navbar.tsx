@@ -14,6 +14,7 @@ import {
   BorderlessButton,
   IconWrapper,
   Wrapper,
+  ProfilePicture,
 } from "./Navbar.style";
 import { useLocation, Link } from "react-router-dom";
 import { ReactComponent as LogoIcon } from "../../assets/icons/navbar-logo.svg";
@@ -25,11 +26,8 @@ import ProfileSettings from "../modals/profile-settings/ProfileSettings";
 import DeleteQuote from "../modals/delete-location/DeleteLocation";
 import { UpdateContext } from "../../utils/UpdateContext";
 import DeleteLocation from "../modals/delete-location/DeleteLocation";
-/*
-import ProfileSettings from "../modals/profile-settings/ProfileSettings";
-import CreateQuote from "../modals/create-quote/CreateQuote";
-import { getSignedInUser } from "../../api/UserApi";
-*/
+import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
+
 /*
  * Navigation bar switches pages, opens modals, and is shown in few different views:
  * Signup and Signin pages
@@ -39,29 +37,49 @@ import { getSignedInUser } from "../../api/UserApi";
  */
 
 const Navbar = () => {
-  const isLoggedIn = true; ///localStorage.getItem("accessToken");
+  const isLoggedIn = localStorage.getItem("accessToken");
   let location = useLocation();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [userid, setUserId] = useState("");
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);
 
+  const [image, setImage] = useState<string>();
+
   const openSettingsModal = () => {
     setIsSettingsModalOpen((prev) => !prev);
   };
-  /*
+
   useEffect(() => {
     if (isLoggedIn) {
       (async () => {
         const response = await getSignedInUser(JSON.parse(isLoggedIn));
         setFirstName(response.name);
         setLastName(response.surname);
+        setUserId(response.id);
       })().catch((e) => {
         console.log("Error: Cant get user. \n" + e);
       });
     }
-  }, [isLoggedIn]);*/
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      (async () => {
+        const response = await getUserProfilePicture(
+          userid,
+          JSON.parse(isLoggedIn)
+        );
+        const url = window.URL || window.webkitURL;
+        const blobUrl = url.createObjectURL(response);
+        setImage(blobUrl);
+      })().catch((e) => {
+        console.log("Error: Cant get user profile picture. \n" + e);
+      });
+    }
+  }, [isLoggedIn, userid]);
 
   return (
     <Container>
@@ -93,9 +111,11 @@ const Navbar = () => {
                   style={{ textDecoration: "none" }}
                 >
                   <MobileLink>
-                    <DefaultProfileIcon />
+                    <ProfilePicture>
+                      <img src={`${image}`} alt="pp" />
+                    </ProfilePicture>
                     <h5>
-                      Name Surname{firstName} {lastName}
+                      {firstName} {lastName}
                     </h5>
                   </MobileLink>
                 </Link>
@@ -149,7 +169,9 @@ const Navbar = () => {
                 <IconWrapper>
                   <Link to="/profile" style={{ textDecoration: "none" }}>
                     <ButtonLoggedin>
-                      <DefaultProfileIcon />
+                      <ProfilePicture>
+                        <img src={`${image}`} alt="pp" />
+                      </ProfilePicture>
                     </ButtonLoggedin>
                   </Link>
                   <Link to="/location/add" style={{ textDecoration: "none" }}>

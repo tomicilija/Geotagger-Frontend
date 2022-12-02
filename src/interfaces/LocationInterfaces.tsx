@@ -15,15 +15,16 @@ export interface QuoteResponse {
 
 export interface Register {
   email: string;
-  pass: string;
-  passConfirm: string;
+  password: string;
+  passwordConfirm: string;
   name: string;
   surname: string;
+  profilePicture: File;
 }
 
 export interface Login {
   email: string;
-  pass: string;
+  password: string;
 }
 
 export interface User {

@@ -52,6 +52,7 @@ export const Image = styled.div`
     }
   }
 `;
+
 export const Guess = styled.div`
   position: absolute;
   display: flex;

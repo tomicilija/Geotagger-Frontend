@@ -13,19 +13,15 @@ import {
 /*import Card from "../../components/card/Card";
 import CardGrid from "../../components/card-grid/CardGrid";*/
 import { Link, useParams } from "react-router-dom";
-import { ReactComponent as DefaultProfileIcon } from "../../assets/icons/profile.svg";
 import CardGuessed from "../../components/cards/card-guessed/CardGuessed";
 import LocationImg from "../../assets/s6L0uQyprpE.png";
 import CardEdit from "../../components/cards/card-edit/CardEdit";
-/*import { getSignedInUser, getUserById, getUserVotes } from "../../api/UserApi";
-import { getMyQuote, getUserQuote } from "../../api/QuoteApi";
-import { UpdateContext } from "../../utils/UpdateContext";
-import { QuoteResponse } from "../../interfaces/QuoteInterfaces";*/
+import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
 const Profile = () => {
-  const isLoggedIn = true; //localStorage.getItem("accessToken");
+  const isLoggedIn = localStorage.getItem("accessToken");
   const [userid, setUserId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -38,6 +34,9 @@ const Profile = () => {
   const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
     window.innerWidth > 1340
   );
+
+  const [image, setImage] = useState<string>();
+
   //const { updated } = useContext(UpdateContext);
   const { id } = useParams();
 
@@ -53,6 +52,35 @@ const Profile = () => {
   const updateScreenSize = () => {
     setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      (async () => {
+        const response = await getSignedInUser(JSON.parse(isLoggedIn));
+        setFirstName(response.name);
+        setLastName(response.surname);
+        setUserId(response.id);
+      })().catch((e) => {
+        console.log("Error: Cant get user. \n" + e);
+      });
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      (async () => {
+        const response = await getUserProfilePicture(
+          userid,
+          JSON.parse(isLoggedIn)
+        );
+        const url = window.URL || window.webkitURL;
+        const blobUrl = url.createObjectURL(response);
+        setImage(blobUrl);
+      })().catch((e) => {
+        console.log("Error: Cant get user profile picture. \n" + e);
+      });
+    }
+  }, [isLoggedIn, userid]);
 
   useEffect(() => {
     window.addEventListener("resize", updateScreenSize);
@@ -129,12 +157,12 @@ const Profile = () => {
         <>
           <ProfileBanner>
             <ProfilePicture>
-              <DefaultProfileIcon />
+              <img src={`${image}`} alt="pp" />
             </ProfilePicture>
             <ProfileInfo>
               <ProfileName>
                 <h4>
-                  Name Surname{firstName} {lastName}
+                  {firstName} {lastName}
                 </h4>
               </ProfileName>
             </ProfileInfo>
@@ -173,10 +201,7 @@ const Profile = () => {
                 <h5>My uploads</h5>
               </Tittle>
 
-              <CardEdit
-                locationid={"1"}
-                image={`${LocationImg}`}
-              />
+              <CardEdit locationid={"1"} image={`${LocationImg}`} />
 
               {/*
             {isThreeCollumnSizeGrid ? (

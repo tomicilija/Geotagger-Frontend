@@ -11,7 +11,7 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  
+
   @media (max-width: 900px) {
     margin: -103px 0;
   }
@@ -20,14 +20,13 @@ export const Container = styled.div`
 export const Background = styled.div`
   z-index: -3;
   background: no-repeat;
-  background-color: red;
   background-size: cover;
   background-position: center;
   margin: 0px;
   width: 50%;
   @media (max-width: 1300px) {
-  padding-top: 20vh;
-  padding-bottom: 20vh;
+    padding-top: 20vh;
+    padding-bottom: 20vh;
   }
   @media (max-width: 900px) {
     display: none;
@@ -77,6 +76,8 @@ export const SignInHeader = styled.div`
     margin-bottom: 10px;
   }
   h5 {
+    margin-top: 10px;
+    font-size: 14px;
     color: #ff7d26;
   }
 `;
@@ -161,16 +162,6 @@ export const SignInFormSection = styled.div`
   a {
     width: 100%;
   }
-`;
-
-export const TwoInRow = styled.div`
-  position: relative;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 16px;
 `;
 
 export const SigninText = styled.div`

@@ -11,7 +11,7 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  
+
   @media (max-width: 900px) {
     margin: -103px 0;
   }
@@ -25,8 +25,8 @@ export const Background = styled.div`
   margin: 0px;
   width: 50%;
   @media (max-width: 1300px) {
-  padding-top: 20vh;
-  padding-bottom: 20vh;
+    padding-top: 20vh;
+    padding-bottom: 20vh;
   }
   @media (max-width: 900px) {
     display: none;
@@ -76,8 +76,72 @@ export const SignUpHeader = styled.div`
     margin-bottom: 10px;
   }
   h5 {
+    margin-top: 10px;
+    font-size: 14px;
     color: #ff7d26;
   }
+`;
+
+export const Image = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  border-radius: 64px;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 64px;
+    &:hover {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      width: 100%;
+      opacity: 0;
+      transition: 0.2s ease;
+    }
+  }
+  @media (max-width: 900px) {
+    max-width: 100%;
+    img {
+      max-width: 100%;
+    }
+  }
+`;
+
+export const Button = styled.button`
+  position: absolute;
+  opacity: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border-radius: 64px;
+  width: 70px;
+  height: 70px;
+  cursor: pointer;
+  &:hover {
+    opacity: 1;
+    background-color: #619b8a;
+  }
+
+  @media (max-width: 900px) {
+  }
+`;
+
+export const Icon = styled.div`
+  position: relative;
+  background: no-repeat;
+  background-size: cover;
+  display: flex;
+  width: 30px;
+  height: 30px;
 `;
 
 export const SignUpForm = styled.div`
