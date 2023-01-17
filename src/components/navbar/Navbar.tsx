@@ -46,6 +46,7 @@ const Navbar = () => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);
 
+  const { updated } = useContext(UpdateContext);
   const [image, setImage] = useState<string>();
 
   const openSettingsModal = () => {
@@ -63,7 +64,7 @@ const Navbar = () => {
         console.log("Error: Cant get user. \n" + e);
       });
     }
-  }, [isLoggedIn]);
+  }, [updated, isLoggedIn]);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -79,7 +80,7 @@ const Navbar = () => {
         console.log("Error: Cant get user profile picture. \n" + e);
       });
     }
-  }, [isLoggedIn, userid]);
+  }, [updated, isLoggedIn, userid]);
 
   return (
     <Container>

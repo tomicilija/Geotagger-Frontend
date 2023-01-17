@@ -4,6 +4,9 @@ import {
   LoginResponse,
   QuoteResponse,
   Register,
+  UpdatePassword,
+  UpdateProfilePicture,
+  UpdateUser,
   User,
 } from "../interfaces/LocationInterfaces";
 
@@ -48,7 +51,27 @@ export const getUserById = async (id: string, token: string): Promise<User> => {
 };
 
 export const updateUser = async (
-  user: Register,
+  user: UpdateUser,
+  token: string
+): Promise<void> => {
+  const response = await axiosInstance.patch("/me/update-user", user, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const updateProfilePicture = async (
+  user: UpdateProfilePicture,
+  token: string
+): Promise<void> => {
+  const response = await axiosFileInstance.patch("/me/update-profilepicture", user, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return response.data;
+};
+
+export const updatePassword = async (
+  user: UpdatePassword,
   token: string
 ): Promise<void> => {
   const response = await axiosInstance.patch("/me/update-password", user, {

@@ -34,6 +34,22 @@ export interface User {
   surname: string;
 }
 
+export interface UpdateUser {
+  email: string;
+  name: string;
+  surname: string;
+}
+
+export interface UpdateProfilePicture {
+  profilePicture: File;
+}
+
+export interface UpdatePassword {
+  currentPassword: string;
+  password: string;
+  passwordConfirm: string;
+}
+
 export interface LoginResponse {
   accessToken: string;
 }

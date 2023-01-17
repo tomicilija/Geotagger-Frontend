@@ -17,6 +17,7 @@ import CardGuessed from "../../components/cards/card-guessed/CardGuessed";
 import LocationImg from "../../assets/s6L0uQyprpE.png";
 import CardEdit from "../../components/cards/card-edit/CardEdit";
 import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
+import { UpdateContext } from "../../utils/UpdateContext";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
@@ -37,7 +38,7 @@ const Profile = () => {
 
   const [image, setImage] = useState<string>();
 
-  //const { updated } = useContext(UpdateContext);
+  const { updated } = useContext(UpdateContext);
   const { id } = useParams();
 
   /*
@@ -64,7 +65,7 @@ const Profile = () => {
         console.log("Error: Cant get user. \n" + e);
       });
     }
-  }, [isLoggedIn]);
+  }, [updated, isLoggedIn]);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -80,7 +81,7 @@ const Profile = () => {
         console.log("Error: Cant get user profile picture. \n" + e);
       });
     }
-  }, [isLoggedIn, userid]);
+  }, [updated, isLoggedIn, userid]);
 
   useEffect(() => {
     window.addEventListener("resize", updateScreenSize);

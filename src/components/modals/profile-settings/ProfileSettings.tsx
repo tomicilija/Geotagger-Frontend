@@ -1,5 +1,4 @@
-import { FC, useContext, useEffect, useState } from "react"; /*
-import { deleteUser, getSignedInUser, signIn, updateUser } from "../../../api/UserApi";*/
+import { FC, useContext, useEffect, useState } from "react";
 import { ProfileSettingsProps } from "../../../interfaces/LocationInterfaces";
 import { UpdateContext } from "../../../utils/UpdateContext";
 import {
@@ -17,7 +16,7 @@ import {
   ConfirmationWrapper,
 } from "./ProfileSettings.style";
 import PlaceholderImage from "../../../assets/default-avatar.svg";
-import { getSignedInUser } from "../../../api/UserApi";
+import { deleteUser, getSignedInUser, updatePassword, updateProfilePicture, updateUser } from "../../../api/UserApi";
 
 // Updating loggedin user information and deleteing loggedin user using modal, that overlays whole page
 
@@ -32,6 +31,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   const [newFirstName, setNewFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [newLastName, setNewLastName] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
@@ -68,35 +68,65 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
     e.preventDefault(); // To prevent refreshing the page on form submit
 
     (async () => {
-      /*
       await updateUser(
         {
           email: newEmail,
-          pass: newPassword,
-          passConfirm: newPasswordConfirm,
           name: newFirstName,
           surname: newLastName,
         },
         JSON.parse(isLoggedIn!)
       );
-      const result = await signIn({ email: newEmail, pass: newPassword });
-      localStorage.setItem(
-        "accessToken",
-        JSON.stringify(result["accessToken"])
-      );
-      setUpdated(!updated);*/
-      setIsUserInfoOpen(false);
-      setIsInformationChangedOpen(true);
+      if (newEmail !== email) {
+        localStorage.clear();
+        window.location.href = "/signin";
+      } else {
+        setUpdated(!updated);
+        setIsUserInfoOpen(false);
+        setIsInformationChangedOpen(true);
+      }
     })().catch((err) => {
       setErrorMessage(err.response.data.message);
     });
   };
 
-  const handleSubmitPassword = async (e: { preventDefault: () => void }) => {};
-
   const handleSubmitProfilePicture = async (e: {
     preventDefault: () => void;
-  }) => {};
+  }) => {
+    e.preventDefault();
+    (async () => {
+      await updateProfilePicture(
+        {
+          profilePicture: image!,
+        },
+        JSON.parse(isLoggedIn!)
+      );
+        setUpdated(!updated);
+        setIsChangePictureOpen(false);
+        setIsInformationChangedOpen(true);
+    })().catch((err) => {
+      setErrorMessage(err.response.data.message);
+    });
+  };
+
+  const handleSubmitPassword = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+
+    (async () => {
+      await updatePassword(
+        {
+          currentPassword: currentPassword,
+          password: newPassword,
+          passwordConfirm: newPasswordConfirm,
+        },
+        JSON.parse(isLoggedIn!)
+      );
+        localStorage.clear();
+        window.location.href = "/signin";
+
+    })().catch((err) => {
+      setErrorMessage(err.response.data.message);
+    });
+  };
 
   const changePassword = async () => {
     (async () => {
@@ -160,7 +190,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
 
   const deleteProfile = async () => {
     (async () => {
-      //await deleteUser(JSON.parse(isLoggedIn!));
+      await deleteUser(JSON.parse(isLoggedIn!));
       setIsSettingsOpen(false);
       localStorage.clear();
       window.location.href = "/";
@@ -277,18 +307,18 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                     <label htmlFor="password">Current password</label>
                     <input
                       type="password"
-                      value="" //value={password}
+                      value={currentPassword}
                       required
-                      //onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
                     />
                   </SettingsSection>
                   <SettingsSection>
                     <label htmlFor="password">New password</label>
                     <input
                       type="password"
-                      //value={password}
+                      value={newPassword}
                       required
-                      //onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => setNewPassword(e.target.value)}
                     />
                   </SettingsSection>
                   <SettingsSection>
@@ -297,9 +327,9 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                     </label>
                     <input
                       type="password"
-                      //value={passwordConfirm}
+                      value={newPasswordConfirm}
                       required
-                      // onChange={(e) => setPasswordConfirm(e.target.value)}
+                      onChange={(e) => setNewPasswordConfirm(e.target.value)}
                     />
                   </SettingsSection>
                   <SettingsSection>
@@ -359,9 +389,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                 <h4>Information changed.</h4>
                 <p>Your settings are saved.</p>
               </SettingsHeader>
-                <button onClick={closeSettingsModal}>
-                  Close
-                </button>
+              <button onClick={closeSettingsModal}>Close</button>
             </ConfirmationWrapper>
           ) : null}
         </Container>
