@@ -21,6 +21,9 @@ import LocationImg from "../../assets/s6L0uQyprpE.png";
 import CardGuessed from "../../components/cards/card-guessed/CardGuessed";
 import CardLocked from "../../components/cards/card-locked/CardLocked";
 import CardGrid from "../../components/card-grid/CardGrid";
+import { LocationResponse } from "../../interfaces/LocationInterfaces";
+import { getLocations } from "../../api/LocationApi";
+import { getMyGuesses } from "../../api/GuessApi";
 
 // One version of landing page can be shown to anyone, logged in user sees different version, same for mobile users
 
@@ -36,29 +39,13 @@ const LandingPage = () => {
   const isLoggedIn = localStorage.getItem("accessToken");
   /*
   const [mostLikedQuotes, setMostLikedQuotes] = useState<QuoteResponse[]>([]);
-  const [recentQuotes, setRecentQuotes] = useState<QuoteResponse[]>([]);
   const [randomQuote, setRandomQuote] = useState<QuoteResponse>(quote);
   const [heroQuote1, setHeroQuote1] = useState<QuoteResponse>(quote);
   const [heroQuote2, setHeroQuote2] = useState<QuoteResponse>(quote);
   const [heroQuote3, setHeroQuote3] = useState<QuoteResponse>(quote);*/
 
-  const [newLocations, setNewLocations] = useState([
-    { locationid: "1", image: `${LocationImg}` },
-    { locationid: "2", image: `${LocationImg}` },
-    { locationid: "3", image: `${LocationImg}` },
-    { locationid: "4", image: `${LocationImg}` },
-    { locationid: "5", image: `${LocationImg}` },
-    { locationid: "6", image: `${LocationImg}` },
-  ]);
-
-  const [guessedLocations, setGuessedLocations] = useState([
-    { locationid: "1", image: `${LocationImg}`, distance: 222 },
-    { locationid: "2", image: `${LocationImg}`, distance: 87 },
-    { locationid: "3", image: `${LocationImg}`, distance: 1007077 },
-    { locationid: "4", image: `${LocationImg}`, distance: 1 },
-    { locationid: "5", image: `${LocationImg}`, distance: 544 },
-    { locationid: "6", image: `${LocationImg}`, distance: 833 },
-  ]);
+  const [newLocations, setNewLocations] = useState<string[]>([]);
+  const [guessedLocations, setguessedLocations] = useState<string[]>([]);
 
   const [showedLikedQuotesDesktop, setShowedLikedQuotesDesktop] = useState(9);
   const [showedRecentQuotesDesktop, setShowedRecentQuotesDesktop] = useState(9);
@@ -99,30 +86,22 @@ const LandingPage = () => {
   const loadRecentQuotesMobile = () => {
     setShowedRecentQuotesMobile((prevValue) => prevValue + 4);
   };
-  /*
-  useEffect(() => {
-    (async () => {
-      const quotes = await getMostUpvoatedQuotes();
-      setHeroQuote1(quotes[0]);
-      setHeroQuote2(quotes[1]);
-      setHeroQuote3(quotes[2]);
-      setRandomQuote(quotes[Math.floor(Math.random() * quotes.length)]);
-    })();
-  }, []);
 
   useEffect(() => {
-    (async () => {
-      const quotes = await getMostUpvoatedQuotes();
-      setMostLikedQuotes(quotes);
-    })();
     if (isLoggedIn) {
       (async () => {
-        const quotes = await getMostRecentQuotes(JSON.parse(isLoggedIn));
-        setRecentQuotes(quotes);
+        const locations = await getLocations(JSON.parse(isLoggedIn));
+        const locationsId = locations.map(object => object.id);
+        setNewLocations(locationsId);
+      })();
+      (async () => {
+        const locations = await getMyGuesses(JSON.parse(isLoggedIn));
+        const locationsId = locations.map(object => object.location_id);
+        setguessedLocations(locationsId);
       })();
     }
   }, [updated, isLoggedIn]);
-*/
+
   return (
     <Container>
       {isLoggedIn ? (
@@ -134,9 +113,11 @@ const LandingPage = () => {
                 Your personal best guesses appear here. Go on and try to beat
                 your personal records or set a new one!
               </p>
-            </Tittle>
-            <CardGrid locations={guessedLocations} />
-            {/*
+            </Tittle>{
+            <CardGrid locationId={guessedLocations} cardStyle={"card-guessed"}   />
+            
+            /*
+            
 
             <CardGuessed
               locationid={"1"}
@@ -169,7 +150,7 @@ const LandingPage = () => {
               </p>
             </Tittle>
 
-            <CardGrid locations={newLocations} />
+            <CardGrid locationId={newLocations} cardStyle={"card-new"}  />
             {/*
 
             <CardNew locationid={"1"} image={`${LocationImg}`} />
@@ -219,7 +200,7 @@ const LandingPage = () => {
             </Slogan>
           </SloganWrapper>
           <MostUpvoated>
-            <CardLocked image={`${LocationImg}`} />
+            <CardGrid locationId={newLocations} cardStyle={"card-locked"}  />
             <Link to="/signup" style={{ textDecoration: "none" }}>
               <Button>Sign up</Button>
             </Link>

@@ -23,9 +23,9 @@ class App extends React.Component {
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/location/*" element={<GuessLocation />} />
+            <Route path="/location/:id" element={<GuessLocation />} />
             <Route path="/location/add" element={<AddLocation />} />
-            <Route path="/location/edit/*" element={<EditLocation />} />
+            <Route path="/location/edit/:id" element={<EditLocation />} />
           </Routes>
           <Footer />
         </BrowserRouter>

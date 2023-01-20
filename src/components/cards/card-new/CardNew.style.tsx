@@ -16,9 +16,9 @@ export const Container = styled.div`
 `;
 
 export const Location = styled.div`
-@media (max-width: 900px) {
-  max-width: 80vw;
-}
+  @media (max-width: 900px) {
+    max-width: 80vw;
+  }
 `;
 
 export const Image = styled.div`
@@ -27,9 +27,12 @@ export const Image = styled.div`
   justify-content: center;
   align-items: center;
   width: 420px;
+  height: 237px;
   img {
     background: url(.jpg);
     width: 420px;
+    height: 237px;
+    object-fit: cover;
     border-radius: 4px;
 
     &:hover {
@@ -46,7 +49,7 @@ export const Image = styled.div`
     }
   }
   @media (max-width: 900px) {
-      max-width: 100%;
+    max-width: 100%;
     img {
       max-width: 100%;
     }

@@ -127,6 +127,9 @@ export const MapLocation = styled.div`
     width: 140px;
     height: 40px;
   }
+  p {
+    color: #ff7d26;
+  }
 
   @media (max-width: 900px) {
     padding: 0;

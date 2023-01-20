@@ -1,16 +1,42 @@
-export interface MyQuote {
-  userid: string;
-  text: string;
-  karma: number;
-  creation_date: string;
+export interface Location {
+  name: string;
+  latitude: number;
+  longitude: number;
+  image: File;
 }
 
-export interface QuoteResponse {
-  userid: string;
-  karma: number;
-  text: string;
+export interface LocationResponse {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
   name: string;
-  surname: string;
+  latitude: number;
+  longitude: number;
+  image: File;
+  user_id: string;
+}
+
+export interface Guess {
+  id: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface GuessResponseById {
+  id: string;
+  createdAt: string;
+  distance: number;
+  profilePicture?: string;
+  user: { id: string; name: string; surname: string; profilePicture: string };
+}
+
+export interface GuessResponse {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  distance: number;
+  user_id: string;
+  location_id: string;
 }
 
 export interface Register {
@@ -55,8 +81,7 @@ export interface LoginResponse {
 }
 
 export interface CardNewProps {
-  locationid?: string;
-  image?: string;
+  locationid: string;
 }
 
 export interface CardGuessedProps {
@@ -66,20 +91,16 @@ export interface CardGuessedProps {
 }
 
 export interface CardLockedProps {
-  image: string;
+  locationid: string;
 }
 
 export interface CardEditProps {
   locationid: string;
-  image: string;
 }
 
 export interface GridProps {
-  locations: {
-    locationid?: string;
-    image?: string;
-    distance?: number;
-  }[];
+  locationId: string[];
+  cardStyle: string;
 }
 
 export interface DeleteLocationProps {

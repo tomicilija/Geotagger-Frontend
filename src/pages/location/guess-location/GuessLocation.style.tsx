@@ -102,6 +102,10 @@ export const MapLocation = styled.div`
     width: 140px;
     height: 40px;
   }
+  p {
+    margin: 10px;
+    color: #ff7d26;
+  }
 
   @media (max-width: 900px) {
     padding: 0;
@@ -346,7 +350,12 @@ export const Avatar = styled.div`
   width: 40px;
   height: 40px;
 
-  border-radius: 64px;
+  img {
+    height: 40px;
+    width: 40px;
+    border-radius: 64px;
+    object-fit: cover;
+  }
 `;
 
 export const ProfileInfo = styled.div`

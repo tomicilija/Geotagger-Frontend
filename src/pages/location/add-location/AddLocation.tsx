@@ -13,25 +13,28 @@ import {
   Icon,
   Form,
 } from "./AddLocation.style";
-import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
+import { useJsApiLoader, GoogleMap, MarkerF } from "@react-google-maps/api";
 /*import Card from "../../components/card/Card";
 import CardGrid from "../../components/card-grid/CardGrid";*/
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { ReactComponent as DefaultProfileIcon } from "../../../assets/icons/profile.svg";
 import LocationImg from "../../assets/s6L0uQyprpE.png";
 /*import { getSignedInUser, getUserById, getUserVotes } from "../../api/UserApi";
 import { getMyQuote, getUserQuote } from "../../api/QuoteApi";
 import { UpdateContext } from "../../utils/UpdateContext";
 import { QuoteResponse } from "../../interfaces/QuoteInterfaces";*/
+import MapMarker from "../../../assets/icons/map-marker.png";
 import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
-import * as img from "../../../assets/placeholder-location-image.png";
 import { preProcessFile } from "typescript";
+import { UpdateContext } from "../../../utils/UpdateContext";
+import { postLocation } from "../../../api/LocationApi";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
 const AddLocation = () => {
-  const isLoggedIn = true; //localStorage.getItem("accessToken");
+  const isLoggedIn = localStorage.getItem("accessToken");
+  const navigate = useNavigate();
   const [userid, setUserId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -44,25 +47,19 @@ const AddLocation = () => {
   const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
     window.innerWidth > 1340
   );
-  //const { updated } = useContext(UpdateContext);
+  const [ErrorMessage, setErrorMessage] = useState("");
+  const { updated } = useContext(UpdateContext);
   const { id } = useParams();
 
   const [coordinates, setCoordinates] = useState({
     lat: 37.77414,
     lng: -122.420052,
   });
+  const [addrss, setAddress] = useState("");
+  const [markerVisibility, setMarkerVisibility] = useState(false);
 
   const mapsApiKey: string = process.env
     .REACT_APP_GOOGLE_MAPS_API_KEY as string;
-
-  /*
-   * Profile page shows profile of logged in user when clicked on profile icon in navbar
-   * or profile of other usr when clicked on name on quote card
-   *
-   * Quote cards can be shown in grid of 3, 2, or 1 columns, depending on screen width
-   * 3 column grid shows max of 9 cards and lods by 9 cards
-   * 2 and 1 column shows max of 4 cards, and loads by 4 cards
-   */
 
   const updateScreenSize = () => {
     setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
@@ -78,8 +75,47 @@ const AddLocation = () => {
   });
 
   useEffect(() => {
-    console.log(coordinates);
+    getAddressFromCoordinates();
   }, [coordinates]);
+
+  const handleMapClick = async (e: any) => {
+    setCoordinates({
+      lat: e.latLng?.lat() as number,
+      lng: e.latLng?.lng() as number,
+    });
+    setMarkerVisibility(true);
+  };
+
+  const getAddressFromCoordinates = async () => {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: coordinates, language: 'en' }, (results, status) => {
+      if (status === "OK") {
+        if (results![0]) {
+          setAddress(results![0].formatted_address);
+        } else {
+          console.log("No results found");
+        }
+      } else {
+        console.log("Geocoder failed due to: " + status);
+      }
+    });
+  };
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault(); // To prevent refreshing the page on form submit
+    (async () => {
+      await postLocation({
+        name: addrss,
+        latitude: Number(coordinates.lat.toFixed(6)),
+        longitude: Number(coordinates.lng.toFixed(6)),
+        image: image!,
+      }, 
+      JSON.parse(isLoggedIn!));
+      return navigate("/profile");
+    })().catch((err) => {
+      setErrorMessage(err.response.data.message);
+    });
+  };
 
   const [image, setImage] = useState<File>();
   const [preview, setPreview] = useState<string>(PlaceholderImage);
@@ -119,8 +155,7 @@ const AddLocation = () => {
                 Add a new <span>location</span>.
               </h4>
             </Tittle>
-            <form>
-              {/*onSubmit={handleSubmit}*/}
+            <form onSubmit={handleSubmit}>
               <Form>
                 <UploadImage>
                   <Image>
@@ -159,23 +194,28 @@ const AddLocation = () => {
                           keyboardShortcuts: false,
                           disableDefaultUI: true,
                         }}
-                        onClick={(e: any) => {
-                          setCoordinates({
-                            lat: e.latLng?.lat() as number,
-                            lng: e.latLng?.lng() as number,
-                          });
-                        }}
+                        onClick={handleMapClick}
                       >
-                        <Marker
-                          position={{ lat: 37.77414, lng: -122.420052 }}
-                        />
+                        {coordinates && (
+                          <MarkerF
+                            position={coordinates}
+                            icon={MapMarker}
+                            visible={markerVisibility}
+                          />
+                        )}
                       </GoogleMap>
                     </Map>
                   ) : (
                     <h3>Loading...</h3>
                   )}
                   <label htmlFor="location">Location</label>
-                  <input type="location" required />
+                  <input
+                    type="location"
+                    value={addrss}
+                    disabled={true}
+                    required
+                  />
+                  <p>{ErrorMessage}</p>
                   <button type="submit">Add new</button>
                 </MapLocation>
               </Form>

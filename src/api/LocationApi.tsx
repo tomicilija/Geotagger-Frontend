@@ -1,114 +1,62 @@
 import axios from "axios";
-import { MyQuote, QuoteResponse } from "../interfaces/LocationInterfaces";
+import { Location, LocationResponse } from "../interfaces/LocationInterfaces";
 
 const axiosInstance = axios.create({ baseURL: "http://localhost:5000/" });
+const axiosFileInstance = axios.create({
+  baseURL: "http://localhost:5000/",
+  headers: { "Content-Type": "multipart/form-data" },
+});
 
-// API calls related to Quotes and Votes
+// API calls related to Locations
 
-export const getMyQuote = async (token: string): Promise<MyQuote> => {
-  const response = await axiosInstance.get("/myquote", {
+export const getLocations = async (token: string): Promise<LocationResponse[]> => {
+  const response = await axiosInstance.get("/location", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
 
-export const getUserQuote = async (id: string): Promise<MyQuote> => {
-  const response = await axiosInstance.get(`/quote/${id}`, {});
+export const getMyLocations = async (token: string): Promise<LocationResponse[]> => {
+  const response = await axiosInstance.get("/location/me", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return response.data;
 };
 
-export const postMyQuote = async (
-  text: string,
+export const getLocationImage = async (id: string, token: string) => {
+  const response = await axiosFileInstance.get(`/location/image/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    responseType: 'blob'
+  });
+  return response.data;
+};
+
+export const postLocation = async (
+  location: Location,
   token: string
 ): Promise<void> => {
-  const response = await axiosInstance.post(
-    "/myquote",
-    { text: text },
+  const response = await axiosFileInstance.post(
+    "/location",
+    location,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;
 };
 
-export const updateMyQuote = async (
-  text: string,
+export const updateLocation = async (
+  location: Location,
   token: string
 ): Promise<void> => {
   const response = await axiosInstance.patch(
-    "/myquote",
-    { text: text },
+    "/location",
+    location,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   return response.data;
 };
 
-export const deleteMyQuote = async (token: string): Promise<void> => {
-  const response = await axiosInstance.delete("/myquote", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
-};
-
-export const voteCheck = async (id: string, token: string): Promise<string> => {
-  const response = await axiosInstance.get(`/user/${id}/vote`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
-};
-
-export const upvoteQuote = async (id: string, token: string): Promise<void> => {
-  const response = await axiosInstance.post(
-    `/user/${id}/upvote`,
-    {},
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
-
-export const downvoteQuote = async (
-  id: string,
-  token: string
-): Promise<void> => {
-  const response = await axiosInstance.post(
-    `/user/${id}/downvote`,
-    {},
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-  return response.data;
-};
-
-export const deleteUpvote = async (
-  id: string,
-  token: string
-): Promise<void> => {
-  const response = await axiosInstance.delete(`/user/${id}/upvote`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
-};
-
-export const deleteDownvote = async (
-  id: string,
-  token: string
-): Promise<void> => {
-  const response = await axiosInstance.delete(`/user/${id}/downvote`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return response.data;
-};
-
-export const getMostUpvoatedQuotes = async (): Promise<QuoteResponse[]> => {
-  const response = await axiosInstance.get(`/likes`, {});
-  return response.data;
-};
-
-export const getMostRecentQuotes = async (
-  token: string
-): Promise<QuoteResponse[]> => {
-  const response = await axiosInstance.get(`/recent`, {
+export const deleteLocation = async (token: string): Promise<void> => {
+  const response = await axiosInstance.delete("/location", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;

@@ -24,11 +24,16 @@ import {
   GuessFormSection,
   Form,
 } from "./GuessLocation.style";
-import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
+import {
+  useJsApiLoader,
+  GoogleMap,
+  Marker,
+  MarkerF,
+} from "@react-google-maps/api";
 /*import Card from "../../components/card/Card";
 import CardGrid from "../../components/card-grid/CardGrid";*/
 import { Link, useParams } from "react-router-dom";
-import { ReactComponent as DefaultProfileIcon } from "../../../assets/icons/profile.svg";
+import MapMarker from "../../../assets/icons/map-marker.png";
 import LocationImg from "../../../assets/icons/profile.svg";
 /*import { getSignedInUser, getUserById, getUserVotes } from "../../api/UserApi";
 import { getMyQuote, getUserQuote } from "../../api/QuoteApi";
@@ -38,11 +43,17 @@ import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
 import * as img from "../../../assets/placeholder-location-image.png";
 import { preProcessFile } from "typescript";
+import { UpdateContext } from "../../../utils/UpdateContext";
+import { getLocationImage } from "../../../api/LocationApi";
+import { getGuessesByLocationId, guessLocation } from "../../../api/GuessApi";
+import { GuessResponseById } from "../../../interfaces/LocationInterfaces";
+import moment from "moment-timezone";
+import { getUserProfilePicture } from "../../../api/UserApi";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
 const GuessLocation = () => {
-  const isLoggedIn = true; //localStorage.getItem("accessToken");
+  const isLoggedIn = localStorage.getItem("accessToken");
   const [userid, setUserId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -55,8 +66,16 @@ const GuessLocation = () => {
   const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
     window.innerWidth > 1340
   );
-  //const { updated } = useContext(UpdateContext);
+  const { updated } = useContext(UpdateContext);
   const { id } = useParams();
+  const [addrss, setAddress] = useState("");
+  const [errorDistance, setErrorDistance] = useState("");
+  const [markerVisibility, setMarkerVisibility] = useState(false);
+  const [ErrorMessage, setErrorMessage] = useState("");
+
+  const [locationGuesses, setLocationGuesses] = useState<GuessResponseById[]>(
+    []
+  );
 
   const isLocationGuessed = true;
 
@@ -90,36 +109,119 @@ const GuessLocation = () => {
     googleMapsApiKey: mapsApiKey,
   });
 
+  const fetchGuesses = async (): Promise<GuessResponseById[]> => {
+    const response = await getGuessesByLocationId(id!, JSON.parse(isLoggedIn!));
+    const guesses = Promise.all(
+      response.map(async (guess) => {
+        const diff = moment.duration(
+          moment().diff(moment(guess.createdAt).format("YYYY-MM-DDTHH:mm:ss"))
+        );
+        const profilePicture = await getUserProfilePicture(
+          guess.user.id,
+          JSON.parse(isLoggedIn!)
+        );
+        const url = window.URL || window.webkitURL;
+        const profilePictureUrl = url.createObjectURL(profilePicture);
+        return {
+          ...guess,
+          createdAt:
+            diff.asHours() < 24 && diff.asHours() > 1
+              ? guess.createdAt.replace(
+                  guess.createdAt,
+                  Math.trunc(diff.asHours()) + " hours ago"
+                )
+              : diff.asHours() < 1 && diff.asMinutes() > 1
+              ? guess.createdAt.replace(
+                  guess.createdAt,
+                  Math.trunc(diff.asMinutes()) + " mins ago"
+                )
+              : diff.asMinutes() < 1
+              ? guess.createdAt.replace(guess.createdAt, "Now")
+              : guess.createdAt.replace(
+                  guess.createdAt,
+                  Intl.DateTimeFormat("en-GB", {
+                    timeStyle: "short",
+                    dateStyle: "medium",
+                  }).format(new Date(guess.createdAt))
+                ),
+          profilePicture: guess.user.profilePicture.replace(
+            guess.user.profilePicture,
+            profilePictureUrl
+          ),
+        };
+      })
+    );
+    return guesses;
+  };
+
   useEffect(() => {
-    console.log(coordinates);
+    fetchGuesses()
+      .then((data) => setLocationGuesses(data))
+      .catch((e) => {
+        console.log("Error: Can't get location guesses. \n" + e);
+      });
+  }, [coordinates, id, isLoggedIn, errorDistance]);
+
+  useEffect(() => {
+    getAddressFromCoordinates();
   }, [coordinates]);
 
-  const [image, setImage] = useState<File>();
-  const [preview, setPreview] = useState<string>(PlaceholderImage);
+  const handleMapClick = async (e: any) => {
+    setCoordinates({
+      lat: e.latLng?.lat() as number,
+      lng: e.latLng?.lng() as number,
+    });
+    setMarkerVisibility(true);
+  };
+
+  const getAddressFromCoordinates = async () => {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode(
+      { location: coordinates, language: "en" },
+      (results, status) => {
+        if (status === "OK") {
+          if (results![0]) {
+            setAddress(results![0].formatted_address);
+          } else {
+            console.log("No results found");
+          }
+        } else {
+          console.log("Geocoder failed due to: " + status);
+        }
+      }
+    );
+  };
+
+  const [locationImage, setLocationImage] = useState<string>(PlaceholderImage);
 
   useEffect(() => {
-    if (image) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(image);
+    if (isLoggedIn) {
+      (async () => {
+        const response = await getLocationImage(id!, JSON.parse(isLoggedIn));
+        const url = window.URL || window.webkitURL;
+        const blobUrl = url.createObjectURL(response);
+        setLocationImage(blobUrl);
+      })().catch((e) => {
+        console.log("Error: Cant get location image. \n" + e);
+      });
     }
-  }, [image]);
+  }, [updated, isLoggedIn, id]);
 
-  const handleUpload = async () => {
-    document.getElementById("selectImages")!.click();
-  };
-
-  const handleDiscard = async () => {
-    setPreview(PlaceholderImage);
-    document.getElementById("selectImages")!.blur();
-    setImage(undefined);
-  };
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files![0];
-    setImage(file);
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault(); // To prevent refreshing the page on form submit
+    (async () => {
+      const response = await guessLocation(
+        {
+          id: id!,
+          latitude: coordinates.lat,
+          longitude: coordinates.lng,
+        },
+        JSON.parse(isLoggedIn!)
+      );
+      setErrorDistance(response.distance.toString());
+    })().catch((err) => {
+      setErrorMessage(err.response.data.message);
+    });
   };
 
   return (
@@ -132,13 +234,12 @@ const GuessLocation = () => {
                 Take a <span>guess</span>!
               </h4>
             </Tittle>
-            <form>
+            <form onSubmit={handleSubmit}>
               <Form>
-                {/*onSubmit={handleSubmit}*/}
                 <UploadImage>
                   <Image>
                     <img
-                      src={preview}
+                      src={`${locationImage}`}
                       alt="location"
                       style={{ objectFit: "cover" }}
                     />
@@ -155,16 +256,15 @@ const GuessLocation = () => {
                           keyboardShortcuts: false,
                           disableDefaultUI: true,
                         }}
-                        onClick={(e: any) => {
-                          setCoordinates({
-                            lat: e.latLng?.lat() as number,
-                            lng: e.latLng?.lng() as number,
-                          });
-                        }}
+                        onClick={handleMapClick}
                       >
-                        <Marker
-                          position={{ lat: 37.77414, lng: -122.420052 }}
-                        />
+                        {coordinates && (
+                          <MarkerF
+                            position={coordinates}
+                            icon={MapMarker}
+                            visible={markerVisibility}
+                          />
+                        )}
                       </GoogleMap>
                     </Map>
                   ) : (
@@ -173,13 +273,18 @@ const GuessLocation = () => {
                   <GuessForm>
                     <GuessFormSection>
                       <label htmlFor="errDist">Error distance</label>
-                      <input type="errDist" required />
+                      <input
+                        type="errDist"
+                        disabled={true}
+                        value={errorDistance}
+                      />
                     </GuessFormSection>
                     <GuessFormSection>
                       <label htmlFor="location">Location</label>
-                      <input type="location" required />
+                      <input type="location" disabled={true} value={addrss} />
                     </GuessFormSection>
                   </GuessForm>
+                  <p>{ErrorMessage}</p>
                   <button type="submit">Guess</button>
                 </MapLocation>
               </Form>
@@ -190,120 +295,29 @@ const GuessLocation = () => {
               <h4>Leaderboard</h4>
             </Tittle>
             <Table>
-              <Row>
-                <LeftSide>
-                  <Rank className="rank">
-                    <p>1</p>
-                  </Rank>
-                  <Profile>
-                    <Avatar>
-                      <img src={`${LocationImg}`} alt="location" />
-                    </Avatar>
-                    <ProfileInfo>
-                      <ProfileName>Elanor Pera</ProfileName>
-                      <GuessTime>23. 4. 2021</GuessTime>
-                    </ProfileInfo>
-                  </Profile>
-                </LeftSide>
-                <RightSide>
-                  <Distance>5m</Distance>
-                </RightSide>
-              </Row>
-              <Row>
-                <LeftSide>
-                  <Rank className="rank">
-                    <p>2</p>
-                  </Rank>
-                  <Profile>
-                    <Avatar>
-                      <img src={`${LocationImg}`} alt="location" />
-                    </Avatar>
-                    <ProfileInfo>
-                      <ProfileName>Elmer Laverty</ProfileName>
-                      <GuessTime>4. 5. 2021</GuessTime>
-                    </ProfileInfo>
-                  </Profile>
-                </LeftSide>
-                <RightSide>
-                  <Distance>10m</Distance>
-                </RightSide>
-              </Row>
-              <Row>
-                <LeftSide>
-                  <Rank className="rank">
-                    <p>3</p>
-                  </Rank>
-                  <Profile>
-                    <Avatar>
-                      <img src={`${LocationImg}`} alt="location" />
-                    </Avatar>
-                    <ProfileInfo>
-                      <ProfileName>Benny Spanbauer</ProfileName>
-                      <GuessTime>5 hours ago</GuessTime>
-                    </ProfileInfo>
-                  </Profile>
-                </LeftSide>
-                <RightSide>
-                  <Distance>23m</Distance>
-                </RightSide>
-              </Row>
-              <Row>
-                <LeftSide>
-                  <Rank className="rank">
-                    <p>4</p>
-                  </Rank>
-                  <Profile>
-                    <Avatar>
-                      <img src={`${LocationImg}`} alt="location" />
-                    </Avatar>
-                    <ProfileInfo>
-                      <ProfileName>Krishna Barbe</ProfileName>
-                      <GuessTime>50 mins ago</GuessTime>
-                    </ProfileInfo>
-                  </Profile>
-                </LeftSide>
-                <RightSide>
-                  <Distance>27m</Distance>
-                </RightSide>
-              </Row>
-              <Row className={`${isLocationGuessed}`}>
-                <LeftSide>
-                  <Rank className="rank">
-                    <p>5</p>
-                  </Rank>
-                  <Profile>
-                    <Avatar>
-                      <img src={`${LocationImg}`} alt="location" />
-                    </Avatar>
-                    <ProfileInfo>
-                      <ProfileName>You</ProfileName>
-                      <GuessTime>1 min ago</GuessTime>
-                    </ProfileInfo>
-                  </Profile>
-                </LeftSide>
-                <RightSide>
-                  <Distance className={`${isLocationGuessed}`}>50m</Distance>
-                </RightSide>
-              </Row>
-              <Row>
-                <LeftSide>
-                  <Rank className="rank">
-                    <p>6</p>
-                  </Rank>
-                  <Profile>
-                    <Avatar>
-                      <img src={`${LocationImg}`} alt="location" />
-                    </Avatar>
-                    <ProfileInfo>
-                      <ProfileName>Darcel Ballentine Ballentine</ProfileName>
-                      <GuessTime>12. 12. 2021</GuessTime>
-                    </ProfileInfo>
-                  </Profile>
-                </LeftSide>
-                <RightSide>
-                  <Distance>3253250m</Distance>
-                </RightSide>
-              </Row>
+              {locationGuesses.map((guess, index) => (
+                <Row>
+                  <LeftSide>
+                    <Rank className="rank">
+                      <p>{index + 1}</p>
+                    </Rank>
+                    <Profile>
+                      <Avatar>
+                        <img src={`${guess.profilePicture}`} alt="pp" />
+                      </Avatar>
+                      <ProfileInfo>
+                        <ProfileName>
+                          {guess.user.name} {guess.user.surname}
+                        </ProfileName>
+                        <GuessTime>{guess.createdAt}</GuessTime>
+                      </ProfileInfo>
+                    </Profile>
+                  </LeftSide>
+                  <RightSide>
+                    <Distance>{guess.distance} m</Distance>
+                  </RightSide>
+                </Row>
+              ))}
             </Table>
           </Leaderboard>
         </>

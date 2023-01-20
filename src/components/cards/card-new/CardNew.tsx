@@ -15,26 +15,34 @@ import { useContext, useEffect, useState } from "react";
 import { UpdateContext } from "../../../utils/UpdateContext";
 import { CardNewProps } from "../../../interfaces/LocationInterfaces";
 import { Link, useNavigate } from "react-router-dom";
+import { getLocationImage } from "../../../api/LocationApi";
 
 // Recives user and quote data, displays it, and handles quote voting
 
-const CardNew: React.FC<CardNewProps> = ({
-  locationid,
-  image,
-  /*quote,
-  firstName,
-  lastName,*/
-}) => {
+const CardNew: React.FC<CardNewProps> = ({ locationid }) => {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("accessToken");
-  const [quoteVoteStatus, setQuoteVoteStatus] = useState("");
-  const [userKarma, setUserKarma] = useState(0);
-  const { updated, setUpdated } = useContext(UpdateContext);
-  /*
-  useEffect(() => {
-    setUserKarma(karma);
-  }, [updated, karma]);
 
+  const [image, setImage] = useState<string>();
+  const { updated, setUpdated } = useContext(UpdateContext);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      (async () => {
+        const response = await getLocationImage(
+          locationid!,
+          JSON.parse(isLoggedIn)
+        );
+        const url = window.URL || window.webkitURL;
+        const blobUrl = url.createObjectURL(response);
+        setImage(blobUrl);
+      })().catch((e) => {
+        console.log("Error: Cant get location image. \n" + e);
+      });
+    }
+  }, [updated, isLoggedIn, locationid]);
+
+  /*
   useEffect(() => {
     (async () => {
       const response = await voteCheck(userid, JSON.parse(isLoggedIn!));
@@ -98,8 +106,11 @@ const CardNew: React.FC<CardNewProps> = ({
     <Container>
       <Location>
         <Image>
-          <img src={image} alt="location" />
-          <Link to={`/location/${locationid}`} style={{ textDecoration: "none" }}>
+          <img src={`${image}`} alt="location" />
+          <Link
+            to={`/location/${locationid}`}
+            style={{ textDecoration: "none" }}
+          >
             <Guess>
               <Button>Guess</Button>
             </Guess>

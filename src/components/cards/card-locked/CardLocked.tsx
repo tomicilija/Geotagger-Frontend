@@ -22,83 +22,34 @@ import { UpdateContext } from "../../../utils/UpdateContext";
 import { CardLockedProps } from "../../../interfaces/LocationInterfaces";
 import { Link, useNavigate } from "react-router-dom";
 import LockedIconImg from "../../../assets/icons/locked-icon.svg";
+import { getLocationImage } from "../../../api/LocationApi";
 
 // Recives user and quote data, displays it, and handles quote voting
 
-const CardLocked: React.FC<CardLockedProps> = ({
-  image,
-  /*quote,
-  firstName,
-  lastName,*/
-}) => {
+const CardLocked: React.FC<CardLockedProps> = ({locationid}) => {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("accessToken");
   const [quoteVoteStatus, setQuoteVoteStatus] = useState("");
   const [userKarma, setUserKarma] = useState(0);
+  const [image, setImage] = useState<string>();
   const { updated, setUpdated } = useContext(UpdateContext);
-  /*
-  useEffect(() => {
-    setUserKarma(karma);
-  }, [updated, karma]);
+  
 
   useEffect(() => {
-    (async () => {
-      const response = await voteCheck(userid, JSON.parse(isLoggedIn!));
-      setQuoteVoteStatus(response);
-    })().catch((e) => {
-      console.log("Error: Cant get state. \n" + e);
-    });
-  }, [updated, userid, isLoggedIn]);
-
-  const updateQuote = async () => {
-    const quote = await getUserQuote(userid);
-    setUpdated(!updated);
-    setUserKarma(quote.karma);
-  };
-
-  const upvote = async () => {
-    await upvoteQuote(userid, JSON.parse(isLoggedIn!));
-  };
-
-  const downvote = async () => {
-    await downvoteQuote(userid, JSON.parse(isLoggedIn!));
-  };
-
-  const deleteupvote = async () => {
-    await deleteUpvote(userid, JSON.parse(isLoggedIn!));
-  };
-
-  const deletedownvote = async () => {
-    await deleteDownvote(userid, JSON.parse(isLoggedIn!));
-  };
-
-  const handleUpvote = async () => {
-    if (quoteVoteStatus === "NEUTRAL") {
-      await upvote();
-    } else if (quoteVoteStatus === "DOWNVOTE") {
-      await deletedownvote();
-      await upvote();
-    } else if (quoteVoteStatus === "UPVOTE") {
-      await deleteupvote();
+    if (isLoggedIn) {
+      (async () => {
+        const response = await getLocationImage(
+          locationid!,
+          JSON.parse(isLoggedIn)
+        );
+        const url = window.URL || window.webkitURL;
+        const blobUrl = url.createObjectURL(response);
+        setImage(blobUrl);
+      })().catch((e) => {
+        console.log("Error: Cant get location image. \n" + e);
+      });
     }
-    await updateQuote();
-  };
-
-  const handleDownvote = async () => {
-    if (quoteVoteStatus === "NEUTRAL") {
-      await downvote();
-    } else if (quoteVoteStatus === "UPVOTE") {
-      await deleteupvote();
-      await downvote();
-    } else if (quoteVoteStatus === "DOWNVOTE") {
-      await deletedownvote();
-    }
-    await updateQuote();
-  };
-
-  const UserProfile = async () => {
-    return navigate(`/profile/${userid}`);
-  };*/
+  }, [updated, isLoggedIn, locationid]);
 
   return (
     <Container>

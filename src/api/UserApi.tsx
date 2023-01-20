@@ -2,7 +2,6 @@ import axios from "axios";
 import {
   Login,
   LoginResponse,
-  QuoteResponse,
   Register,
   UpdatePassword,
   UpdateProfilePicture,
@@ -85,28 +84,4 @@ export const deleteUser = async (token: string): Promise<void> => {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
-};
-
-export const getUserVotes = async (
-  id: string,
-  token: string
-): Promise<[QuoteResponse]> => {
-  const response = await axiosInstance
-    .get(`/user/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    .then((res) => {
-      if (res.data.length > 0) {
-        return res.data;
-      } else {
-        return null;
-      }
-    })
-    .catch((e) => {
-      console.log(e);
-      return e;
-    });
-  return response;
 };

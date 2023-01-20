@@ -30,6 +30,8 @@ export const Image = styled.div`
   img {
     background: url(.jpg);
     width: 420px;
+    height: 237px;
+    object-fit: cover;
     border-radius: 4px;
   }
   @media (max-width: 900px) {

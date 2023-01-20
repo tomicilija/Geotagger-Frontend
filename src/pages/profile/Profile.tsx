@@ -18,6 +18,10 @@ import LocationImg from "../../assets/s6L0uQyprpE.png";
 import CardEdit from "../../components/cards/card-edit/CardEdit";
 import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
 import { UpdateContext } from "../../utils/UpdateContext";
+import { GuessResponse, LocationResponse } from "../../interfaces/LocationInterfaces";
+import { getLocations, getMyLocations } from "../../api/LocationApi";
+import CardGrid from "../../components/card-grid/CardGrid";
+import { getMyGuesses } from "../../api/GuessApi";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
@@ -35,6 +39,9 @@ const Profile = () => {
   const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
     window.innerWidth > 1340
   );
+
+  const [myLocations, setMyLocations] = useState<string[]>([]);
+  const [guessedLocations, setGuessedLocations] = useState<string[]>([]);
 
   const [image, setImage] = useState<string>();
 
@@ -64,6 +71,16 @@ const Profile = () => {
       })().catch((e) => {
         console.log("Error: Cant get user. \n" + e);
       });
+      (async () => {
+        const locations = await getMyLocations(JSON.parse(isLoggedIn));
+        const locationsId = locations.map(object => object.id);
+        setMyLocations(locationsId);
+      })();
+      (async () => {
+        const locations = await getMyGuesses(JSON.parse(isLoggedIn));
+        const locationsId = locations.map(object => object.location_id);
+        setGuessedLocations(locationsId);
+      })();
     }
   }, [updated, isLoggedIn]);
 
@@ -174,11 +191,7 @@ const Profile = () => {
                 <h5>My best guesses</h5>
               </Tittle>
 
-              <CardGuessed
-                locationid={"1"}
-                image={`${LocationImg}`}
-                distance={255}
-              />
+              <CardGrid locationId={guessedLocations} cardStyle={"card-guessed"}   />
 
               {/*
             {isThreeCollumnSizeGrid ? (
@@ -202,7 +215,7 @@ const Profile = () => {
                 <h5>My uploads</h5>
               </Tittle>
 
-              <CardEdit locationid={"1"} image={`${LocationImg}`} />
+              <CardGrid locationId={myLocations} cardStyle={"card-edit"} />
 
               {/*
             {isThreeCollumnSizeGrid ? (
