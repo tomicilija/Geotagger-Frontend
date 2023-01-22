@@ -24,6 +24,7 @@ import { CardGuessedProps } from "../../../interfaces/LocationInterfaces";
 import { Link, useNavigate } from "react-router-dom";
 import { getLocationImage } from "../../../api/LocationApi";
 import { getGuessesByLocationId } from "../../../api/GuessApi";
+import { getSignedInUser } from "../../../api/UserApi";
 
 // Recives user and quote data, displays it, and handles quote voting
 
@@ -34,10 +35,21 @@ const CardGuessed: React.FC<CardGuessedProps> = ({ locationid }) => {
   const [userKarma, setUserKarma] = useState(0);
   const [image, setImage] = useState<string>();
   const [distance, setDistance] = useState<string>();
+  const [userid, setUserId] = useState("");
   const { updated, setUpdated } = useContext(UpdateContext);
-  
+
   useEffect(() => {
     if (isLoggedIn) {
+      (async () => {
+        const response = await getSignedInUser(JSON.parse(isLoggedIn));
+        setUserId(response.id);
+      })().catch((e) => {
+        if (e.response.status === 401) {
+          console.log("Unauthorized");
+        } else {
+          console.log("Error: Cant get user. \n" + e);
+        }
+      });
       (async () => {
         const response = await getLocationImage(
           locationid!,
@@ -53,14 +65,20 @@ const CardGuessed: React.FC<CardGuessedProps> = ({ locationid }) => {
         const response = await getGuessesByLocationId(
           locationid!,
           JSON.parse(isLoggedIn)
-        ); 
-        const distance = response.map(item => item.distance)
-        setDistance((distance).toString())
+        );
+
+        const allDistances = response.map((guess) => {
+          if (guess.user.id === userid) {
+            return guess.distance;
+          } else return null;
+        });
+        const distance = allDistances.filter(val => val !== null).map(val => val);
+        setDistance(distance[0]!.toString());
       })().catch((e) => {
         console.log("Error: Cant get location guesses. \n" + e);
       });
     }
-  }, [updated, isLoggedIn, locationid]);
+  }, [updated, isLoggedIn, locationid, userid]);
   /*
   useEffect(() => {
     setUserKarma(karma);
