@@ -23,10 +23,17 @@ export const getGuessesByLocationId = async (
   return response.data;
 };
 
-export const getMyGuesses = async (token: string): Promise<GuessResponse[]> => {
-  const response = await axiosInstance.get(`/location/guesses/me`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const getMyGuesses = async (
+  page: number,
+  size: number,
+  token: string
+): Promise<GuessResponse[]> => {
+  const response = await axiosInstance.get(
+    `/location/guesses/me?page=${page}&size=${size * page}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return response.data;
 };
 
@@ -34,8 +41,12 @@ export const guessLocation = async (
   guess: Guess,
   token: string
 ): Promise<GuessResponse> => {
-  const response = await axiosInstance.post(`/location/guess/${guess.id}`, guess, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await axiosInstance.post(
+    `/location/guess/${guess.id}`,
+    guess,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return response.data;
 };

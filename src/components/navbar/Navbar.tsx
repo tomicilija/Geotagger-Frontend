@@ -37,7 +37,9 @@ import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
  */
 
 const Navbar = () => {
-  const isLoggedIn = localStorage.getItem("accessToken");
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("accessToken")
+  );
   let location = useLocation();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -61,7 +63,12 @@ const Navbar = () => {
         setLastName(response.surname);
         setUserId(response.id);
       })().catch((e) => {
-        console.log("Error: Cant get user. \n" + e);
+        if (e.response.status === 401) {
+          console.log("Unauthorized");
+          setIsLoggedIn(null);
+        } else {
+          console.log("Error: Cant get user. \n" + e);
+        }
       });
     }
   }, [updated, isLoggedIn]);

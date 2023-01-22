@@ -195,7 +195,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
       localStorage.clear();
       window.location.href = "/";
     })().catch((err) => {
-      console.log(err);
       setErrorMessage(err.message);
     });
   };
@@ -350,7 +349,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                 <p>Change your profile photo.</p>
                 <h5>{ErrorMessage}</h5>
               </SettingsHeader>
-              {/* <DefaultProfilePicture /> */}
               <form onSubmit={handleSubmitProfilePicture}>
                 <SettingsForm>
                   <UploadImage>

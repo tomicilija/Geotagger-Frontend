@@ -48,12 +48,15 @@ import { getLocationImage } from "../../../api/LocationApi";
 import { getGuessesByLocationId, guessLocation } from "../../../api/GuessApi";
 import { GuessResponseById } from "../../../interfaces/LocationInterfaces";
 import moment from "moment-timezone";
-import { getUserProfilePicture } from "../../../api/UserApi";
+import { getSignedInUser, getUserProfilePicture } from "../../../api/UserApi";
+import { sign } from "crypto";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
 const GuessLocation = () => {
-  const isLoggedIn = localStorage.getItem("accessToken");
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("accessToken")
+  );
   const [userid, setUserId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -76,8 +79,6 @@ const GuessLocation = () => {
   const [locationGuesses, setLocationGuesses] = useState<GuessResponseById[]>(
     []
   );
-
-  const isLocationGuessed = true;
 
   const [coordinates, setCoordinates] = useState({
     lat: 37.77414,
@@ -155,12 +156,19 @@ const GuessLocation = () => {
   };
 
   useEffect(() => {
+    (async () => {
+      const response = await getSignedInUser(JSON.parse(isLoggedIn!));
+      setUserId(response.id);
+    })().catch((e) => {
+      console.log("Error: Cant get user. \n" + e);
+    });
+
     fetchGuesses()
       .then((data) => setLocationGuesses(data))
       .catch((e) => {
         console.log("Error: Can't get location guesses. \n" + e);
       });
-  }, [coordinates, id, isLoggedIn, errorDistance]);
+  }, [coordinates, id, isLoggedIn, errorDistance, userid]);
 
   useEffect(() => {
     getAddressFromCoordinates();
@@ -203,6 +211,13 @@ const GuessLocation = () => {
         setLocationImage(blobUrl);
       })().catch((e) => {
         console.log("Error: Cant get location image. \n" + e);
+      }).catch((e) => {
+        if (e.response.status === 401) {
+          console.log("Unauthorized");
+          setIsLoggedIn(null);
+        } else {
+          console.log("Error: Cant get location. \n" + e);
+        }
       });
     }
   }, [updated, isLoggedIn, id]);
@@ -296,27 +311,71 @@ const GuessLocation = () => {
             </Tittle>
             <Table>
               {locationGuesses.map((guess, index) => (
-                <Row>
-                  <LeftSide>
-                    <Rank className="rank">
-                      <p>{index + 1}</p>
-                    </Rank>
-                    <Profile>
-                      <Avatar>
-                        <img src={`${guess.profilePicture}`} alt="pp" />
-                      </Avatar>
-                      <ProfileInfo>
-                        <ProfileName>
-                          {guess.user.name} {guess.user.surname}
-                        </ProfileName>
-                        <GuessTime>{guess.createdAt}</GuessTime>
-                      </ProfileInfo>
-                    </Profile>
-                  </LeftSide>
-                  <RightSide>
-                    <Distance>{guess.distance} m</Distance>
-                  </RightSide>
-                </Row>
+                <>
+                  {userid === guess.user.id && guess.createdAt==="Now" ? (
+                    <Row className="you-row fadeInFromAbove">
+                      <LeftSide>
+                        <Rank className="rank">
+                          <p>{index + 1}</p>
+                        </Rank>
+                        <Profile>
+                          <Avatar>
+                            <img src={`${guess.profilePicture}`} alt="pp" />
+                          </Avatar>
+                          <ProfileInfo>
+                            <ProfileName>You</ProfileName>
+                            <GuessTime>{guess.createdAt}</GuessTime>
+                          </ProfileInfo>
+                        </Profile>
+                      </LeftSide>
+                      <RightSide>
+                        <Distance className="you-distance">{guess.distance} m</Distance>
+                      </RightSide>
+                    </Row>
+                  ) : userid === guess.user.id && guess.createdAt!=="Now" ? (
+                    <Row className="you-row">
+                      <LeftSide>
+                        <Rank className="rank">
+                          <p>{index + 1}</p>
+                        </Rank>
+                        <Profile>
+                          <Avatar>
+                            <img src={`${guess.profilePicture}`} alt="pp" />
+                          </Avatar>
+                          <ProfileInfo>
+                            <ProfileName>You</ProfileName>
+                            <GuessTime>{guess.createdAt}</GuessTime>
+                          </ProfileInfo>
+                        </Profile>
+                      </LeftSide>
+                      <RightSide>
+                        <Distance className="you-distance">{guess.distance} m</Distance>
+                      </RightSide>
+                    </Row>
+                  ) : (
+                    <Row>
+                      <LeftSide>
+                        <Rank className="rank">
+                          <p>{index + 1}</p>
+                        </Rank>
+                        <Profile>
+                          <Avatar>
+                            <img src={`${guess.profilePicture}`} alt="pp" />
+                          </Avatar>
+                          <ProfileInfo>
+                            <ProfileName>
+                              {guess.user.name} {guess.user.surname}
+                            </ProfileName>
+                            <GuessTime>{guess.createdAt}</GuessTime>
+                          </ProfileInfo>
+                        </Profile>
+                      </LeftSide>
+                      <RightSide>
+                        <Distance>{guess.distance} m</Distance>
+                      </RightSide>
+                    </Row>
+                  )}
+                </>
               ))}
             </Table>
           </Leaderboard>
@@ -324,7 +383,7 @@ const GuessLocation = () => {
       ) : (
         <NotFound>
           <h3>
-            Error 402! <span>Unauthorized</span>.
+            Error 401! <span>Unauthorized</span>.
           </h3>
           <p>You are not logged in. Please log in to guess the locaton.</p>
           <Link to="/" style={{ textDecoration: "none" }}>

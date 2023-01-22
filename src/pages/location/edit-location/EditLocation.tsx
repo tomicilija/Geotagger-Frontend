@@ -12,7 +12,7 @@ import {
 import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 /*import Card from "../../components/card/Card";
 import CardGrid from "../../components/card-grid/CardGrid";*/
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { ReactComponent as DefaultProfileIcon } from "../../../assets/icons/profile.svg";
 import LocationImg from "../../assets/s6L0uQyprpE.png";
 /*import { getSignedInUser, getUserById, getUserVotes } from "../../api/UserApi";
@@ -23,11 +23,21 @@ import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
 import * as img from "../../../assets/placeholder-location-image.png";
 import { preProcessFile } from "typescript";
+import {
+  getLocationById,
+  getLocationImage,
+  updateLocation,
+} from "../../../api/LocationApi";
+import { UpdateContext } from "../../../utils/UpdateContext";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
 const EditLocation = () => {
-  const isLoggedIn = true; //localStorage.getItem("accessToken");
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("accessToken")
+  );
+  const navigate = useNavigate();
+  const [addrss, setAddress] = useState("");
   const [userid, setUserId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -43,6 +53,8 @@ const EditLocation = () => {
   //const { updated } = useContext(UpdateContext);
   const { id } = useParams();
 
+  const { updated } = useContext(UpdateContext);
+  const [ErrorMessage, setErrorMessage] = useState("");
   const [coordinates, setCoordinates] = useState({
     lat: 37.77414,
     lng: -122.420052,
@@ -75,12 +87,82 @@ const EditLocation = () => {
     googleMapsApiKey: mapsApiKey,
   });
 
-  useEffect(() => {
-    console.log(coordinates);
-  }, [coordinates]);
-
   const [image, setImage] = useState<File>();
   const [preview, setPreview] = useState<string>(PlaceholderImage);
+
+  const [locationImage, setLocationImage] = useState<string>(PlaceholderImage);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      (async () => {
+        const response = await getLocationById(id!, JSON.parse(isLoggedIn!));
+        setAddress(response.name);
+        setCoordinates({
+          lat: response.latitude as number,
+          lng: response.longitude as number,
+        });
+      })().catch((e) => {
+        setErrorMessage(e.response.data.message);
+      });
+
+      (async () => {
+        const response = await getLocationImage(id!, JSON.parse(isLoggedIn));
+        const url = window.URL || window.webkitURL;
+        const blobUrl = url.createObjectURL(response);
+        setLocationImage(blobUrl);
+        setPreview(blobUrl);
+      })()
+        .catch((e) => {
+          console.log("Error: Cant get location image. \n" + e);
+        })
+        .catch((e) => {
+          if (e.response.status === 401) {
+            console.log("Unauthorized");
+            setIsLoggedIn(null);
+          } else {
+            console.log("Error: Cant get location. \n" + e);
+          }
+        });
+    }
+  }, [updated, isLoggedIn, id]);
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
+    e.preventDefault(); // To prevent refreshing the page on form submit
+    console.log(id);
+    console.log(addrss);
+    console.log(coordinates);
+    console.log(image);
+    (async () => {
+      await updateLocation(
+        id!,
+        {
+          name: addrss,
+          latitude: coordinates.lat,
+          longitude: coordinates.lng,
+          image: image!,
+        },
+        JSON.parse(isLoggedIn!)
+      );
+      return navigate("/profile");
+    })().catch((e) => {
+      setErrorMessage(e.response.data.message);
+    });
+  };
+
+  const handleUpload = async () => {
+    document.getElementById("selectImages")!.click();
+  };
+
+  const handleDiscard = async () => {
+    setPreview(locationImage);
+    document.getElementById("selectImages")!.blur();
+    setImage(undefined);
+  };
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files![0];
+    setImage(file);
+  };
 
   useEffect(() => {
     if (image) {
@@ -92,21 +174,6 @@ const EditLocation = () => {
     }
   }, [image]);
 
-  const handleUpload = async () => {
-    document.getElementById("selectImages")!.click();
-  };
-
-  const handleDiscard = async () => {
-    setPreview(PlaceholderImage);
-    document.getElementById("selectImages")!.blur();
-    setImage(undefined);
-  };
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files![0];
-    setImage(file);
-  };
-
   return (
     <Container>
       {isLoggedIn ? (
@@ -117,23 +184,23 @@ const EditLocation = () => {
                 Edit <span>location</span>.
               </h4>
             </Tittle>
-            <form>
-              {/*onSubmit={handleSubmit}*/}
+            <form onSubmit={handleSubmit}>
               <UploadImage>
                 <Image>
                   <img
-                    src={preview}
+                    src={`${preview}`}
                     alt="location"
                     style={{ objectFit: "cover" }}
                   />
                 </Image>
-                <p>Location: {locationName}</p>
+                <p>Location: {addrss}</p>
+                <p>{ErrorMessage}</p>
                 <Buttons>
                   <Button type="button" onClick={handleUpload}>
                     Upload image
                   </Button>
                   <div>
-                    <Button type="button">Save</Button>
+                    <Button type="submit">Save</Button>
                     <Button type="button" onClick={handleDiscard}>
                       Cancel
                     </Button>
@@ -153,7 +220,7 @@ const EditLocation = () => {
       ) : (
         <NotFound>
           <h3>
-            Error 402! <span>Unauthorized</span>.
+            Error 401! <span>Unauthorized</span>.
           </h3>
           <p>You are not logged in. Please log in to add a new locaton.</p>
           <Link to="/" style={{ textDecoration: "none" }}>

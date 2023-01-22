@@ -14,8 +14,47 @@ export const CardWrapper = styled.div`
     display: flex;
     width: auto;
   }
+  .horizontal {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    width: 100%;
+    @media (max-width: 700px) {
+      position: absolute;
+      overflow-x: scroll;
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: start;
+      align-items: flex-start;
+      align-content: flex-start;
+      margin-top: -30px;
+      margin-left: 20px;
+      width: 90vw;
+    }
+  }
+
+  .horizontal > div {
+    width: 33.3333%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    @media (max-width: 1440px) {
+      width: 50%;
+    }
+    @media (max-width: 1000px) {
+      width: 100%;
+    }
+  }
 
   @media (max-width: 900px) {
+    margin-top: 20px;
+    align-items: center;
   }
 `;
 
@@ -48,4 +87,3 @@ export const NotFound = styled.div`
     color: #000000;
   }
 `;
-

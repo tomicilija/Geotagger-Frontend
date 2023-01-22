@@ -38,6 +38,7 @@ const CardEdit: React.FC<CardEditProps> = ({ locationid }) => {
   const [image, setImage] = useState<string>();
 
   const openDeleteModal = () => {
+    localStorage.setItem("deleteLocationId", locationid);
     localStorage.setItem("isDeleteModalOpen", "true");
     setUpdated(!updated);
   };

@@ -33,7 +33,9 @@ import { postLocation } from "../../../api/LocationApi";
 // On profile page user quote, karma, and liked quotes is displayed
 
 const AddLocation = () => {
-  const isLoggedIn = localStorage.getItem("accessToken");
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("accessToken")
+  );
   const navigate = useNavigate();
   const [userid, setUserId] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -75,7 +77,14 @@ const AddLocation = () => {
   });
 
   useEffect(() => {
-    getAddressFromCoordinates();
+    getAddressFromCoordinates().catch((e) => {
+      if (e.response.status === 401) {
+        console.log("Unauthorized");
+        setIsLoggedIn(null);
+      } else {
+        console.log("Error: Cant get location. \n" + e);
+      }
+    });
   }, [coordinates]);
 
   const handleMapClick = async (e: any) => {
@@ -88,32 +97,37 @@ const AddLocation = () => {
 
   const getAddressFromCoordinates = async () => {
     const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ location: coordinates, language: 'en' }, (results, status) => {
-      if (status === "OK") {
-        if (results![0]) {
-          setAddress(results![0].formatted_address);
+    geocoder.geocode(
+      { location: coordinates, language: "en" },
+      (results, status) => {
+        if (status === "OK") {
+          if (results![0]) {
+            setAddress(results![0].formatted_address);
+          } else {
+            console.log("No results found");
+          }
         } else {
-          console.log("No results found");
+          console.log("Geocoder failed due to: " + status);
         }
-      } else {
-        console.log("Geocoder failed due to: " + status);
       }
-    });
+    );
   };
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
     (async () => {
-      await postLocation({
-        name: addrss,
-        latitude: Number(coordinates.lat.toFixed(6)),
-        longitude: Number(coordinates.lng.toFixed(6)),
-        image: image!,
-      }, 
-      JSON.parse(isLoggedIn!));
+      await postLocation(
+        {
+          name: addrss,
+          latitude: Number(coordinates.lat.toFixed(6)),
+          longitude: Number(coordinates.lng.toFixed(6)),
+          image: image!,
+        },
+        JSON.parse(isLoggedIn!)
+      );
       return navigate("/profile");
-    })().catch((err) => {
-      setErrorMessage(err.response.data.message);
+    })().catch((e) => {
+      setErrorMessage(e.response.data.message);
     });
   };
 
@@ -225,7 +239,7 @@ const AddLocation = () => {
       ) : (
         <NotFound>
           <h3>
-            Error 402! <span>Unauthorized</span>.
+            Error 401! <span>Unauthorized</span>.
           </h3>
           <p>You are not logged in. Please log in to add a new locaton.</p>
           <Link to="/" style={{ textDecoration: "none" }}>

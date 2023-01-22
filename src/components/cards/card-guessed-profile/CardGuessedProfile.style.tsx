@@ -9,9 +9,9 @@ export const Container = styled.div`
   margin-left: 20px;
   margin-bottom: 20px;
 
-  max-width: 80vw;
   @media (max-width: 900px) {
-    margin-left: 20px;
+    max-width: 100%;
+    margin-left: 0px;
   }
 `;
 
@@ -26,20 +26,22 @@ export const Image = styled.div`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: 420px;
-  max-width: 80vw;
+  width: 311px;
   img {
-    max-width: 80vw;
     background: url(.jpg);
-    width: 420px;
-    height: 237px;
+    width: 311px;
+    height: 175px;
     object-fit: cover;
     border-radius: 4px;
   }
   @media (max-width: 900px) {
-    max-width: 80vw;
+    max-width: 100%;
+    width: 420px;
+    height: 237px;
     img {
-      max-width: 80vw;
+      max-width: 100%;
+      width: 420px;
+      height: 237px;
     }
   }
 `;
@@ -50,7 +52,7 @@ export const Overlay = styled.div`
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  width: 420px;
+  width: 100%;
   height: 100%;
   background: linear-gradient(
     90deg,
@@ -66,8 +68,6 @@ export const Overlay = styled.div`
     line-height: 36px;
     color: #ffffff;
   }
-  @media (max-width: 900px) {
-    max-width: 80vw;}
 `;
 
 export const Guess = styled.div`
@@ -82,15 +82,13 @@ export const Guess = styled.div`
   left: 0;
   right: 0;
   height: 100%;
-  width: 420px;
+  width: 100%;
   transition: 0.8s ease;
   background-color: #669f89;
   border-radius: 4px;
   &:hover {
     opacity: 1;
   }
-  @media (max-width: 900px) {
-    max-width: 80vw;}
 `;
 
 export const Button = styled.button`

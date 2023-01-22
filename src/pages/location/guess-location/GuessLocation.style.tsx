@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 export const Container = styled.div`
   position: relative;
@@ -236,7 +236,6 @@ export const Leaderboard = styled.div`
   padding: 0 10px 0 10px;
   width: 20%;
   min-width: 420px;
-  height: 80vh;
   min-height: 650px;
 
   @media (max-width: 900px) {
@@ -261,11 +260,27 @@ export const Table = styled.div`
   width: 100%;
   gap: 8px;
 
-  .true {
+  .you-row {
     background: #619b8a;
     border-radius: 4px;
   }
+  .you-distance {
+    color: #ffffff;
+  }
 
+  .fadeInFromAbove{
+    animation: fadeInFromAbove 1s ease-in-out forwards;
+  }
+  @keyframes fadeInFromAbove {
+    0% {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
   @media (max-width: 900px) {
   }
 `;

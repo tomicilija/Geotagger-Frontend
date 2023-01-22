@@ -98,6 +98,9 @@ export const MostUpvoated = styled.div`
 
   @media (max-width: 900px) {
     margin-bottom: 0;
+    :first-child {
+      margin-bottom: 250px;
+    }
   }
 `;
 
@@ -243,5 +246,35 @@ export const Slogan = styled.div`
     p {
       text-align: center;
     }
+  }
+`;
+
+export const LoadMore = styled.div`
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 50px;
+
+  width: 130px;
+  height: 40px;
+
+  border: 1px solid #669f89;
+  border-radius: 4px;
+
+  font-family: "Roboto";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 19px;
+  text-transform: uppercase;
+
+  color: #619b8a;
+
+  cursor: pointer;
+
+  :hover {
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
   }
 `;

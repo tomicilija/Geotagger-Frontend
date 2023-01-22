@@ -9,6 +9,7 @@ import {
   Wrapper,
   MostUpvoated,
   Tittle,
+  LoadMore,
 } from "./Profile.style";
 /*import Card from "../../components/card/Card";
 import CardGrid from "../../components/card-grid/CardGrid";*/
@@ -18,7 +19,10 @@ import LocationImg from "../../assets/s6L0uQyprpE.png";
 import CardEdit from "../../components/cards/card-edit/CardEdit";
 import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
 import { UpdateContext } from "../../utils/UpdateContext";
-import { GuessResponse, LocationResponse } from "../../interfaces/LocationInterfaces";
+import {
+  GuessResponse,
+  LocationResponse,
+} from "../../interfaces/LocationInterfaces";
 import { getLocations, getMyLocations } from "../../api/LocationApi";
 import CardGrid from "../../components/card-grid/CardGrid";
 import { getMyGuesses } from "../../api/GuessApi";
@@ -26,26 +30,23 @@ import { getMyGuesses } from "../../api/GuessApi";
 // On profile page user quote, karma, and liked quotes is displayed
 
 const Profile = () => {
-  const isLoggedIn = localStorage.getItem("accessToken");
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("accessToken")
+  );
   const [userid, setUserId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [userQquote, setUserQquote] = useState("");
-  const [userKarma, setUserKarma] = useState(0);
-  // const [userVotes, setUserVotes] = useState<QuoteResponse[]>([]);
-  const [userHasLikes, setUserHasLikes] = useState(false);
-  const [showedQuotesDesktop, setShowedQuotesDesktop] = useState(9);
-  const [showedQuotesMobile, setShowedQuotesMobile] = useState(4);
-  const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
-    window.innerWidth > 1340
-  );
+  const [locationsPage, setLocationsPage] = useState(1);
+  const [locationsSize] = useState(4);
+  const [guessesPage, setGuessedPage] = useState(1);
+  const [guessesSize] = useState(4);
 
   const [myLocations, setMyLocations] = useState<string[]>([]);
   const [guessedLocations, setGuessedLocations] = useState<string[]>([]);
 
   const [image, setImage] = useState<string>();
 
-  const { updated } = useContext(UpdateContext);
+  const { updated, setUpdated } = useContext(UpdateContext);
   const { id } = useParams();
 
   /*
@@ -57,10 +58,6 @@ const Profile = () => {
    * 2 and 1 column shows max of 4 cards, and loads by 4 cards
    */
 
-  const updateScreenSize = () => {
-    setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
-  };
-
   useEffect(() => {
     if (isLoggedIn) {
       (async () => {
@@ -69,16 +66,29 @@ const Profile = () => {
         setLastName(response.surname);
         setUserId(response.id);
       })().catch((e) => {
-        console.log("Error: Cant get user. \n" + e);
+        if (e.response.status === 401) {
+          console.log("Unauthorized");
+          setIsLoggedIn(null);
+        } else {
+          console.log("Error: Cant get user. \n" + e);
+        }
       });
       (async () => {
-        const locations = await getMyLocations(JSON.parse(isLoggedIn));
-        const locationsId = locations.map(object => object.id);
+        const locations = await getMyLocations(
+          locationsPage,
+          locationsSize,
+          JSON.parse(isLoggedIn)
+        );
+        const locationsId = locations.map((object) => object.id);
         setMyLocations(locationsId);
       })();
       (async () => {
-        const locations = await getMyGuesses(JSON.parse(isLoggedIn));
-        const locationsId = locations.map(object => object.location_id);
+        const locations = await getMyGuesses(
+          guessesPage,
+          guessesSize,
+          JSON.parse(isLoggedIn)
+        );
+        const locationsId = locations.map((object) => object.location_id);
         setGuessedLocations(locationsId);
       })();
     }
@@ -100,74 +110,15 @@ const Profile = () => {
     }
   }, [updated, isLoggedIn, userid]);
 
-  useEffect(() => {
-    window.addEventListener("resize", updateScreenSize);
-    return () => window.removeEventListener("resize", updateScreenSize);
-  });
-
-  const loadQuotesDesktop = () => {
-    setShowedQuotesDesktop((prevValue) => prevValue + 9);
+  const loadNewLocations = () => {
+    setLocationsPage(locationsPage + 1);
+    setUpdated(!updated);
   };
 
-  const loadQuotesMobile = () => {
-    setShowedQuotesMobile((prevValue) => prevValue + 4);
+  const loadMyGuesses = () => {
+    setGuessedPage(guessesPage + 1);
+    setUpdated(!updated);
   };
-  /*
-  useEffect(() => {
-    if (isLoggedIn) {
-      if (id){
-        (async () => {
-          const response = await getUserById(id, JSON.parse(isLoggedIn));
-          setFirstName(response.name);
-          setLastName(response.surname);
-          setUserId(response.id);
-        })().catch((e) => {
-          console.log("Error: Cant get user. \n" + e);
-          window.location.href = "/";
-        });
-  
-        (async () => {
-          const response = await getUserQuote(id);
-          setUserQquote(response.text);
-          setUserKarma(response.karma);
-        })().catch((e) => {
-          console.log("Error! Cant get users quote. \n" + e);
-        });
-      } else{
-        (async () => {
-          const response = await getSignedInUser(JSON.parse(isLoggedIn));
-          setFirstName(response.name);
-          setLastName(response.surname);
-          setUserId(response.id);
-        })().catch((e) => {
-          console.log("Error: Cant get user. \n" + e);
-        });
-  
-        (async () => {
-          const response = await getMyQuote(JSON.parse(isLoggedIn));
-          setUserQquote(response.text);
-          setUserKarma(response.karma);
-        })().catch((e) => {
-          console.log("Error! Cant get users quote. \n" + e);
-        });
-      }
-
-      if (userid) {
-        (async () => {
-          const response = await getUserVotes(userid, JSON.parse(isLoggedIn));
-          if (response) {
-            setUserVotes(response);
-            setUserHasLikes(true);
-          } else {
-            setUserHasLikes(false);
-            console.log("User has no likes of other posts!");
-          }
-        })().catch((e) => {
-          console.log("Error! Cant get users votes: " + e);
-        });
-      }
-    }
-  }, [id, userid, updated, isLoggedIn]);*/
 
   return (
     <Container>
@@ -191,24 +142,11 @@ const Profile = () => {
                 <h5>My best guesses</h5>
               </Tittle>
 
-              <CardGrid locationId={guessedLocations} cardStyle={"card-guessed"}   />
-
-              {/*
-            {isThreeCollumnSizeGrid ? (
-              <>
-                <CardGrid
-                  quotes={mostLikedQuotes.slice(0, showedLikedQuotesDesktop)}
-                />
-                <SeeMore onClick={loadLikedQuotesDesktop}>Load more</SeeMore>
-              </>
-            ) : (
-              <>
-                <CardGrid
-                  quotes={mostLikedQuotes.slice(0, showedLikedQuotesMobile)}
-                />
-                <SeeMore onClick={loadLikedQuotesMobile}>Load more</SeeMore>
-              </>
-            )}*/}
+              <CardGrid
+                locationId={guessedLocations}
+                cardStyle={"card-guessed-profile"}
+              />
+              <LoadMore onClick={loadMyGuesses}>Load more</LoadMore>
             </MostUpvoated>
             <MostUpvoated>
               <Tittle>
@@ -216,23 +154,7 @@ const Profile = () => {
               </Tittle>
 
               <CardGrid locationId={myLocations} cardStyle={"card-edit"} />
-
-              {/*
-            {isThreeCollumnSizeGrid ? (
-              <>
-                <CardGrid
-                  quotes={recentQuotes.slice(0, showedRecentQuotesDesktop)}
-                />
-                <SeeMore onClick={loadRecentQuotesDesktop}>Load more</SeeMore>
-              </>
-            ) : (
-              <>
-                <CardGrid
-                  quotes={recentQuotes.slice(0, showedRecentQuotesMobile)}
-                />
-                <SeeMore onClick={loadRecentQuotesMobile}>Load more</SeeMore>
-              </>
-            )}*/}
+              <LoadMore onClick={loadNewLocations}>Load more</LoadMore>
             </MostUpvoated>
           </Wrapper>
         </>

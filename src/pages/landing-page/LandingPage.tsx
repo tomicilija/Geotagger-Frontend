@@ -10,6 +10,7 @@ import {
   Slogan,
   Button,
   BgMap,
+  LoadMore,
 } from "./LandingPage.style";
 import { Link } from "react-router-dom";
 //import { getMostUpvoatedQuotes, getMostRecentQuotes } from "../../api/QuoteApi";
@@ -24,37 +25,23 @@ import CardGrid from "../../components/card-grid/CardGrid";
 import { LocationResponse } from "../../interfaces/LocationInterfaces";
 import { getLocations } from "../../api/LocationApi";
 import { getMyGuesses } from "../../api/GuessApi";
+import { setuid } from "process";
 
 // One version of landing page can be shown to anyone, logged in user sees different version, same for mobile users
 
-const quote = {
-  userid: "",
-  karma: 0,
-  text: "",
-  name: "",
-  surname: "",
-};
-
 const LandingPage = () => {
-  const isLoggedIn = localStorage.getItem("accessToken");
-  /*
-  const [mostLikedQuotes, setMostLikedQuotes] = useState<QuoteResponse[]>([]);
-  const [randomQuote, setRandomQuote] = useState<QuoteResponse>(quote);
-  const [heroQuote1, setHeroQuote1] = useState<QuoteResponse>(quote);
-  const [heroQuote2, setHeroQuote2] = useState<QuoteResponse>(quote);
-  const [heroQuote3, setHeroQuote3] = useState<QuoteResponse>(quote);*/
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("accessToken")
+  );
 
   const [newLocations, setNewLocations] = useState<string[]>([]);
-  const [guessedLocations, setguessedLocations] = useState<string[]>([]);
+  const [guessedLocations, setGuessedLocations] = useState<string[]>([]);
+  const [locationsPage, setLocationsPage] = useState(1);
+  const [locationsSize] = useState(3);
+  const [guessesPage, setGuessedPage] = useState(1);
+  const [guessesSize] = useState(3);
 
-  const [showedLikedQuotesDesktop, setShowedLikedQuotesDesktop] = useState(9);
-  const [showedRecentQuotesDesktop, setShowedRecentQuotesDesktop] = useState(9);
-  const [showedLikedQuotesMobile, setShowedLikedQuotesMobile] = useState(4);
-  const [showedRecentQuotesMobile, setShowedRecentQuotesMobile] = useState(4);
-  const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
-    window.innerWidth > 1340
-  );
-  const { updated } = useContext(UpdateContext);
+  const { updated, setUpdated } = useContext(UpdateContext);
 
   /*
    * Quote cards can be shown in grid of 3, 2, or 1 columns, depending on screen width
@@ -62,43 +49,51 @@ const LandingPage = () => {
    * 2 and 1 column shows max of 4 cards, and loads by 4 cards
    */
 
-  const updateScreenSize = () => {
-    setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
+
+  const loadNewLocations = () => {
+    setLocationsPage(locationsPage + 1);
+    setUpdated(!updated);
   };
 
-  useEffect(() => {
-    window.addEventListener("resize", updateScreenSize);
-    return () => window.removeEventListener("resize", updateScreenSize);
-  });
-
-  const loadLikedQuotesDesktop = () => {
-    setShowedLikedQuotesDesktop((prevValue) => prevValue + 9);
-  };
-
-  const loadLikedQuotesMobile = () => {
-    setShowedLikedQuotesMobile((prevValue) => prevValue + 4);
-  };
-
-  const loadRecentQuotesDesktop = () => {
-    setShowedRecentQuotesDesktop((prevValue) => prevValue + 9);
-  };
-
-  const loadRecentQuotesMobile = () => {
-    setShowedRecentQuotesMobile((prevValue) => prevValue + 4);
+  const loadMyGuesses = () => {
+    setGuessedPage(guessesPage + 1);
+    setUpdated(!updated);
   };
 
   useEffect(() => {
     if (isLoggedIn) {
       (async () => {
-        const locations = await getLocations(JSON.parse(isLoggedIn));
-        const locationsId = locations.map(object => object.id);
+        const locations = await getLocations(
+          locationsPage,
+          locationsSize,
+          JSON.parse(isLoggedIn)
+        );
+        const locationsId = locations.map((object) => object.id);
         setNewLocations(locationsId);
-      })();
+      })().catch((e) => {
+        if (e.response.status === 401) {
+          console.log("Unauthorized");
+          setIsLoggedIn(null);
+        } else {
+          console.log("Error: Cant get location. \n" + e);
+        }
+      });
       (async () => {
-        const locations = await getMyGuesses(JSON.parse(isLoggedIn));
-        const locationsId = locations.map(object => object.location_id);
-        setguessedLocations(locationsId);
-      })();
+        const locations = await getMyGuesses(
+          guessesPage,
+          guessesSize,
+          JSON.parse(isLoggedIn)
+        );
+        const locationsId = locations.map((object) => object.location_id);
+        setGuessedLocations(locationsId);
+      })().catch((e) => {
+        if (e.response.status === 401) {
+          console.log("Unauthorized");
+          setIsLoggedIn(null);
+        } else {
+          console.log("Error: Cant get guesses. \n" + e);
+        }
+      });
     }
   }, [updated, isLoggedIn]);
 
@@ -113,33 +108,12 @@ const LandingPage = () => {
                 Your personal best guesses appear here. Go on and try to beat
                 your personal records or set a new one!
               </p>
-            </Tittle>{
-            <CardGrid locationId={guessedLocations} cardStyle={"card-guessed"}   />
-            
-            /*
-            
-
-            <CardGuessed
-              locationid={"1"}
-              image={`${LocationImg}`}
-              distance={255}
+            </Tittle>
+            <CardGrid
+              locationId={guessedLocations}
+              cardStyle={"card-guessed"}
             />
-
-            {isThreeCollumnSizeGrid ? (
-              <>
-                <CardGrid
-                  quotes={mostLikedQuotes.slice(0, showedLikedQuotesDesktop)}
-                />
-                <SeeMore onClick={loadLikedQuotesDesktop}>Load more</SeeMore>
-              </>
-            ) : (
-              <>
-                <CardGrid
-                  quotes={mostLikedQuotes.slice(0, showedLikedQuotesMobile)}
-                />
-                <SeeMore onClick={loadLikedQuotesMobile}>Load more</SeeMore>
-              </>
-            )}*/}
+            {/* <LoadMore onClick={loadMyGuesses}>Load more</LoadMore> */}
           </MostUpvoated>
           <MostUpvoated>
             <Tittle>
@@ -149,28 +123,8 @@ const LandingPage = () => {
                 pressing on a picture.
               </p>
             </Tittle>
-
-            <CardGrid locationId={newLocations} cardStyle={"card-new"}  />
-            {/*
-
-            <CardNew locationid={"1"} image={`${LocationImg}`} />
-
-            
-            {isThreeCollumnSizeGrid ? (
-              <>
-                <CardGrid
-                  quotes={recentQuotes.slice(0, showedRecentQuotesDesktop)}
-                />
-                <SeeMore onClick={loadRecentQuotesDesktop}>Load more</SeeMore>
-              </>
-            ) : (
-              <>
-                <CardGrid
-                  quotes={recentQuotes.slice(0, showedRecentQuotesMobile)}
-                />
-                <SeeMore onClick={loadRecentQuotesMobile}>Load more</SeeMore>
-              </>
-            )}*/}
+            <CardGrid locationId={newLocations} cardStyle={"card-new"} />
+            <LoadMore onClick={loadNewLocations}>Load more</LoadMore>
           </MostUpvoated>
         </Wrapper>
       ) : (
@@ -200,7 +154,7 @@ const LandingPage = () => {
             </Slogan>
           </SloganWrapper>
           <MostUpvoated>
-            <CardGrid locationId={newLocations} cardStyle={"card-locked"}  />
+            <CardGrid locationId={newLocations} cardStyle={"card-locked"} />
             <Link to="/signup" style={{ textDecoration: "none" }}>
               <Button>Sign up</Button>
             </Link>

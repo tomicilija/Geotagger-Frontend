@@ -12,6 +12,7 @@ import {
   ConfirmationWrapper,
 } from "./DeleteLocation.style";
 import PlaceholderImage from "../../../assets/default-avatar.svg";
+import { deleteLocation } from "../../../api/LocationApi";
 
 // Updating loggedin user information and deleteing loggedin user using modal, that overlays whole page
 
@@ -35,48 +36,19 @@ const DeleteLocation = () => {
   const [isSureOpen, setIsSureOpen] = useState<boolean>(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false);
 
-  
   const deleteModal = localStorage.getItem("isDeleteModalOpen");
+  const locationId = localStorage.getItem("deleteLocationId");
 
   useEffect(() => {
     setIsSureOpen(JSON.parse(deleteModal!) === true);
     setIsDeleteOpen(JSON.parse(deleteModal!) === true);
   }, [deleteModal, updated]);
 
-  /*
-  useEffect(() => {
-    getSignedInUser(JSON.parse(isLoggedIn!))
-      .then(({ email, name, surname, id }) => {
-        setEmail(email);
-        setFirstName(name);
-        setLastName(surname);
-      })
-      .catch((e) => {
-        console.log("Error: Cant get user. \n" + e);
-      });
-  });*/
 
   const handleDelete = async (e: { preventDefault: () => void }) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
-
     (async () => {
-      /*
-      await updateUser(
-        {
-          email: newEmail,
-          pass: newPassword,
-          passConfirm: newPasswordConfirm,
-          name: newFirstName,
-          surname: newLastName,
-        },
-        JSON.parse(isLoggedIn!)
-      );
-      const result = await signIn({ email: newEmail, pass: newPassword });
-      localStorage.setItem(
-        "accessToken",
-        JSON.stringify(result["accessToken"])
-      );
-      setUpdated(!updated);*/
+      await deleteLocation(locationId!, JSON.parse(isLoggedIn!));
       setIsSureOpen(false);
       setDeletedOpen(true);
     })().catch((err) => {
@@ -90,6 +62,7 @@ const DeleteLocation = () => {
       setDeletedOpen(false);
       setIsDeleteOpen(false);
       localStorage.setItem("isDeleteModalOpen", "false");
+      setUpdated(!updated);
     })().catch((err) => {
       console.log(err);
       setErrorMessage(err.message);
@@ -109,7 +82,7 @@ const DeleteLocation = () => {
                   action.
                 </p>
               </SettingsHeader>
-              {/* <DefaultProfilePicture /> */}
+              <h5>{ErrorMessage}</h5>
               <form onSubmit={handleDelete}>
                 <SettingsForm>
                   <SettingsSection>
