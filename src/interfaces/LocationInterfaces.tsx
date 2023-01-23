@@ -76,6 +76,17 @@ export interface UpdatePassword {
   passwordConfirm: string;
 }
 
+export interface ForgotPassword {
+  email: string;
+}
+
+export interface ResetPassword {
+  email: string;
+  token: string;
+  password: string;
+  passwordConfirm: string;
+}
+
 export interface LoginResponse {
   accessToken: string;
 }
@@ -111,4 +122,9 @@ export interface DeleteLocationProps {
 export interface ProfileSettingsProps {
   isSettingsOpen: boolean;
   setIsSettingsOpen: (isSettingsOpen: boolean) => void;
+}
+
+export interface ForgotPasswordProps {
+  isForgotPasswordOpen: boolean;
+  setIsForgotPassword: (isForgotPassword: boolean) => void;
 }

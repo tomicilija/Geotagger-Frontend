@@ -81,7 +81,14 @@ const Profile = () => {
         );
         const locationsId = locations.map((object) => object.id);
         setMyLocations(locationsId);
-      })();
+      })().catch((e) => {
+        if (e.response.status === 401) {
+          console.log("Unauthorized");
+          setIsLoggedIn(null);
+        } else {
+          console.log("Error: Cant get locations. \n" + e);
+        }
+      });
       (async () => {
         const locations = await getMyGuesses(
           guessesPage,
@@ -90,7 +97,14 @@ const Profile = () => {
         );
         const locationsId = locations.map((object) => object.location_id);
         setGuessedLocations(locationsId);
-      })();
+      })().catch((e) => {
+        if (e.response.status === 401) {
+          console.log("Unauthorized");
+          setIsLoggedIn(null);
+        } else {
+          console.log("Error: Cant get guesses. \n" + e);
+        }
+      });
     }
   }, [updated, isLoggedIn]);
 

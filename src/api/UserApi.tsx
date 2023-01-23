@@ -1,8 +1,10 @@
 import axios from "axios";
 import {
+  ForgotPassword,
   Login,
   LoginResponse,
   Register,
+  ResetPassword,
   UpdatePassword,
   UpdateProfilePicture,
   UpdateUser,
@@ -37,7 +39,7 @@ export const getSignedInUser = async (token: string): Promise<User> => {
 export const getUserProfilePicture = async (id: string, token: string) => {
   const response = await axiosFileInstance.get(`/me/profilepicture/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
-    responseType: 'blob'
+    responseType: "blob",
   });
   return response.data;
 };
@@ -63,9 +65,13 @@ export const updateProfilePicture = async (
   user: UpdateProfilePicture,
   token: string
 ): Promise<void> => {
-  const response = await axiosFileInstance.patch("/me/update-profilepicture", user, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await axiosFileInstance.patch(
+    "/me/update-profilepicture",
+    user,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return response.data;
 };
 
@@ -83,5 +89,15 @@ export const deleteUser = async (token: string): Promise<void> => {
   const response = await axiosInstance.delete("/me", {
     headers: { Authorization: `Bearer ${token}` },
   });
+  return response.data;
+};
+
+export const forgotPassword = async (forgotPassword: ForgotPassword): Promise<void> => {
+  const response = await axiosInstance.post("/me/forgot-password", forgotPassword);
+  return response.data;
+};
+
+export const resetPassword = async (resetPassword: ResetPassword): Promise<void> => {
+  const response = await axiosInstance.patch("/me/reset-password", resetPassword);
   return response.data;
 };
