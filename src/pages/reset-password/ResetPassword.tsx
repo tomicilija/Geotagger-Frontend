@@ -12,12 +12,15 @@ import {
   Button,
   Icon,
   Warning,
+  Peek,
+  PeekImg,
 } from "./ResetPassword.style";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { resetPassword, signUp } from "../../api/UserApi";
 import Backgroundimg from "../../assets/background/background-signup-map.svg";
 import BackgroundIconImg from "../../assets/icons/logo-icon-border.svg";
+import PeekIconImg from "../../assets/icons/peek-icon.svg";
 import { Label, Input } from "reactstrap";
 import * as yup from "yup";
 
@@ -28,6 +31,8 @@ const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const schema = yup.object().shape({
     email: yup.string().email("Invalid email").required("Email is required"),
@@ -105,26 +110,44 @@ const ResetPassword = () => {
             </SignUpFormSection>
             {errors.email && <Warning>{errors.email}</Warning>}
             <SignUpFormSection>
-              {/*TODO: add peak password button*/}
+              {/*TODO: add peek password button*/}
               <Label for="password">New Password</Label>
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
               />
+              <Peek
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <PeekImg
+                  className={showPassword ? "seen" : "hidden"}
+                  style={{ backgroundImage: `url(${PeekIconImg})` }}
+                />
+              </Peek>
             </SignUpFormSection>
             {errors.password && <Warning>{errors.password}</Warning>}
             <SignUpFormSection>
               <Label for="confirmPassword">Confirm New Password</Label>
               <Input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 name="passwordConfirm"
                 id="passwordConfirm"
                 value={formData.passwordConfirm}
                 onChange={handleChange}
               />
+              <Peek
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <PeekImg
+                  className={showConfirmPassword ? "seen" : "hidden"}
+                  style={{ backgroundImage: `url(${PeekIconImg})` }}
+                />
+              </Peek>
             </SignUpFormSection>
             {errors.passwordConfirm && (
               <Warning>{errors.passwordConfirm}</Warning>

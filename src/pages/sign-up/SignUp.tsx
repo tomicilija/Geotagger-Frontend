@@ -12,6 +12,8 @@ import {
   Buttons,
   Icon,
   Warning,
+  Peek,
+  PeekImg,
 } from "./SignUp.style";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -20,7 +22,8 @@ import { signUp } from "../../api/UserApi";
 import Backgroundimg from "../../assets/background/background-signup-map.svg";
 import BackgroundIconImg from "../../assets/icons/logo-icon-border.svg";
 import UploadIconImg from "../../assets/icons/upload-white-icon.png";
-import { Label, Input} from "reactstrap";
+import PeekIconImg from "../../assets/icons/peek-icon.svg";
+import { Label, Input } from "reactstrap";
 import * as yup from "yup";
 
 const SignUp = () => {
@@ -31,6 +34,8 @@ const SignUp = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>(ProfilePicture);
@@ -163,7 +168,7 @@ const SignUp = () => {
                 onChange={handleChange}
               />
             </SignUpFormSection>
-              {errors.email && <Warning>{errors.email}</Warning>}
+            {errors.email && <Warning>{errors.email}</Warning>}
             <TwoInRow>
               <SignUpFormSection>
                 <Label for="firstName">First Name</Label>
@@ -191,26 +196,43 @@ const SignUp = () => {
               {errors.surname && <Warning>{errors.surname}</Warning>}
             </TwoInRow>
             <SignUpFormSection>
-              {/*TODO: add peak password button*/}
               <Label for="password">Password</Label>
               <Input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
               />
+              <Peek
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <PeekImg
+                  className={showPassword ? "seen" : "hidden"}
+                  style={{ backgroundImage: `url(${PeekIconImg})` }}
+                />
+              </Peek>
             </SignUpFormSection>
             {errors.password && <Warning>{errors.password}</Warning>}
             <SignUpFormSection>
               <Label for="confirmPassword">Confirm Password</Label>
               <Input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 name="passwordConfirm"
                 id="passwordConfirm"
                 value={formData.passwordConfirm}
                 onChange={handleChange}
               />
+              <Peek
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                <PeekImg
+                  className={showConfirmPassword ? "seen" : "hidden"}
+                  style={{ backgroundImage: `url(${PeekIconImg})` }}
+                />
+              </Peek>
             </SignUpFormSection>
             {errors.passwordConfirm && (
               <Warning>{errors.passwordConfirm}</Warning>

@@ -15,6 +15,8 @@ import {
   Button,
   ConfirmationWrapper,
   Warning,
+  Peek,
+  PeekImg,
 } from "./ProfileSettings.style";
 import PlaceholderImage from "../../../assets/default-avatar.svg";
 import {
@@ -24,6 +26,7 @@ import {
   updateProfilePicture,
   updateUser,
 } from "../../../api/UserApi";
+import PeekIconImg from "../../../assets/icons/peek-icon.svg";
 import { Label, Input } from "reactstrap";
 import * as yup from "yup";
 
@@ -45,6 +48,9 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
   const { updated, setUpdated } = useContext(UpdateContext);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [image, setImage] = useState<File>();
   const [preview, setPreview] = useState<string>(PlaceholderImage);
@@ -424,12 +430,23 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                   <SettingsSection>
                     <Label for="password">Current password</Label>
                     <Input
-                      type="password"
+                      type={showCurrentPassword ? "text" : "password"}
                       name="currentPassword"
                       id="currentPassword"
                       value={passwordFormData.currentPassword}
                       onChange={handleChangePassword}
                     />
+                    <Peek
+                      type="button"
+                      onClick={() =>
+                        setShowCurrentPassword(!showCurrentPassword)
+                      }
+                    >
+                      <PeekImg
+                        className={showCurrentPassword ? "seen" : "hidden"}
+                        style={{ backgroundImage: `url(${PeekIconImg})` }}
+                      />
+                    </Peek>
                   </SettingsSection>
                   {errors.currentPassword && (
                     <Warning>{errors.currentPassword}</Warning>
@@ -437,12 +454,21 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                   <SettingsSection>
                     <Label for="password">New password</Label>
                     <Input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       name="newPassword"
                       id="newPassword"
                       value={passwordFormData.newPassword}
                       onChange={handleChangePassword}
                     />
+                    <Peek
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      <PeekImg
+                        className={showPassword ? "seen" : "hidden"}
+                        style={{ backgroundImage: `url(${PeekIconImg})` }}
+                      />
+                    </Peek>
                   </SettingsSection>
                   {errors.newPassword && (
                     <Warning>{errors.newPassword}</Warning>
@@ -450,12 +476,23 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                   <SettingsSection>
                     <Label for="confirmPassword">Confirm new password</Label>
                     <Input
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       name="newPasswordConfirm"
                       id="newPasswordConfirm"
                       value={passwordFormData.newPasswordConfirm}
                       onChange={handleChangePassword}
                     />
+                    <Peek
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                    >
+                      <PeekImg
+                        className={showConfirmPassword ? "seen" : "hidden"}
+                        style={{ backgroundImage: `url(${PeekIconImg})` }}
+                      />
+                    </Peek>
                   </SettingsSection>
                   {errors.newPasswordConfirm && (
                     <Warning>{errors.newPasswordConfirm}</Warning>

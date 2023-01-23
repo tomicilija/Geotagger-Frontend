@@ -9,6 +9,8 @@ import {
   BackgroundIcon,
   ForgotPass,
   Warning,
+  Peek,
+  PeekImg,
 } from "./SignIn.style";
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -17,6 +19,7 @@ import Backgroundimg from "../../assets/background/background-signup-map.svg";
 import BackgroundIconImg from "../../assets/icons/logo-icon-border.svg";
 import { UpdateContext } from "../../utils/UpdateContext";
 import ForgotPassword from "../../components/modals/forgot-password/ForgotPassword";
+import PeekIconImg from "../../assets/icons/peek-icon.svg";
 import { Label, Input} from "reactstrap";
 import * as yup from "yup";
 
@@ -27,6 +30,7 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
   const { updated, setUpdated } = useContext(UpdateContext);
+  const [showPassword, setShowPassword] = useState(false);
 
   const schema = yup.object().shape({
     email: yup.string().email("Invalid email").required("Email is required"),
@@ -104,15 +108,18 @@ const SignIn = () => {
             </SignInFormSection>
               {errors.email && <Warning>{errors.email}</Warning>}
             <SignInFormSection>
-              {/*TODO: add peak password button*/}
+              {/*TODO: add peek password button*/}
               <Label for="password">Password</Label>
               <Input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 name="password"
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
               />
+              <Peek type="button" onClick={() => setShowPassword(!showPassword)}>
+                <PeekImg className={showPassword ? "seen" : "hidden"} style={{ backgroundImage: `url(${PeekIconImg})` }} />
+              </Peek>
             </SignInFormSection>
             {errors.password && <Warning>{errors.password}</Warning>}
             <SignInFormSection>

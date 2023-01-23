@@ -293,6 +293,35 @@ export const Buttons = styled.div`
   }
 `;
 
+export const Peek = styled.button`
+  position: absolute;
+  justify-content: flex-end !important;
+  align-self: flex-end !important;
+  margin-top: 20px;
+  width: 25% !important;
+  height: 25px;
+  background-color: transparent;
+  cursor: default;
+
+  @media (max-width: 900px) {
+  }
+`;
+
+export const PeekImg = styled.div`
+  position: relative;
+  background: no-repeat;
+  width: 23px;
+  height: 16px;
+  cursor: pointer;
+
+  &.seen {
+    opacity: 100%;
+  }
+  &.hidden {
+    opacity: 30%;
+  }
+`;
+
 export const Button = styled.button`
   display: flex;
   flex-direction: row;
