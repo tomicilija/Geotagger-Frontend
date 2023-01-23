@@ -12,6 +12,7 @@ import {
   Button,
   Icon,
   Form,
+  Warning,
 } from "./AddLocation.style";
 import { useJsApiLoader, GoogleMap, MarkerF } from "@react-google-maps/api";
 /*import Card from "../../components/card/Card";
@@ -29,6 +30,8 @@ import PlaceholderImage from "../../../assets/placeholder-location-image.png";
 import { preProcessFile } from "typescript";
 import { UpdateContext } from "../../../utils/UpdateContext";
 import { postLocation } from "../../../api/LocationApi";
+import { Label, Input } from "reactstrap";
+import * as yup from "yup";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
@@ -63,6 +66,46 @@ const AddLocation = () => {
   const mapsApiKey: string = process.env
     .REACT_APP_GOOGLE_MAPS_API_KEY as string;
 
+  const locationSchema = yup.object().shape({
+    latitude: yup
+      .string()
+      .required("Latitude is required")
+      .test(
+        "is-num",
+        "You are required to select location before submiting your guess!",
+        (val) => !isNaN(parseFloat(val!))
+      ),
+    longitude: yup
+      .string()
+      .required("Longitude is required")
+      .test("is-num", (val) => !isNaN(parseFloat(val!))),
+  });
+
+  const imageSchema = yup.object().shape({
+    locationImage: yup
+      .mixed()
+      .test(
+        "fileFormat",
+        "Unsupported file format",
+        (value) =>
+          value &&
+          value.type.match(
+            /^image\/(jpeg|jpg|png|gif|tif|pjp|apng|ico|bmp|titf|jfif|svg)$/
+          )
+      )
+      .required("New Location image is required to edit the location!"),
+  });
+
+  const [locationData, setLocationData] = useState({
+    latitude: "",
+    longitude: "",
+  });
+  const [imageData, setImageData] = useState({
+    profilePicture: null,
+  });
+
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
+
   const updateScreenSize = () => {
     setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
   };
@@ -93,6 +136,10 @@ const AddLocation = () => {
       lng: e.latLng?.lng() as number,
     });
     setMarkerVisibility(true);
+    setLocationData({
+      latitude: e.latLng?.lat(),
+      longitude: e.latLng?.lng(),
+    });
   };
 
   const getAddressFromCoordinates = async () => {
@@ -113,22 +160,35 @@ const AddLocation = () => {
     );
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
-    (async () => {
-      await postLocation(
-        {
-          name: addrss,
-          latitude: Number(coordinates.lat.toFixed(6)),
-          longitude: Number(coordinates.lng.toFixed(6)),
-          image: image!,
-        },
-        JSON.parse(isLoggedIn!)
-      );
-      return navigate("/profile");
-    })().catch((e) => {
-      setErrorMessage(e.response.data.message);
-    });
+    try {
+      await imageSchema.validate(imageData, { abortEarly: false });
+      await locationSchema.validate(locationData, { abortEarly: false });
+      setErrors({});
+      (async () => {
+        await postLocation(
+          {
+            name: addrss,
+            latitude: Number(coordinates.lat.toFixed(6)),
+            longitude: Number(coordinates.lng.toFixed(6)),
+            image: image!,
+          },
+          JSON.parse(isLoggedIn!)
+        );
+        return navigate("/profile");
+      })().catch((e) => {
+        setErrorMessage(e.response.data.message);
+      });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: { [key: string]: string } = {};
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
+        setErrors(validationErrors);
+      }
+    }
   };
 
   const [image, setImage] = useState<File>();
@@ -145,18 +205,23 @@ const AddLocation = () => {
   }, [image]);
 
   const handleUpload = async () => {
-    document.getElementById("selectImages")!.click();
+    document.getElementById("locationImage")!.click();
   };
 
   const handleDiscard = async () => {
     setPreview(PlaceholderImage);
-    document.getElementById("selectImages")!.blur();
+    document.getElementById("locationImage")!.blur();
     setImage(undefined);
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocationData({ ...locationData, [e.target.name]: e.target.value });
+  };
+
+  const handleChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files![0];
     setImage(file);
+    setImageData({ ...imageData, [event.target.name!]: file });
   };
 
   return (
@@ -188,14 +253,17 @@ const AddLocation = () => {
                         style={{ backgroundImage: `url(${DeleteIconImg})` }}
                       />
                     </Button>
-                    <input
+                    <Input
                       type="file"
-                      accept="image/*"
-                      id="selectImages"
-                      onChange={(e) => handleChange(e)}
+                      name="locationImage"
+                      id="locationImage"
+                      onChange={(e) => handleChangeImage(e)}
                       style={{ display: "none" }}
                     />
                   </Buttons>
+                  {errors.locationImage && (
+                    <Warning>{errors.locationImage}</Warning>
+                  )}
                 </UploadImage>
                 <MapLocation>
                   {isLoaded ? (
@@ -222,12 +290,15 @@ const AddLocation = () => {
                   ) : (
                     <h3>Loading...</h3>
                   )}
-                  <label htmlFor="location">Location</label>
-                  <input
-                    type="location"
-                    value={addrss}
+                  {errors.latitude && <Warning>{errors.latitude}</Warning>}
+                  <Label for="location">Location</Label>
+                  <Input
+                    type="text"
+                    name="locationName"
+                    id="locationName"
                     disabled={true}
-                    required
+                    value={addrss}
+                    onChange={handleChange}
                   />
                   <p>{ErrorMessage}</p>
                   <button type="submit">Add new</button>

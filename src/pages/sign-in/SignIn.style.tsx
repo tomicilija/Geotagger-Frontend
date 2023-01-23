@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const Container = styled.div`
   position: relative;
   width: 100%;
+  min-height: 800px;
   height: 100vh;
   margin-bottom: -63px;
   display: flex;
@@ -24,9 +25,9 @@ export const Background = styled.div`
   background-position: center;
   margin: 0px;
   width: 50%;
-  @media (max-width: 1300px) {
-    padding-top: 20vh;
-    padding-bottom: 20vh;
+  height: 100vh;
+  @media (max-height: 1000px) {
+    height: 1000px;
   }
   @media (max-width: 900px) {
     display: none;
@@ -192,5 +193,15 @@ export const ForgotPass = styled.div`
   cursor: pointer;
   p {
     color: #619b8a;
+  }
+`;
+
+export const Warning = styled.div`
+  color: #ff7d26;
+  text-align: left;
+  font-size: 12px;
+  margin-top: -10px;
+
+  @media (max-width: 900px) {
   }
 `;

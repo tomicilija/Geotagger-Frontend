@@ -4,7 +4,7 @@ export const Container = styled.div`
   position: relative;
   overflow-x: hidden;
   width: 100%;
-  min-height: calc(100vh - 63px);
+  min-height: calc(100vh - 60px);
 
   display: flex;
   flex-wrap: wrap;
@@ -445,5 +445,14 @@ export const NotFound = styled.div`
       width: 300px;
       text-align: center;
     }
+  }
+`;
+
+export const Warning = styled.div`
+  color: #ff7d26;
+  text-align: center;
+  font-size: 12px;
+  margin-top: -10px;
+  @media (max-width: 900px) {
   }
 `;

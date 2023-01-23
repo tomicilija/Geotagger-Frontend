@@ -14,9 +14,18 @@ import {
   Buttons,
   Button,
   ConfirmationWrapper,
+  Warning,
 } from "./ProfileSettings.style";
 import PlaceholderImage from "../../../assets/default-avatar.svg";
-import { deleteUser, getSignedInUser, updatePassword, updateProfilePicture, updateUser } from "../../../api/UserApi";
+import {
+  deleteUser,
+  getSignedInUser,
+  updatePassword,
+  updateProfilePicture,
+  updateUser,
+} from "../../../api/UserApi";
+import { Label, Input } from "reactstrap";
+import * as yup from "yup";
 
 // Updating loggedin user information and deleteing loggedin user using modal, that overlays whole page
 
@@ -48,6 +57,67 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
     useState<boolean>(false);
   const [isUserInfoOpen, setIsUserInfoOpen] = useState<boolean>(true);
 
+  const passwordSchema = yup.object().shape({
+    currentPassword: yup.string().required("Current password is required"),
+    newPassword: yup
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .matches(
+        /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
+        "Password is too weak (Must contain: at least 1 upper case letter, least 1 lower case letter, 1 number or special character)"
+      )
+      .required("Password is required"),
+    newPasswordConfirm: yup
+      .string()
+      .oneOf([yup.ref("newPassword"), null], "Passwords must match")
+      .required("Confirm password is required"),
+  });
+  const [passwordFormData, setPasswordFormData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    newPasswordConfirm: "",
+  });
+  const userSchema = yup.object().shape({
+    email: yup.string().email("Invalid email").required("Email is required"),
+    name: yup.string().required("Name is required"),
+    surname: yup.string().required("Surname is required"),
+  });
+  const [userFormData, setUserFormData] = useState({
+    email: "",
+    name: "",
+    surname: "",
+  });
+  const proflePicutreSchema = yup.object().shape({
+    profilePicture: yup
+      .mixed()
+      .test(
+        "fileFormat",
+        "Unsupported file format",
+        (value) =>
+          value &&
+          value.type.match(
+            /^image\/(jpeg|jpg|png|gif|tif|pjp|apng|ico|bmp|titf|jfif|svg)$/
+          )
+      )
+      .required("Profile picture is required"),
+  });
+  const [proflePicutreFormData, setProfilePictureFormData] = useState({
+    profilePicture: null,
+  });
+
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
+
+  const handleChangeUserInfo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserFormData({ ...userFormData, [e.target.name]: e.target.value });
+  };
+
+  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPasswordFormData({
+      ...passwordFormData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   useEffect(() => {
     setIsUserInfoOpen(isSettingsOpen);
   }, [isSettingsOpen]);
@@ -66,66 +136,103 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
 
   const handleSubmitUserInfo = async (e: { preventDefault: () => void }) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
-
-    (async () => {
-      await updateUser(
-        {
-          email: newEmail,
-          name: newFirstName,
-          surname: newLastName,
-        },
-        JSON.parse(isLoggedIn!)
-      );
-      if (newEmail !== email) {
-        localStorage.clear();
-        window.location.href = "/signin";
-      } else {
-        setUpdated(!updated);
-        setIsUserInfoOpen(false);
-        setIsInformationChangedOpen(true);
+    try {
+      await userSchema.validate(userFormData, { abortEarly: false });
+      setErrors({});
+      (async () => {
+        await updateUser(
+          {
+            email: userFormData.email,
+            name: userFormData.name,
+            surname: userFormData.surname,
+          },
+          JSON.parse(isLoggedIn!)
+        );
+        if (userFormData.email !== email) {
+          localStorage.clear();
+          window.location.href = "/signin";
+        } else {
+          setUpdated(!updated);
+          setIsUserInfoOpen(false);
+          setIsInformationChangedOpen(true);
+        }
+      })().catch((err) => {
+        setErrorMessage(err.response.data.message);
+      });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: { [key: string]: string } = {};
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
+        setErrors(validationErrors);
       }
-    })().catch((err) => {
-      setErrorMessage(err.response.data.message);
-    });
+    }
   };
 
   const handleSubmitProfilePicture = async (e: {
     preventDefault: () => void;
   }) => {
-    e.preventDefault();
-    (async () => {
-      await updateProfilePicture(
-        {
-          profilePicture: image!,
-        },
-        JSON.parse(isLoggedIn!)
-      );
+    e.preventDefault(); // To prevent refreshing the page on form submit
+    try {
+      await proflePicutreSchema.validate(proflePicutreFormData, {
+        abortEarly: false,
+      });
+      setErrors({});
+      (async () => {
+        await updateProfilePicture(
+          {
+            profilePicture: image!,
+          },
+          JSON.parse(isLoggedIn!)
+        );
         setUpdated(!updated);
         setIsChangePictureOpen(false);
         setIsInformationChangedOpen(true);
-    })().catch((err) => {
-      setErrorMessage(err.response.data.message);
-    });
+      })().catch((err) => {
+        setErrorMessage(err.response.data.message);
+      });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: { [key: string]: string } = {};
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
+        setErrors(validationErrors);
+      }
+    }
   };
 
   const handleSubmitPassword = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-
-    (async () => {
-      await updatePassword(
-        {
-          currentPassword: currentPassword,
-          password: newPassword,
-          passwordConfirm: newPasswordConfirm,
-        },
-        JSON.parse(isLoggedIn!)
-      );
+    e.preventDefault(); // To prevent refreshing the page on form submit
+    try {
+      await passwordSchema.validate(passwordFormData, {
+        abortEarly: false,
+      });
+      setErrors({});
+      (async () => {
+        await updatePassword(
+          {
+            currentPassword: passwordFormData.currentPassword,
+            password: passwordFormData.newPassword,
+            passwordConfirm: passwordFormData.newPasswordConfirm,
+          },
+          JSON.parse(isLoggedIn!)
+        );
         localStorage.clear();
         window.location.href = "/signin";
-
-    })().catch((err) => {
-      setErrorMessage(err.response.data.message);
-    });
+      })().catch((err) => {
+        setErrorMessage(err.response.data.message);
+      });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: { [key: string]: string } = {};
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
+        setErrors(validationErrors);
+      }
+    }
   };
 
   const changePassword = async () => {
@@ -210,18 +317,22 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   }, [image]);
 
   const handleUpload = async () => {
-    document.getElementById("selectImages")!.click();
+    document.getElementById("profilePicture")!.click();
   };
 
   const handleDiscard = async () => {
     setPreview(PlaceholderImage);
-    document.getElementById("selectImages")!.blur();
+    document.getElementById("profilePicture")!.blur();
     setImage(undefined);
   };
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files![0];
     setImage(file);
+    setProfilePictureFormData({
+      ...proflePicutreFormData,
+      [event.target.name!]: event.target.files![0]!,
+    });
   };
 
   return (
@@ -241,36 +352,44 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
               <form onSubmit={handleSubmitUserInfo}>
                 <SettingsForm>
                   <SettingsSection>
-                    <label htmlFor="email">Email</label>
-                    <input
+                    <Label for="email">Email</Label>
+                    <Input
                       type="email"
+                      name="email"
+                      id="email"
                       placeholder={email}
-                      value={newEmail}
-                      required
-                      onChange={(e) => setNewEmail(e.target.value)}
+                      value={userFormData.email}
+                      onChange={handleChangeUserInfo}
                     />
                   </SettingsSection>
+                  {errors.email && <Warning>{errors.email}</Warning>}
                   <TwoInRow>
                     <SettingsSection>
-                      <label htmlFor="firstName">First Name</label>
-                      <input
-                        type="firstname"
+                      <Label for="firstName">First Name</Label>
+                      <Input
+                        type="text"
+                        name="name"
+                        id="name"
+                        value={userFormData.name}
+                        onChange={handleChangeUserInfo}
                         placeholder={firstName}
-                        value={newFirstName}
-                        required
-                        onChange={(e) => setNewFirstName(e.target.value)}
                       />
                     </SettingsSection>
                     <SettingsSection>
-                      <label htmlFor="lastName">Last Name</label>
-                      <input
-                        type="lastname"
+                      <Label for="lastName">Last Name</Label>
+                      <Input
+                        type="text"
+                        name="surname"
+                        id="surname"
                         placeholder={lastName}
-                        value={newLastName}
-                        required
-                        onChange={(e) => setNewLastName(e.target.value)}
+                        value={userFormData.surname}
+                        onChange={handleChangeUserInfo}
                       />
                     </SettingsSection>
+                  </TwoInRow>
+                  <TwoInRow>
+                    {errors.name && <Warning>{errors.name}</Warning>}
+                    {errors.surname && <Warning>{errors.surname}</Warning>}
                   </TwoInRow>
                   <SettingsSection>
                     <ChangeSetings>
@@ -303,34 +422,44 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
               <form onSubmit={handleSubmitPassword}>
                 <SettingsForm>
                   <SettingsSection>
-                    <label htmlFor="password">Current password</label>
-                    <input
+                    <Label for="password">Current password</Label>
+                    <Input
                       type="password"
-                      value={currentPassword}
-                      required
-                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      name="currentPassword"
+                      id="currentPassword"
+                      value={passwordFormData.currentPassword}
+                      onChange={handleChangePassword}
                     />
                   </SettingsSection>
+                  {errors.currentPassword && (
+                    <Warning>{errors.currentPassword}</Warning>
+                  )}
                   <SettingsSection>
-                    <label htmlFor="password">New password</label>
-                    <input
+                    <Label for="password">New password</Label>
+                    <Input
                       type="password"
-                      value={newPassword}
-                      required
-                      onChange={(e) => setNewPassword(e.target.value)}
+                      name="newPassword"
+                      id="newPassword"
+                      value={passwordFormData.newPassword}
+                      onChange={handleChangePassword}
                     />
                   </SettingsSection>
+                  {errors.newPassword && (
+                    <Warning>{errors.newPassword}</Warning>
+                  )}
                   <SettingsSection>
-                    <label htmlFor="confirmPassword">
-                      Confirm new password
-                    </label>
-                    <input
+                    <Label for="confirmPassword">Confirm new password</Label>
+                    <Input
                       type="password"
-                      value={newPasswordConfirm}
-                      required
-                      onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                      name="newPasswordConfirm"
+                      id="newPasswordConfirm"
+                      value={passwordFormData.newPasswordConfirm}
+                      onChange={handleChangePassword}
                     />
                   </SettingsSection>
+                  {errors.newPasswordConfirm && (
+                    <Warning>{errors.newPasswordConfirm}</Warning>
+                  )}
                   <SettingsSection>
                     <TwoInRow>
                       <button type="submit">Submit</button>
@@ -359,15 +488,18 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                         style={{ objectFit: "cover" }}
                       />
                     </Image>
+                    {errors.profilePicture && (
+                      <Warning>{errors.profilePicture}</Warning>
+                    )}
                     <Buttons>
                       <Button type="button" onClick={handleUpload}>
                         Upload image
                       </Button>
-                      <input
+                      <Input
                         type="file"
-                        accept="image/*"
-                        id="selectImages"
-                        onChange={(e) => handleChange(e)}
+                        name="profilePicture"
+                        id="profilePicture"
+                        onChange={handleChangeImage}
                         style={{ display: "none" }}
                       />
                     </Buttons>

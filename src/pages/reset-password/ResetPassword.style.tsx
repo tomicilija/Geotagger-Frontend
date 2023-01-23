@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const Container = styled.div`
   position: relative;
   width: 100%;
+  min-height: 800px;
   height: 100vh;
   margin-bottom: -63px;
   display: flex;
@@ -248,5 +249,15 @@ export const SigninText = styled.div`
   margin-top: 25px;
   p {
     color: #619b8a;
+  }
+`;
+
+export const Warning = styled.div`
+  color: #ff7d26;
+  text-align: left;
+  font-size: 12px;
+  margin-top: -10px;
+
+  @media (max-width: 900px) {
   }
 `;

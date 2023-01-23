@@ -23,6 +23,7 @@ import {
   GuessForm,
   GuessFormSection,
   Form,
+  Warning,
 } from "./GuessLocation.style";
 import {
   useJsApiLoader,
@@ -50,6 +51,9 @@ import { GuessResponseById } from "../../../interfaces/LocationInterfaces";
 import moment from "moment-timezone";
 import { getSignedInUser, getUserProfilePicture } from "../../../api/UserApi";
 import { sign } from "crypto";
+import { Label, Input } from "reactstrap";
+import * as yup from "yup";
+import { number } from "yup/lib/locale";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
@@ -75,27 +79,37 @@ const GuessLocation = () => {
   const [errorDistance, setErrorDistance] = useState("");
   const [markerVisibility, setMarkerVisibility] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState("");
-
   const [locationGuesses, setLocationGuesses] = useState<GuessResponseById[]>(
     []
   );
-
   const [coordinates, setCoordinates] = useState({
     lat: 37.77414,
     lng: -122.420052,
   });
 
+  const schema = yup.object().shape({
+    latitude: yup
+      .string()
+      .required("Latitude is required")
+      .test(
+        "is-num",
+        "You are required to select location before submiting your guess!",
+        (val) => !isNaN(parseFloat(val!))
+      ),
+    longitude: yup
+      .string()
+      .required("Longitude is required")
+      .test("is-num", (val) => !isNaN(parseFloat(val!))),
+  });
+  const [formData, setFormData] = useState({
+    latitude: "",
+    longitude: "",
+  });
+
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
+
   const mapsApiKey: string = process.env
     .REACT_APP_GOOGLE_MAPS_API_KEY as string;
-
-  /*
-   * Profile page shows profile of logged in user when clicked on profile icon in navbar
-   * or profile of other usr when clicked on name on quote card
-   *
-   * Quote cards can be shown in grid of 3, 2, or 1 columns, depending on screen width
-   * 3 column grid shows max of 9 cards and lods by 9 cards
-   * 2 and 1 column shows max of 4 cards, and loads by 4 cards
-   */
 
   const updateScreenSize = () => {
     setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
@@ -179,6 +193,10 @@ const GuessLocation = () => {
       lat: e.latLng?.lat() as number,
       lng: e.latLng?.lng() as number,
     });
+    setFormData({
+      latitude: e.latLng?.lat(),
+      longitude: e.latLng?.lng(),
+    });
     setMarkerVisibility(true);
   };
 
@@ -209,34 +227,52 @@ const GuessLocation = () => {
         const url = window.URL || window.webkitURL;
         const blobUrl = url.createObjectURL(response);
         setLocationImage(blobUrl);
-      })().catch((e) => {
-        console.log("Error: Cant get location image. \n" + e);
-      }).catch((e) => {
-        if (e.response.status === 401) {
-          console.log("Unauthorized");
-          setIsLoggedIn(null);
-        } else {
-          console.log("Error: Cant get location. \n" + e);
-        }
-      });
+      })()
+        .catch((e) => {
+          console.log("Error: Cant get location image. \n" + e);
+        })
+        .catch((e) => {
+          if (e.response.status === 401) {
+            console.log("Unauthorized");
+            setIsLoggedIn(null);
+          } else {
+            console.log("Error: Cant get location. \n" + e);
+          }
+        });
     }
   }, [updated, isLoggedIn, id]);
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
-    (async () => {
-      const response = await guessLocation(
-        {
-          id: id!,
-          latitude: coordinates.lat,
-          longitude: coordinates.lng,
-        },
-        JSON.parse(isLoggedIn!)
-      );
-      setErrorDistance(response.distance.toString());
-    })().catch((err) => {
-      setErrorMessage(err.response.data.message);
-    });
+    try {
+      await schema.validate(formData, { abortEarly: false });
+      setErrors({});
+      (async () => {
+        const response = await guessLocation(
+          {
+            id: id!,
+            latitude: coordinates.lat,
+            longitude: coordinates.lng,
+          },
+          JSON.parse(isLoggedIn!)
+        );
+        setErrorDistance(response.distance.toString());
+      })().catch((err) => {
+        setErrorMessage(err.response.data.message);
+      });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: { [key: string]: string } = {};
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
+        setErrors(validationErrors);        
+      }
+    }
   };
 
   return (
@@ -285,18 +321,28 @@ const GuessLocation = () => {
                   ) : (
                     <h3>Loading...</h3>
                   )}
+                  {errors.latitude && <Warning>{errors.latitude}</Warning>}
                   <GuessForm>
                     <GuessFormSection>
-                      <label htmlFor="errDist">Error distance</label>
-                      <input
-                        type="errDist"
+                      <Label for="errDist">Error distance</Label>
+                      <Input
+                        type="text"
+                        name="distance"
+                        id="distance"
                         disabled={true}
                         value={errorDistance}
                       />
                     </GuessFormSection>
                     <GuessFormSection>
-                      <label htmlFor="location">Location</label>
-                      <input type="location" disabled={true} value={addrss} />
+                      <Label for="location">Location</Label>
+                      <Input
+                        type="text"
+                        name="locationName"
+                        id="locationName"
+                        disabled={true}
+                        value={addrss}
+                        onChange={handleChange}
+                      />
                     </GuessFormSection>
                   </GuessForm>
                   <p>{ErrorMessage}</p>
@@ -312,7 +358,7 @@ const GuessLocation = () => {
             <Table>
               {locationGuesses.map((guess, index) => (
                 <>
-                  {userid === guess.user.id && guess.createdAt==="Now" ? (
+                  {userid === guess.user.id && guess.createdAt === "Now" ? (
                     <Row className="you-row fadeInFromAbove">
                       <LeftSide>
                         <Rank className="rank">
@@ -329,10 +375,12 @@ const GuessLocation = () => {
                         </Profile>
                       </LeftSide>
                       <RightSide>
-                        <Distance className="you-distance">{guess.distance} m</Distance>
+                        <Distance className="you-distance">
+                          {guess.distance} m
+                        </Distance>
                       </RightSide>
                     </Row>
-                  ) : userid === guess.user.id && guess.createdAt!=="Now" ? (
+                  ) : userid === guess.user.id && guess.createdAt !== "Now" ? (
                     <Row className="you-row">
                       <LeftSide>
                         <Rank className="rank">
@@ -349,7 +397,9 @@ const GuessLocation = () => {
                         </Profile>
                       </LeftSide>
                       <RightSide>
-                        <Distance className="you-distance">{guess.distance} m</Distance>
+                        <Distance className="you-distance">
+                          {guess.distance} m
+                        </Distance>
                       </RightSide>
                     </Row>
                   ) : (

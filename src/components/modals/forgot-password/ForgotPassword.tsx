@@ -10,10 +10,13 @@ import {
   SettingsSection,
   TwoInRow,
   ConfirmationWrapper,
+  Warning,
 } from "./ForgotPassword.style";
 import PlaceholderImage from "../../../assets/default-avatar.svg";
 import { deleteLocation } from "../../../api/LocationApi";
 import { forgotPassword } from "../../../api/UserApi";
+import { Label, Input } from "reactstrap";
+import * as yup from "yup";
 
 // Updating loggedin user information and deleteing loggedin user using modal, that overlays whole page
 
@@ -40,24 +43,47 @@ const ForgotPassword = () => {
 
   const forgotPasswordModal = localStorage.getItem("isForgotPasswordModalOpen");
 
+  const schema = yup.object().shape({
+    email: yup.string().email("Invalid email").required("Email is required"),
+  });
+  const [formData, setFormData] = useState({
+    email: "",
+  });
+
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
+
   useEffect(() => {
     setIsForgotPassOpen(JSON.parse(forgotPasswordModal!) === true);
     setIsSureOpen(JSON.parse(forgotPasswordModal!) === true);
   }, [forgotPasswordModal, updated]);
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const handleForgotPass = async (e: { preventDefault: () => void }) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
-
-    console.log(email);
-    (async () => {
-      await forgotPassword({
-        email: email,
+    try {
+      await schema.validate(formData, { abortEarly: false });
+      setErrors({});
+      (async () => {
+        await forgotPassword({
+          email: formData.email,
+        });
+        setIsSureOpen(false);
+        setForgotPasswordOpen(true);
+      })().catch((err) => {
+        setErrorMessage(err.response.data.message);
       });
-      setIsSureOpen(false);
-      setForgotPasswordOpen(true);
-    })().catch((err) => {
-      setErrorMessage(err.response.data.message);
-    });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: { [key: string]: string } = {};
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
+        setErrors(validationErrors);
+      }
+    }
   };
 
   const closeForgotPasswordModal = async () => {
@@ -90,14 +116,16 @@ const ForgotPassword = () => {
               <form onSubmit={handleForgotPass}>
                 <SettingsForm>
                   <SettingsSection>
-                    <label htmlFor="email">Email</label>
-                    <input
+                    <Label for="email">Email</Label>
+                    <Input
                       type="email"
-                      value={email}
-                      required
-                      onChange={(e) => setEmail(e.target.value)}
+                      name="email"
+                      id="email"
+                      value={formData.email}
+                      onChange={handleChange}
                     />
                   </SettingsSection>
+                  {errors.email && <Warning>{errors.email}</Warning>}
                   <SettingsSection>
                     <TwoInRow>
                       <button type="submit">Submit</button>

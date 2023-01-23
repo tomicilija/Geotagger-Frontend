@@ -8,6 +8,7 @@ import {
   Image,
   Buttons,
   Button,
+  Warning,
 } from "./EditLocation.style";
 import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 /*import Card from "../../components/card/Card";
@@ -29,6 +30,8 @@ import {
   updateLocation,
 } from "../../../api/LocationApi";
 import { UpdateContext } from "../../../utils/UpdateContext";
+import { Label, Input } from "reactstrap";
+import * as yup from "yup";
 
 // On profile page user quote, karma, and liked quotes is displayed
 
@@ -60,19 +63,28 @@ const EditLocation = () => {
     lng: -122.420052,
   });
 
-  const locationName = "Liegue St 523, Monaco";
-
   const mapsApiKey: string = process.env
     .REACT_APP_GOOGLE_MAPS_API_KEY as string;
 
-  /*
-   * Profile page shows profile of logged in user when clicked on profile icon in navbar
-   * or profile of other usr when clicked on name on quote card
-   *
-   * Quote cards can be shown in grid of 3, 2, or 1 columns, depending on screen width
-   * 3 column grid shows max of 9 cards and lods by 9 cards
-   * 2 and 1 column shows max of 4 cards, and loads by 4 cards
-   */
+  const schema = yup.object().shape({
+    locationImage: yup
+      .mixed()
+      .test(
+        "fileFormat",
+        "Unsupported file format",
+        (value) =>
+          value &&
+          value.type.match(
+            /^image\/(jpeg|jpg|png|gif|tif|pjp|apng|ico|bmp|titf|jfif|svg)$/
+          )
+      )
+      .required("New Location image is required to edit the location!"),
+  });
+  const [formData, setFormData] = useState({
+    profilePicture: null,
+  });
+
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
 
   const updateScreenSize = () => {
     setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
@@ -126,42 +138,51 @@ const EditLocation = () => {
     }
   }, [updated, isLoggedIn, id]);
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
-    console.log(id);
-    console.log(addrss);
-    console.log(coordinates);
-    console.log(image);
-    (async () => {
-      await updateLocation(
-        id!,
-        {
-          name: addrss,
-          latitude: coordinates.lat,
-          longitude: coordinates.lng,
-          image: image!,
-        },
-        JSON.parse(isLoggedIn!)
-      );
-      return navigate("/profile");
-    })().catch((e) => {
-      setErrorMessage(e.response.data.message);
-    });
+    try {
+      await schema.validate(formData, { abortEarly: false });
+      setErrors({});
+      (async () => {
+        await updateLocation(
+          id!,
+          {
+            name: addrss,
+            latitude: coordinates.lat,
+            longitude: coordinates.lng,
+            image: image!,
+          },
+          JSON.parse(isLoggedIn!)
+        );
+        return navigate("/profile");
+      })().catch((e) => {
+        setErrorMessage(e.response.data.message);
+      });
+    } catch (err) {
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: { [key: string]: string } = {};
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
+        setErrors(validationErrors);
+      }
+    }
   };
 
   const handleUpload = async () => {
-    document.getElementById("selectImages")!.click();
+    document.getElementById("locationImage")!.click();
   };
 
   const handleDiscard = async () => {
     setPreview(locationImage);
-    document.getElementById("selectImages")!.blur();
+    document.getElementById("locationImage")!.blur();
     setImage(undefined);
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files![0];
     setImage(file);
+    setFormData({ ...formData, [event.target.name!]: file });
   };
 
   useEffect(() => {
@@ -205,14 +226,17 @@ const EditLocation = () => {
                       Cancel
                     </Button>
                   </div>
-                  <input
+                  <Input
                     type="file"
-                    accept="image/*"
-                    id="selectImages"
+                    name="locationImage"
+                    id="locationImage"
                     onChange={(e) => handleChange(e)}
                     style={{ display: "none" }}
                   />
                 </Buttons>
+                {errors.locationImage && (
+                  <Warning>{errors.locationImage}</Warning>
+                )}
               </UploadImage>
             </form>
           </Wrapper>

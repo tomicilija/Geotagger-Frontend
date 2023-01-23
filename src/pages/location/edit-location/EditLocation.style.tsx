@@ -205,3 +205,13 @@ export const NotFound = styled.div`
     }
   }
 `;
+
+export const Warning = styled.div`
+  color: #ff7d26;
+  text-align: center;
+  font-size: 12px;
+  margin-top: 10px;
+
+  @media (max-width: 900px) {
+  }
+`;

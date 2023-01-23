@@ -3,17 +3,19 @@ import styled from "styled-components";
 export const Container = styled.div`
   position: relative;
   width: 100%;
+  min-height: 950px;
   height: 100vh;
   margin-bottom: -63px;
   display: flex;
   flex-wrap: wrap;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   overflow: hidden;
 
   @media (max-width: 900px) {
     margin: -103px 0;
+    min-height: 1000px;
   }
 `;
 
@@ -24,9 +26,9 @@ export const Background = styled.div`
   background-position: center;
   margin: 0px;
   width: 50%;
-  @media (max-width: 1300px) {
-    padding-top: 20vh;
-    padding-bottom: 20vh;
+  height: 100vh;
+  @media (max-height: 1000px) {
+    height: 1000px;
   }
   @media (max-width: 900px) {
     display: none;
@@ -49,7 +51,7 @@ export const BackgroundIcon = styled.div`
 export const SignUpFormWrapper = styled.div`
   position: relative;
   width: 50%;
-  //min-height: 750px;
+  min-height: 750px;
   display: flex;
   flex-wrap: nowrap;
   flex-direction: column;
@@ -115,7 +117,7 @@ export const Image = styled.div`
   }
 `;
 
-export const Button = styled.button`
+export const Buttons = styled.button`
   position: absolute;
   opacity: 0;
   display: flex;
@@ -248,5 +250,16 @@ export const SigninText = styled.div`
   margin-top: 25px;
   p {
     color: #619b8a;
+  }
+`;
+
+export const Warning = styled.div`
+  color: #ff7d26;
+  text-align: center;
+  font-size: 12px;
+  margin-top: -10px;
+  width: 50%;
+
+  @media (max-width: 900px) {
   }
 `;

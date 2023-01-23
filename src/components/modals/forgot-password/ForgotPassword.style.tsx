@@ -223,3 +223,14 @@ export const TwoInRow = styled.div`
     justify-content: space-between;
   }
 `;
+
+export const Warning = styled.div`
+  color: #ff7d26;
+  text-align: center;
+  font-size: 12px;
+  margin-top: -10px;
+  width: 50%;
+
+  @media (max-width: 900px) {
+  }
+`;

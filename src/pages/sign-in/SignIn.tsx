@@ -8,6 +8,7 @@ import {
   SigninText,
   BackgroundIcon,
   ForgotPass,
+  Warning,
 } from "./SignIn.style";
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,6 +17,9 @@ import Backgroundimg from "../../assets/background/background-signup-map.svg";
 import BackgroundIconImg from "../../assets/icons/logo-icon-border.svg";
 import { UpdateContext } from "../../utils/UpdateContext";
 import ForgotPassword from "../../components/modals/forgot-password/ForgotPassword";
+import { Label, Input} from "reactstrap";
+import * as yup from "yup";
+
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -23,22 +27,55 @@ const SignIn = () => {
   const [password, setPassword] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
   const { updated, setUpdated } = useContext(UpdateContext);
-  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
-    useState<boolean>(false);
 
-  const handleSubmit = (e: { preventDefault: () => void }) => {
+  const schema = yup.object().shape({
+    email: yup.string().email("Invalid email").required("Email is required"),
+    password: yup
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .matches(
+        /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/,
+        "Password is too weak (Must contain: at least 1 upper case letter, least 1 lower case letter, 1 number or special character)"
+      )
+      .required("Password is required"),
+  });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
-    (async () => {
-      const result = await signIn({ email: email, password: password });
-      localStorage.setItem(
-        "accessToken",
-        JSON.stringify(result["accessToken"])
-      );
-      setUpdated(!updated);
-      return navigate("/profile");
-    })().catch((err) => {
-      setErrorMessage(err.response.data.message);
-    });
+    try {
+      await schema.validate(formData, { abortEarly: false });
+      setErrors({});
+      (async () => {
+        const result = await signIn({ email: formData.email, password: formData.password });
+        localStorage.setItem(
+          "accessToken",
+          JSON.stringify(result["accessToken"])
+        );
+        setUpdated(!updated);
+        return navigate("/profile");
+      })().catch((err) => {
+        setErrorMessage(err.response.data.message);
+      });
+    } catch (err) {
+      console.log(err);
+      if (err instanceof yup.ValidationError) {
+        const validationErrors: { [key: string]: string } = {};
+        err.inner.forEach((error) => {
+          validationErrors[error.path!] = error.message;
+        });
+        setErrors(validationErrors);
+      }
+    }
   };
   const openForgotPasswordModal = () => {
     localStorage.setItem("isForgotPasswordModalOpen", "true");
@@ -56,23 +93,28 @@ const SignIn = () => {
         <form onSubmit={handleSubmit}>
           <SignInForm>
             <SignInFormSection>
-              <label htmlFor="email">Email</label>
-              <input
+              <Label for="email">Email</Label>
+              <Input
                 type="email"
-                value={email}
-                required
-                onChange={(e) => setEmail(e.target.value)}
+                name="email"
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
               />
             </SignInFormSection>
+              {errors.email && <Warning>{errors.email}</Warning>}
             <SignInFormSection>
-              <label htmlFor="password">Password</label>
-              <input
+              {/*TODO: add peak password button*/}
+              <Label for="password">Password</Label>
+              <Input
                 type="password"
-                value={password}
-                required
-                onChange={(e) => setPassword(e.target.value)}
+                name="password"
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
               />
             </SignInFormSection>
+            {errors.password && <Warning>{errors.password}</Warning>}
             <SignInFormSection>
               <button type="submit">Sign in</button>
             </SignInFormSection>
