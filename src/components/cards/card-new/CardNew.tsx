@@ -30,8 +30,7 @@ const CardNew: React.FC<CardNewProps> = ({ locationid }) => {
     if (isLoggedIn) {
       (async () => {
         const response = await getLocationImage(
-          locationid!,
-          JSON.parse(isLoggedIn)
+          locationid!
         );
         const url = window.URL || window.webkitURL;
         const blobUrl = url.createObjectURL(response);

@@ -16,6 +16,10 @@ export interface LocationResponse {
   user_id: string;
 }
 
+export interface RandomLocationResponse {
+  id: string;
+}
+
 export interface Guess {
   id: string;
   latitude: number;

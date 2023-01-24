@@ -50,14 +50,11 @@ export const BackgroundIcon = styled.div`
 export const SignInFormWrapper = styled.div`
   position: relative;
   width: 50%;
-  //min-height: 750px;
   display: flex;
   flex-wrap: nowrap;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  //margin: 100px;
 
   gap: 26px;
 

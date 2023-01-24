@@ -20,17 +20,20 @@ import BackgroundIconImg from "../../assets/icons/logo-icon-border.svg";
 import { UpdateContext } from "../../utils/UpdateContext";
 import ForgotPassword from "../../components/modals/forgot-password/ForgotPassword";
 import PeekIconImg from "../../assets/icons/peek-icon.svg";
-import { Label, Input} from "reactstrap";
+import { Label, Input } from "reactstrap";
 import * as yup from "yup";
-
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
   const { updated, setUpdated } = useContext(UpdateContext);
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
   const schema = yup.object().shape({
     email: yup.string().email("Invalid email").required("Email is required"),
@@ -43,35 +46,30 @@ const SignIn = () => {
       )
       .required("Password is required"),
   });
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const [errors, setErrors] = useState<{ [field: string]: string }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault();
     try {
       await schema.validate(formData, { abortEarly: false });
       setErrors({});
       (async () => {
-        const result = await signIn({ email: formData.email, password: formData.password });
+        const result = await signIn({
+          email: formData.email,
+          password: formData.password,
+        });
         localStorage.setItem(
           "accessToken",
           JSON.stringify(result["accessToken"])
         );
-        setUpdated(!updated);
         return navigate("/profile");
       })().catch((err) => {
         setErrorMessage(err.response.data.message);
       });
     } catch (err) {
-      console.log(err);
       if (err instanceof yup.ValidationError) {
         const validationErrors: { [key: string]: string } = {};
         err.inner.forEach((error) => {
@@ -106,19 +104,25 @@ const SignIn = () => {
                 onChange={handleChange}
               />
             </SignInFormSection>
-              {errors.email && <Warning>{errors.email}</Warning>}
+            {errors.email && <Warning>{errors.email}</Warning>}
             <SignInFormSection>
               {/*TODO: add peek password button*/}
               <Label for="password">Password</Label>
               <Input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 name="password"
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
               />
-              <Peek type="button" onClick={() => setShowPassword(!showPassword)}>
-                <PeekImg className={showPassword ? "seen" : "hidden"} style={{ backgroundImage: `url(${PeekIconImg})` }} />
+              <Peek
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <PeekImg
+                  className={showPassword ? "seen" : "hidden"}
+                  style={{ backgroundImage: `url(${PeekIconImg})` }}
+                />
               </Peek>
             </SignInFormSection>
             {errors.password && <Warning>{errors.password}</Warning>}
@@ -137,7 +141,7 @@ const SignIn = () => {
           </ForgotPass>
         </form>
       </SignInFormWrapper>
-        <ForgotPassword />
+      <ForgotPassword />
       <Background style={{ backgroundImage: `url(${Backgroundimg})` }}>
         <BackgroundIcon
           style={{ backgroundImage: `url(${BackgroundIconImg})` }}

@@ -83,68 +83,6 @@ export const SignUpHeader = styled.div`
   }
 `;
 
-export const Image = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  width: 70px;
-  height: 70px;
-  border-radius: 64px;
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 64px;
-    &:hover {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 100%;
-      width: 100%;
-      opacity: 0;
-      transition: 0.2s ease;
-    }
-  }
-  @media (max-width: 900px) {
-    max-width: 100%;
-    img {
-      max-width: 100%;
-    }
-  }
-`;
-
-export const Button = styled.button`
-  position: absolute;
-  opacity: 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  border-radius: 64px;
-  width: 70px;
-  height: 70px;
-  cursor: pointer;
-  &:hover {
-    opacity: 1;
-    background-color: #619b8a;
-  }
-
-  @media (max-width: 900px) {
-  }
-`;
-
-export const Icon = styled.div`
-  position: relative;
-  background: no-repeat;
-  background-size: cover;
-  display: flex;
-  width: 30px;
-  height: 30px;
-`;
-
 export const SignUpForm = styled.div`
   position: relative;
   width: 420px;
@@ -224,31 +162,6 @@ export const SignUpFormSection = styled.div`
 
   a {
     width: 100%;
-  }
-`;
-
-export const TwoInRow = styled.div`
-  position: relative;
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 16px;
-`;
-
-export const SigninText = styled.div`
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-self: flex-end;
-  justify-content: space-between;
-  align-content: flex-end;
-  align-items: flex-end;
-  width: 100%;
-  margin-top: 25px;
-  p {
-    color: #619b8a;
   }
 `;
 

@@ -9,19 +9,19 @@ export const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  justify-content: flex-start; //  flex-start | flex-end | center | space-between | space-around | space-evenly
+  justify-content: flex-start;
   align-items: center;
 `;
 
 export const Wrapper = styled.div`
   position: relative;
   display: flex;
-  flex-direction: column; //  row | row-reverse | column | column-reverse;
-  flex-wrap: wrap; //  nowrap | wrap | wrap-reverse
+  flex-direction: column;
+  flex-wrap: wrap;
 
-  justify-content: flex-start; //  flex-start | flex-end | center | space-between | space-around | space-evenly
-  align-items: flex-start; //  stretch | flex-start | flex-end | center | baseline | first baseline | last baseline
-  align-content: flex-start; //  flex-start | flex-end | center | space-between | space-around | space-evenly | stretch
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
   text-align: start;
 
   padding: 50px;
@@ -37,7 +37,7 @@ export const Wrapper = styled.div`
   }
 `;
 
-export const MostUpvoated = styled.div`
+export const BestGuesses = styled.div`
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -47,8 +47,15 @@ export const MostUpvoated = styled.div`
   width: 100%;
   margin-bottom: 100px;
 
+  p {
+    margin-top: 50px;
+  }
+
   @media (max-width: 900px) {
     margin-bottom: 0;
+    p {
+      margin-top: 20px;
+    }
   }
 `;
 
@@ -142,117 +149,6 @@ export const ProfileName = styled.div`
       font-size: 24px;
       line-height: 28px;
     }
-  }
-`;
-
-export const Quote = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 16px 32px;
-  gap: 10px;
-  font-family: "Raleway";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 28px;
-
-  color: #de8667;
-  p {
-    font-size: 15px;
-    color: black;
-  }
-  span {
-    color: #de8667;
-  }
-
-  @media (max-width: 900px) {
-  }
-`;
-
-export const Likes = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 16px 32px;
-
-  h3 {
-    width: 100%;
-    align-items: flex-start;
-    font-family: "Raleway";
-    font-style: normal;
-    font-weight: 400;
-    font-size: 24px;
-    line-height: 28px;
-  }
-
-  p {
-    margin: 10px;
-    font-size: 15px;
-    color: black;
-  }
-  span {
-    color: #de8667;
-  }
-  @media (max-width: 900px) {
-    padding: 0 0 0 10px;
-  }
-`;
-
-export const CardWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 50px;
-
-  position: relative;
-
-  .my-masonry-grid {
-    display: flex;
-    width: auto;
-  }
-
-  @media (max-width: 900px) {
-  }
-`;
-
-export const SeeMore = styled.div`
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  margin: 50px;
-
-  width: 200px;
-  height: 40px;
-
-  background: #ffffff;
-  /* Orange */
-
-  border: 2px solid #de8667;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-  border-radius: 32px;
-
-  /* P desktop */
-
-  font-family: "Raleway";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 19px;
-  /* identical to box height */
-
-  text-align: center;
-
-  /* Orange */
-
-  color: #de8667;
-  cursor: pointer;
-
-  :hover {
-    border-bottom: 5px solid #e59967;
-    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
   }
 `;
 

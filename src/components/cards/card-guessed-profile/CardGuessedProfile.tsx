@@ -52,8 +52,7 @@ const CardGuessedProfile: React.FC<CardGuessedProps> = ({ locationid }) => {
       });
       (async () => {
         const response = await getLocationImage(
-          locationid!,
-          JSON.parse(isLoggedIn)
+          locationid!
         );
         const url = window.URL || window.webkitURL;
         const blobUrl = url.createObjectURL(response);

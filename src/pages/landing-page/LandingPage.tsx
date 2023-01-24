@@ -3,7 +3,7 @@ import {
   Container,
   Wrapper,
   HeroWrapper,
-  MostUpvoated,
+  BestGuesses,
   Tittle,
   HeroTittle,
   SloganWrapper,
@@ -13,50 +13,29 @@ import {
   LoadMore,
 } from "./LandingPage.style";
 import { Link } from "react-router-dom";
-//import { getMostUpvoatedQuotes, getMostRecentQuotes } from "../../api/QuoteApi";
 import { UpdateContext } from "../../utils/UpdateContext";
-//import { QuoteResponse } from "../../interfaces/QuoteInterfaces";
 import { ReactComponent as BackgroundWorldMap } from "../../assets/background/background-world-map.svg";
-import CardNew from "../../components/cards/card-new/CardNew";
-import LocationImg from "../../assets/s6L0uQyprpE.png";
-import CardGuessed from "../../components/cards/card-guessed/CardGuessed";
-import CardLocked from "../../components/cards/card-locked/CardLocked";
 import CardGrid from "../../components/card-grid/CardGrid";
-import { LocationResponse } from "../../interfaces/LocationInterfaces";
-import { getLocations } from "../../api/LocationApi";
+import { getLocations, getRandomLocationsId } from "../../api/LocationApi";
 import { getMyGuesses } from "../../api/GuessApi";
-import { setuid } from "process";
-
-// One version of landing page can be shown to anyone, logged in user sees different version, same for mobile users
 
 const LandingPage = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("accessToken")
-  );
+  const isLoggedIn = localStorage.getItem("accessToken");
 
   const [newLocations, setNewLocations] = useState<string[]>([]);
   const [guessedLocations, setGuessedLocations] = useState<string[]>([]);
+  const [lockedLocations, setlockedLocations] = useState<string[]>([]);
+  const [userBestGuesses, setUserBestGuesses] = useState(false);
+  const [userUploads, setUploads] = useState(false);
   const [locationsPage, setLocationsPage] = useState(1);
   const [locationsSize] = useState(3);
-  const [guessesPage, setGuessedPage] = useState(1);
+  const [guessesPage] = useState(1);
   const [guessesSize] = useState(3);
 
   const { updated, setUpdated } = useContext(UpdateContext);
 
-  /*
-   * Quote cards can be shown in grid of 3, 2, or 1 columns, depending on screen width
-   * 3 column grid shows max of 9 cards and lods by 9 cards
-   * 2 and 1 column shows max of 4 cards, and loads by 4 cards
-   */
-
-
   const loadNewLocations = () => {
     setLocationsPage(locationsPage + 1);
-    setUpdated(!updated);
-  };
-
-  const loadMyGuesses = () => {
-    setGuessedPage(guessesPage + 1);
     setUpdated(!updated);
   };
 
@@ -70,10 +49,13 @@ const LandingPage = () => {
         );
         const locationsId = locations.map((object) => object.id);
         setNewLocations(locationsId);
+        if (locations.length > 1) {
+          setUploads(true);
+        }
       })().catch((e) => {
         if (e.response.status === 401) {
           console.log("Unauthorized");
-          setIsLoggedIn(null);
+          localStorage.setItem("accessToken", "");
         } else {
           console.log("Error: Cant get location. \n" + e);
         }
@@ -86,10 +68,13 @@ const LandingPage = () => {
         );
         const locationsId = locations.map((object) => object.location_id);
         setGuessedLocations(locationsId);
+        if (locations.length > 1) {
+          setUserBestGuesses(true);
+        }
       })().catch((e) => {
         if (e.response.status === 401) {
           console.log("Unauthorized");
-          setIsLoggedIn(null);
+          localStorage.setItem("accessToken", "");
         } else {
           console.log("Error: Cant get guesses. \n" + e);
         }
@@ -97,11 +82,27 @@ const LandingPage = () => {
     }
   }, [updated, isLoggedIn]);
 
+  useEffect(() => {
+    if (!isLoggedIn) {
+    (async () => {
+      const locations = await getRandomLocationsId();
+      const locationsId = locations.map((object) => object.id);
+      setlockedLocations(locationsId);
+    })().catch((e) => {
+      if (e.response.status === 401) {
+        console.log("Unauthorized");
+        localStorage.setItem("accessToken", "");
+      } else {
+        console.log("Error: Cant get location. \n" + e);
+      }
+    });}
+  }, []);
+
   return (
     <Container>
       {isLoggedIn ? (
         <Wrapper>
-          <MostUpvoated>
+          <BestGuesses>
             <Tittle>
               <h4>Personal best guesses</h4>
               <p>
@@ -109,13 +110,19 @@ const LandingPage = () => {
                 your personal records or set a new one!
               </p>
             </Tittle>
-            <CardGrid
-              locationId={guessedLocations}
-              cardStyle={"card-guessed"}
-            />
-            {/* <LoadMore onClick={loadMyGuesses}>Load more</LoadMore> */}
-          </MostUpvoated>
-          <MostUpvoated>
+            {userBestGuesses ? (
+              <CardGrid
+                locationId={guessedLocations}
+                cardStyle={"card-guessed"}
+              />
+            ) : (
+              <p>
+                Do you want to test your geography knowledge? Try guessing a
+                location!
+              </p>
+            )}
+          </BestGuesses>
+          <BestGuesses>
             <Tittle>
               <h4>New locations</h4>
               <p>
@@ -123,9 +130,18 @@ const LandingPage = () => {
                 pressing on a picture.
               </p>
             </Tittle>
-            <CardGrid locationId={newLocations} cardStyle={"card-new"} />
-            <LoadMore onClick={loadNewLocations}>Load more</LoadMore>
-          </MostUpvoated>
+            {userUploads ? (
+              <>
+                <CardGrid locationId={newLocations} cardStyle={"card-new"} />
+                <LoadMore onClick={loadNewLocations}>Load more</LoadMore>
+              </>
+            ) : (
+              <p>
+                Do you have any photos of interesting loctions? Add a new
+                location!
+              </p>
+            )}
+          </BestGuesses>
         </Wrapper>
       ) : (
         <>
@@ -153,12 +169,12 @@ const LandingPage = () => {
               </p>
             </Slogan>
           </SloganWrapper>
-          <MostUpvoated>
-            <CardGrid locationId={newLocations} cardStyle={"card-locked"} />
+          <BestGuesses>
+            <CardGrid locationId={lockedLocations} cardStyle={"card-locked"} />
             <Link to="/signup" style={{ textDecoration: "none" }}>
               <Button>Sign up</Button>
             </Link>
-          </MostUpvoated>
+          </BestGuesses>
         </>
       )}
     </Container>

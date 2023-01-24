@@ -5,9 +5,9 @@ import {
   GuessResponseById,
 } from "../interfaces/LocationInterfaces";
 
-const axiosInstance = axios.create({ baseURL: "http://localhost:5000/" });
+const axiosInstance = axios.create({ baseURL: process.env.API_URL });
 const axiosFileInstance = axios.create({
-  baseURL: "http://localhost:5000/",
+  baseURL: process.env.API_URL,
   headers: { "Content-Type": "multipart/form-data" },
 });
 

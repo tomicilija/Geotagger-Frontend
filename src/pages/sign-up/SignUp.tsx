@@ -28,17 +28,21 @@ import * as yup from "yup";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
 
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>(ProfilePicture);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    passwordConfirm: "",
+    name: "",
+    surname: "",
+    profilePicture: null,
+  });
 
   const schema = yup.object().shape({
     email: yup.string().email("Invalid email").required("Email is required"),
@@ -69,16 +73,6 @@ const SignUp = () => {
       )
       .required("Profile picture is required"),
   });
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    passwordConfirm: "",
-    name: "",
-    surname: "",
-    profilePicture: null,
-  });
-
-  const [errors, setErrors] = useState<{ [field: string]: string }>({});
 
   useEffect(() => {
     if (formData.profilePicture) {
@@ -100,11 +94,11 @@ const SignUp = () => {
 
   const handleChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setImage(event.target.files![0]);
-    setFormData({ ...formData, [event.target.name!]: event.target.files![0]! });
+    setFormData({ ...formData, [event.target.name]: event.target.files![0]! });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault();
     try {
       await schema.validate(formData, { abortEarly: false });
       setErrors({});

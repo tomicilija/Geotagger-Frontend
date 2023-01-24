@@ -86,7 +86,7 @@ export const BgMap = styled.div`
   }
 `;
 
-export const MostUpvoated = styled.div`
+export const BestGuesses = styled.div`
   position: relative;
   display: flex;
   flex-wrap: wrap;
@@ -96,10 +96,17 @@ export const MostUpvoated = styled.div`
   width: 100%;
   margin-bottom: 100px;
 
+  p {
+    margin-top: 50px;
+  }
+
   @media (max-width: 900px) {
     margin-bottom: 0;
     :first-child {
       margin-bottom: 250px;
+    }
+    p {
+      margin-top: 20px;
     }
   }
 `;

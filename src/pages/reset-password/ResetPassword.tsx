@@ -5,19 +5,14 @@ import {
   SignUpHeader,
   SignUpForm,
   SignUpFormSection,
-  TwoInRow,
-  SigninText,
   BackgroundIcon,
-  Image,
-  Button,
-  Icon,
   Warning,
   Peek,
   PeekImg,
 } from "./ResetPassword.style";
-import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { resetPassword, signUp } from "../../api/UserApi";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { resetPassword } from "../../api/UserApi";
 import Backgroundimg from "../../assets/background/background-signup-map.svg";
 import BackgroundIconImg from "../../assets/icons/logo-icon-border.svg";
 import PeekIconImg from "../../assets/icons/peek-icon.svg";
@@ -27,13 +22,16 @@ import * as yup from "yup";
 const ResetPassword = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
 
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    passwordConfirm: "",
+  });
   const schema = yup.object().shape({
     email: yup.string().email("Invalid email").required("Email is required"),
     password: yup
@@ -49,20 +47,14 @@ const ResetPassword = () => {
       .oneOf([yup.ref("password"), null], "Passwords must match")
       .required("Confirm password is required"),
   });
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    passwordConfirm: "",
-  });
 
-  const [errors, setErrors] = useState<{ [field: string]: string }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault(); 
     try {
       await schema.validate(formData, { abortEarly: false });
       setErrors({});

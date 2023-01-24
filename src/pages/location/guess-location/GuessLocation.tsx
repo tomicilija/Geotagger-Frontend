@@ -223,7 +223,7 @@ const GuessLocation = () => {
   useEffect(() => {
     if (isLoggedIn) {
       (async () => {
-        const response = await getLocationImage(id!, JSON.parse(isLoggedIn));
+        const response = await getLocationImage(id!);
         const url = window.URL || window.webkitURL;
         const blobUrl = url.createObjectURL(response);
         setLocationImage(blobUrl);

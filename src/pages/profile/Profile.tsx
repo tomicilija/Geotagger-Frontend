@@ -7,32 +7,19 @@ import {
   ProfileName,
   NotFound,
   Wrapper,
-  MostUpvoated,
+  BestGuesses,
   Tittle,
   LoadMore,
 } from "./Profile.style";
-/*import Card from "../../components/card/Card";
-import CardGrid from "../../components/card-grid/CardGrid";*/
-import { Link, useParams } from "react-router-dom";
-import CardGuessed from "../../components/cards/card-guessed/CardGuessed";
-import LocationImg from "../../assets/s6L0uQyprpE.png";
-import CardEdit from "../../components/cards/card-edit/CardEdit";
+import { Link } from "react-router-dom";
 import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
 import { UpdateContext } from "../../utils/UpdateContext";
-import {
-  GuessResponse,
-  LocationResponse,
-} from "../../interfaces/LocationInterfaces";
-import { getLocations, getMyLocations } from "../../api/LocationApi";
+import { getMyLocations } from "../../api/LocationApi";
 import CardGrid from "../../components/card-grid/CardGrid";
 import { getMyGuesses } from "../../api/GuessApi";
 
-// On profile page user quote, karma, and liked quotes is displayed
-
 const Profile = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("accessToken")
-  );
+  const isLoggedIn = localStorage.getItem("accessToken");
   const [userid, setUserId] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -40,6 +27,8 @@ const Profile = () => {
   const [locationsSize] = useState(4);
   const [guessesPage, setGuessedPage] = useState(1);
   const [guessesSize] = useState(4);
+  const [userBestGuesses, setUserBestGuesses] = useState(false);
+  const [userUploads, setUploads] = useState(false);
 
   const [myLocations, setMyLocations] = useState<string[]>([]);
   const [guessedLocations, setGuessedLocations] = useState<string[]>([]);
@@ -47,18 +36,11 @@ const Profile = () => {
   const [image, setImage] = useState<string>();
 
   const { updated, setUpdated } = useContext(UpdateContext);
-  const { id } = useParams();
-
-  /*
-   * Profile page shows profile of logged in user when clicked on profile icon in navbar
-   * or profile of other usr when clicked on name on quote card
-   *
-   * Quote cards can be shown in grid of 3, 2, or 1 columns, depending on screen width
-   * 3 column grid shows max of 9 cards and lods by 9 cards
-   * 2 and 1 column shows max of 4 cards, and loads by 4 cards
-   */
 
   useEffect(() => {
+    const mapsApiKey: string = process.env
+      .API_URL as string;
+    console.log(mapsApiKey);
     if (isLoggedIn) {
       (async () => {
         const response = await getSignedInUser(JSON.parse(isLoggedIn));
@@ -68,7 +50,7 @@ const Profile = () => {
       })().catch((e) => {
         if (e.response.status === 401) {
           console.log("Unauthorized");
-          setIsLoggedIn(null);
+          localStorage.setItem("accessToken", "");
         } else {
           console.log("Error: Cant get user. \n" + e);
         }
@@ -81,10 +63,13 @@ const Profile = () => {
         );
         const locationsId = locations.map((object) => object.id);
         setMyLocations(locationsId);
+        if (locations.length > 1) {
+          setUploads(true);
+        }
       })().catch((e) => {
         if (e.response.status === 401) {
           console.log("Unauthorized");
-          setIsLoggedIn(null);
+          localStorage.setItem("accessToken", "");
         } else {
           console.log("Error: Cant get locations. \n" + e);
         }
@@ -97,10 +82,13 @@ const Profile = () => {
         );
         const locationsId = locations.map((object) => object.location_id);
         setGuessedLocations(locationsId);
+        if (locations.length > 1) {
+          setUserBestGuesses(true);
+        }
       })().catch((e) => {
         if (e.response.status === 401) {
           console.log("Unauthorized");
-          setIsLoggedIn(null);
+          localStorage.setItem("accessToken", "");
         } else {
           console.log("Error: Cant get guesses. \n" + e);
         }
@@ -122,7 +110,7 @@ const Profile = () => {
         console.log("Error: Cant get user profile picture. \n" + e);
       });
     }
-  }, [updated, isLoggedIn, userid]);
+  }, [userid]);
 
   const loadNewLocations = () => {
     setLocationsPage(locationsPage + 1);
@@ -151,25 +139,41 @@ const Profile = () => {
             </ProfileInfo>
           </ProfileBanner>
           <Wrapper>
-            <MostUpvoated>
+            <BestGuesses>
               <Tittle>
                 <h5>My best guesses</h5>
               </Tittle>
-
-              <CardGrid
-                locationId={guessedLocations}
-                cardStyle={"card-guessed-profile"}
-              />
-              <LoadMore onClick={loadMyGuesses}>Load more</LoadMore>
-            </MostUpvoated>
-            <MostUpvoated>
+              {userBestGuesses ? (
+                <>
+                  <CardGrid
+                    locationId={guessedLocations}
+                    cardStyle={"card-guessed-profile"}
+                  />
+                  <LoadMore onClick={loadMyGuesses}>Load more</LoadMore>
+                </>
+              ) : (
+                <p>
+                  Do you want to test your geography knowledge? Try guessing a
+                  location!
+                </p>
+              )}
+            </BestGuesses>
+            <BestGuesses>
               <Tittle>
                 <h5>My uploads</h5>
               </Tittle>
-
-              <CardGrid locationId={myLocations} cardStyle={"card-edit"} />
-              <LoadMore onClick={loadNewLocations}>Load more</LoadMore>
-            </MostUpvoated>
+              {userUploads ? (
+                <>
+                  <CardGrid locationId={myLocations} cardStyle={"card-edit"} />
+                  <LoadMore onClick={loadNewLocations}>Load more</LoadMore>
+                </>
+              ) : (
+                <p>
+                  Do you have any photos of interesting loctions? Add a new
+                  location!
+                </p>
+              )}
+            </BestGuesses>
           </Wrapper>
         </>
       ) : (

@@ -62,6 +62,6 @@ export const LockedIcon = styled.div`
   position: absolute;
   background: no-repeat;
   display: flex;
-  width: 48px;
-  height: 48px;
+  width: 33px;
+  height: 43px;
 `;

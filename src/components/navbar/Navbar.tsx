@@ -20,26 +20,14 @@ import { useLocation, Link } from "react-router-dom";
 import { ReactComponent as LogoIcon } from "../../assets/icons/navbar-logo.svg";
 import { ReactComponent as RightArrow } from "../../assets/arrows/rightArrow.svg";
 import { ReactComponent as RightArrowGreen } from "../../assets/arrows/rightArrow-green.svg";
-import { ReactComponent as DefaultProfileIcon } from "../../assets/icons/profile.svg";
 import { ReactComponent as AddPicture } from "../../assets/icons/add.svg";
 import ProfileSettings from "../modals/profile-settings/ProfileSettings";
-import DeleteQuote from "../modals/delete-location/DeleteLocation";
 import { UpdateContext } from "../../utils/UpdateContext";
 import DeleteLocation from "../modals/delete-location/DeleteLocation";
 import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
 
-/*
- * Navigation bar switches pages, opens modals, and is shown in few different views:
- * Signup and Signin pages
- * Landing page with and without logged in user
- * Profile page with white quotastic logo
- * Mobile page with and without logged in user
- */
-
 const Navbar = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("accessToken")
-  );
+  const isLoggedIn = localStorage.getItem("accessToken");
   let location = useLocation();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -47,8 +35,6 @@ const Navbar = () => {
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);
-
-  const { updated } = useContext(UpdateContext);
   const [image, setImage] = useState<string>();
 
   const openSettingsModal = () => {
@@ -65,13 +51,13 @@ const Navbar = () => {
       })().catch((e) => {
         if (e.response.status === 401) {
           console.log("Unauthorized");
-          setIsLoggedIn(null);
+          localStorage.setItem("accessToken", "");
         } else {
           console.log("Error: Cant get user. \n" + e);
         }
       });
     }
-  }, [updated, isLoggedIn]);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -87,7 +73,7 @@ const Navbar = () => {
         console.log("Error: Cant get user profile picture. \n" + e);
       });
     }
-  }, [updated, isLoggedIn, userid]);
+  }, [userid]);
 
   return (
     <Container>

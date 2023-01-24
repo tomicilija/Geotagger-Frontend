@@ -57,9 +57,6 @@ export const SignUpFormWrapper = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
-  //margin: 100px;
-
   gap: 16px;
 
   @media (max-width: 900px) {

@@ -1,9 +1,13 @@
 import axios from "axios";
-import { Location, LocationResponse } from "../interfaces/LocationInterfaces";
+import {
+  Location,
+  LocationResponse,
+  RandomLocationResponse,
+} from "../interfaces/LocationInterfaces";
 
-const axiosInstance = axios.create({ baseURL: "http://localhost:5000/" });
+const axiosInstance = axios.create({ baseURL: process.env.API_URL });
 const axiosFileInstance = axios.create({
-  baseURL: "http://localhost:5000/",
+  baseURL: process.env.API_URL,
   headers: { "Content-Type": "multipart/form-data" },
 });
 
@@ -14,9 +18,12 @@ export const getLocations = async (
   size: number,
   token: string
 ): Promise<LocationResponse[]> => {
-  const response = await axiosInstance.get(`/location?page=${page}&size=${size*page}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await axiosInstance.get(
+    `/location?page=${page}&size=${size * page}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return response.data;
 };
 
@@ -25,9 +32,12 @@ export const getMyLocations = async (
   size: number,
   token: string
 ): Promise<LocationResponse[]> => {
-  const response = await axiosInstance.get(`/location/me?page=${page}&size=${size*page}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const response = await axiosInstance.get(
+    `/location/me?page=${page}&size=${size * page}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return response.data;
 };
 
@@ -41,11 +51,17 @@ export const getLocationById = async (
   return response.data;
 };
 
-export const getLocationImage = async (id: string, token: string) => {
+export const getLocationImage = async (id: string) => {
   const response = await axiosFileInstance.get(`/location/image/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
     responseType: "blob",
   });
+  return response.data;
+};
+
+export const getRandomLocationsId = async (): Promise<
+  RandomLocationResponse[]
+> => {
+  const response = await axiosInstance.get(`/location/random`, {});
   return response.data;
 };
 
