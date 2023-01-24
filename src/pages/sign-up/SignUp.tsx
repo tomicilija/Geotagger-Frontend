@@ -84,7 +84,7 @@ const SignUp = () => {
     }
   }, [formData.profilePicture]);
 
-  const handleUpload = async () => {
+  const handleUpload = () => {
     document.getElementById("profilePicture")!.click();
   };
 

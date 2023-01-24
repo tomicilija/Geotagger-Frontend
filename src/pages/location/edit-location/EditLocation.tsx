@@ -118,11 +118,11 @@ const EditLocation = () => {
     }
   };
 
-  const handleUpload = async () => {
+  const handleUpload = () => {
     document.getElementById("locationImage")!.click();
   };
 
-  const handleDiscard = async () => {
+  const handleDiscard = () => {
     setPreview(locationImage);
     document.getElementById("locationImage")!.blur();
     setImage(undefined);

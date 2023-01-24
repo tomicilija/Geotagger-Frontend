@@ -148,7 +148,7 @@ const GuessLocation = () => {
     getAddressFromCoordinates();
   }, [coordinates]);
 
-  const handleMapClick = async (e: any) => {
+  const handleMapClick = (e: any) => {
     setCoordinates({
       lat: e.latLng?.lat() as number,
       lng: e.latLng?.lng() as number,
@@ -160,7 +160,7 @@ const GuessLocation = () => {
     setMarkerVisibility(true);
   };
 
-  const getAddressFromCoordinates = async () => {
+  const getAddressFromCoordinates = () => {
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode(
       { location: coordinates, language: "en" },

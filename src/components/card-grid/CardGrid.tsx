@@ -68,7 +68,7 @@ const CardGrid: React.FC<GridProps> = ({ locationId, cardStyle }) => {
           </>
         ) : cardStyle === "card-guessed" ? (
           <>
-            <div className="horizontal">
+            <div className={locationId.length<3 ? "horizontal2" : "horizontal"}>
               {locationId.map((value) => (
                 <div>
                   <CardGuessed locationid={value} />

@@ -44,7 +44,7 @@ const ForgotPassword = () => {
   };
 
   const handleForgotPass = async (e: { preventDefault: () => void }) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault();
     try {
       await schema.validate(formData, { abortEarly: false });
       setErrors({});
@@ -68,17 +68,12 @@ const ForgotPassword = () => {
     }
   };
 
-  const closeForgotPasswordModal = async () => {
-    (async () => {
+  const closeForgotPasswordModal = () => {
       setIsSureOpen(false);
       setForgotPasswordOpen(false);
       setIsForgotPassOpen(false);
       localStorage.setItem("isForgotPasswordModalOpen", "false");
       setUpdated(!updated);
-    })().catch((err) => {
-      console.log(err);
-      setErrorMessage(err.message);
-    });
   };
 
   return (

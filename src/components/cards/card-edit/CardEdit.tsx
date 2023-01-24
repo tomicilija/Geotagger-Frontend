@@ -14,8 +14,6 @@ import EditIconImg from "../../../assets/icons/pen-edit-icon.svg";
 import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import { getLocationImage } from "../../../api/LocationApi";
 
-// Recives user and quote data, displays it, and handles quote voting
-
 const CardEdit: React.FC<CardEditProps> = ({ locationid }) => {
   const isLoggedIn = localStorage.getItem("accessToken");
   const { updated, setUpdated } = useContext(UpdateContext);

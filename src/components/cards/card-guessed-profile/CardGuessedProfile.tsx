@@ -18,7 +18,7 @@ const CardGuessedProfile: React.FC<CardGuessedProps> = ({ locationid }) => {
   const [image, setImage] = useState<string>();
   const [distance, setDistance] = useState<string>();
   const [userid, setUserId] = useState("");
-  
+
   useEffect(() => {
     if (isLoggedIn) {
       (async () => {
@@ -32,9 +32,7 @@ const CardGuessedProfile: React.FC<CardGuessedProps> = ({ locationid }) => {
         }
       });
       (async () => {
-        const response = await getLocationImage(
-          locationid!
-        );
+        const response = await getLocationImage(locationid!);
         const url = window.URL || window.webkitURL;
         const blobUrl = url.createObjectURL(response);
         setImage(blobUrl);
@@ -52,11 +50,11 @@ const CardGuessedProfile: React.FC<CardGuessedProps> = ({ locationid }) => {
             return guess.distance;
           } else return null;
         });
-        const distance = allDistances.filter(val => val !== null).map(val => val);
+        const distance = allDistances
+          .filter((val) => val !== null)
+          .map((val) => val);
         setDistance(distance[0]!.toString());
-      })().catch((e) => {
-        console.log("Error: Cant get location guesses. \n" + e);
-      });
+      })().catch((e) => {});
     }
   }, [isLoggedIn, locationid, userid]);
 

@@ -169,7 +169,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   const handleSubmitProfilePicture = async (e: {
     preventDefault: () => void;
   }) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault();
     try {
       await proflePicutreSchema.validate(proflePicutreFormData, {
         abortEarly: false,
@@ -231,54 +231,34 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
     }
   };
 
-  const changePassword = async () => {
-    (async () => {
+  const changePassword = () => {
       setIsUserInfoOpen(false);
       setIsChangePictureOpen(false);
       setIsChangePasswordOpen(true);
-    })().catch((err) => {
-      console.log(err);
-      setErrorMessage(err.message);
-    });
   };
 
-  const changeProfilePicture = async () => {
-    (async () => {
+  const changeProfilePicture = () => {
       setIsUserInfoOpen(false);
       setIsChangePasswordOpen(false);
       setIsChangePictureOpen(true);
-    })().catch((err) => {
-      console.log(err);
-      setErrorMessage(err.message);
-    });
   };
 
-  const closeSettingsModal = async () => {
-    (async () => {
+  const closeSettingsModal = () => {
       setIsUserInfoOpen(false);
       setIsChangePasswordOpen(false);
       setIsChangePictureOpen(false);
       setIsInformationChangedOpen(false);
       setIsSettingsOpen(false);
-    })().catch((err) => {
-      console.log(err);
-      setErrorMessage(err.message);
-    });
   };
 
-  const closePasswordWindow = async () => {
-    (async () => {
+  const closePasswordWindow = () => {
       setIsChangePictureOpen(false);
       setIsChangePasswordOpen(false);
       setIsUserInfoOpen(true);
       setIsSettingsOpen(true);
-    })().catch((err) => {
-      console.log(err);
-      setErrorMessage(err.message);
-    });
   };
 
-  const closePictureWindow = async () => {
+  const closePictureWindow = () => {
     (async () => {
       setIsChangePictureOpen(false);
       setIsChangePasswordOpen(false);
@@ -291,7 +271,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
     });
   };
 
-  const deleteProfile = async () => {
+  const deleteProfile = () => {
     (async () => {
       await deleteUser(JSON.parse(isLoggedIn!));
       setIsSettingsOpen(false);
@@ -312,11 +292,11 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
     }
   }, [image]);
 
-  const handleUpload = async () => {
+  const handleUpload = () => {
     document.getElementById("profilePicture")!.click();
   };
 
-  const handleDiscard = async () => {
+  const handleDiscard = () => {
     setPreview(PlaceholderImage);
     document.getElementById("profilePicture")!.blur();
     setImage(undefined);

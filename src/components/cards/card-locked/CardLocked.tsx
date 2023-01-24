@@ -11,8 +11,6 @@ import { CardNewProps } from "../../../interfaces/LocationInterfaces";
 import LockedIconImg from "../../../assets/icons/locked-icon.svg";
 import { getLocationImage } from "../../../api/LocationApi";
 
-// Recives user and quote data, displays it, and handles quote voting
-
 const CardLocked: React.FC<CardNewProps> = ({ locationid }) => {
   const isLoggedIn = localStorage.getItem("accessToken");
 

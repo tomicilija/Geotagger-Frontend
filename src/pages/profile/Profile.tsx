@@ -107,7 +107,7 @@ const Profile = () => {
         console.log("Error: Cant get user profile picture. \n" + e);
       });
     }
-  }, [updated, userid]);
+  }, [updated, userid, isLoggedIn]);
 
   const loadNewLocations = () => {
     setLocationsPage(locationsPage + 1);

@@ -27,7 +27,7 @@ const DeleteLocation = () => {
     setIsDeleteOpen(JSON.parse(deleteModal!) === true);
   }, [deleteModal, updated]);
 
-  const handleDelete = async (e: { preventDefault: () => void }) => {
+  const handleDelete = (e: { preventDefault: () => void }) => {
     e.preventDefault(); // To prevent refreshing the page on form submit
     (async () => {
       await deleteLocation(locationId!, JSON.parse(isLoggedIn!));
@@ -38,17 +38,12 @@ const DeleteLocation = () => {
     });
   };
 
-  const closeDeleteModal = async () => {
-    (async () => {
+  const closeDeleteModal = () => {
       setIsSureOpen(false);
       setDeletedOpen(false);
       setIsDeleteOpen(false);
       localStorage.setItem("isDeleteModalOpen", "false");
       setUpdated(!updated);
-    })().catch((err) => {
-      console.log(err);
-      setErrorMessage(err.message);
-    });
   };
 
   return (

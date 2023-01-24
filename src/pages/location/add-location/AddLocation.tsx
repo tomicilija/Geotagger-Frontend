@@ -79,16 +79,11 @@ const AddLocation = () => {
 
   useEffect(() => {
     getAddressFromCoordinates().catch((e) => {
-      if (e.response.status === 401) {
-        console.log("Unauthorized");
-        localStorage.setItem("accessToken", "");
-      } else {
-        console.log("Error: Cant get location. \n" + e);
-      }
+      console.log("Error: Cant get location. \n" + e);
     });
   }, [coordinates]);
 
-  const handleMapClick = async (e: any) => {
+  const handleMapClick = (e: any) => {
     setCoordinates({
       lat: e.latLng?.lat() as number,
       lng: e.latLng?.lng() as number,
