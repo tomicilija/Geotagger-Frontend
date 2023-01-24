@@ -4,10 +4,9 @@ import {
   GuessResponse,
   GuessResponseById,
 } from "../interfaces/LocationInterfaces";
+// API calls related to Guesses
 
 const axiosInstance = axios.create({ baseURL: process.env.REACT_APP_API_URL });
-
-// API calls related to Guesses
 
 export const getGuessesByLocationId = async (
   id: string,
