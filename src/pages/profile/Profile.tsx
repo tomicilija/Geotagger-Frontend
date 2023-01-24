@@ -38,9 +38,6 @@ const Profile = () => {
   const { updated, setUpdated } = useContext(UpdateContext);
 
   useEffect(() => {
-    const mapsApiKey: string = process.env
-      .API_URL as string;
-    console.log(mapsApiKey);
     if (isLoggedIn) {
       (async () => {
         const response = await getSignedInUser(JSON.parse(isLoggedIn));

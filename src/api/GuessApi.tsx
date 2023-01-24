@@ -5,11 +5,7 @@ import {
   GuessResponseById,
 } from "../interfaces/LocationInterfaces";
 
-const axiosInstance = axios.create({ baseURL: process.env.API_URL });
-const axiosFileInstance = axios.create({
-  baseURL: process.env.API_URL,
-  headers: { "Content-Type": "multipart/form-data" },
-});
+const axiosInstance = axios.create({ baseURL: process.env.REACT_APP_API_URL });
 
 // API calls related to Guesses
 

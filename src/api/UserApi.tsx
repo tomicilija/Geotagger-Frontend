@@ -11,9 +11,9 @@ import {
   User,
 } from "../interfaces/LocationInterfaces";
 
-const axiosInstance = axios.create({ baseURL: process.env.API_URL });
+const axiosInstance = axios.create({ baseURL: process.env.REACT_APP_API_URL });
 const axiosFileInstance = axios.create({
-  baseURL: process.env.API_URL,
+  baseURL: process.env.REACT_APP_API_URL,
   headers: { "Content-Type": "multipart/form-data" },
 });
 
