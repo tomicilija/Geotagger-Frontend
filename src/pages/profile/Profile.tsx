@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import {
   Container,
   ProfileBanner,
@@ -12,102 +12,67 @@ import {
   LoadMore,
 } from "./Profile.style";
 import { Link } from "react-router-dom";
-import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
 import { UpdateContext } from "../../utils/UpdateContext";
+import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
 import { getMyLocations } from "../../api/LocationApi";
-import CardGrid from "../../components/card-grid/CardGrid";
 import { getMyGuesses } from "../../api/GuessApi";
+import CardGrid from "../../components/card-grid/CardGrid";
 
 const Profile = () => {
   const isLoggedIn = localStorage.getItem("accessToken");
-  const [userid, setUserId] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [userData, setUserData] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
+  });
   const [locationsPage, setLocationsPage] = useState(1);
   const [locationsSize] = useState(4);
   const [guessesPage, setGuessedPage] = useState(1);
   const [guessesSize] = useState(4);
   const [userBestGuesses, setUserBestGuesses] = useState(false);
-  const [userUploads, setUploads] = useState(false);
-
+  const [userUploads, setUserUploads] = useState(false);
   const [myLocations, setMyLocations] = useState<string[]>([]);
   const [guessedLocations, setGuessedLocations] = useState<string[]>([]);
-
   const [image, setImage] = useState<string>();
-
   const { updated, setUpdated } = useContext(UpdateContext);
 
-  useEffect(() => {
+  const getData = useCallback(async () => {
     if (isLoggedIn) {
-      (async () => {
-        const response = await getSignedInUser(JSON.parse(isLoggedIn));
-        setFirstName(response.name);
-        setLastName(response.surname);
-        setUserId(response.id);
-      })().catch((e) => {
-        if (e.response.status === 401) {
-          console.log("Unauthorized");
-          localStorage.setItem("accessToken", "");
-        } else {
-          console.log("Error: Cant get user. \n" + e);
-        }
+      const [user, profilePicture, locations, guesses] = await Promise.all([
+        getSignedInUser(JSON.parse(isLoggedIn)),
+        getUserProfilePicture(userData.id, JSON.parse(isLoggedIn)),
+        getMyLocations(locationsPage, locationsSize, JSON.parse(isLoggedIn)),
+        getMyGuesses(guessesPage, guessesSize, JSON.parse(isLoggedIn)),
+      ]);
+      setUserData({
+        id: user.id,
+        firstName: user.name,
+        lastName: user.surname,
       });
-      (async () => {
-        const locations = await getMyLocations(
-          locationsPage,
-          locationsSize,
-          JSON.parse(isLoggedIn)
-        );
-        const locationsId = locations.map((object) => object.id);
-        setMyLocations(locationsId);
-        if (locations.length > 0) {
-          setUploads(true);
-        }
-      })().catch((e) => {
-        if (e.response.status === 401) {
-          console.log("Unauthorized");
-          localStorage.setItem("accessToken", "");
-        } else {
-          console.log("Error: Cant get locations. \n" + e);
-        }
-      });
-      (async () => {
-        const locations = await getMyGuesses(
-          guessesPage,
-          guessesSize,
-          JSON.parse(isLoggedIn)
-        );
-        const locationsId = locations.map((object) => object.location_id);
-        setGuessedLocations(locationsId);
-        if (locations.length > 0) {
-          setUserBestGuesses(true);
-        }
-      })().catch((e) => {
-        if (e.response.status === 401) {
-          console.log("Unauthorized");
-          localStorage.setItem("accessToken", "");
-        } else {
-          console.log("Error: Cant get guesses. \n" + e);
-        }
-      });
+
+      const url = window.URL || window.webkitURL;
+      const blobUrl = url.createObjectURL(profilePicture);
+      setImage(blobUrl);
+
+      const locationsId = locations.map((object) => object.id);
+      setMyLocations(locationsId);
+      if (locations.length > 0) {
+        setUserUploads(true);
+      }
+
+      const guessesId = guesses.map((object) => object.location_id);
+      setGuessedLocations(guessesId);
+      if (guesses.length > 0) {
+        setUserBestGuesses(true);
+      }
     }
-  }, [updated, isLoggedIn]);
+  }, [guessesPage, guessesSize, isLoggedIn, locationsPage, locationsSize, userData.id]);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      (async () => {
-        const response = await getUserProfilePicture(
-          userid,
-          JSON.parse(isLoggedIn)
-        );
-        const url = window.URL || window.webkitURL;
-        const blobUrl = url.createObjectURL(response);
-        setImage(blobUrl);
-      })().catch((e) => {
-        console.log("Error: Cant get user profile picture. \n" + e);
-      });
-    }
-  }, [updated, userid, isLoggedIn]);
+    getData().catch((e) => {
+      console.log("Error: Cant get data. \n" + e);
+    });
+  }, [updated, isLoggedIn, getData]);
 
   const loadNewLocations = () => {
     setLocationsPage(locationsPage + 1);
@@ -130,7 +95,7 @@ const Profile = () => {
             <ProfileInfo>
               <ProfileName>
                 <h4>
-                  {firstName} {lastName}
+                  {userData.firstName} {userData.lastName}
                 </h4>
               </ProfileName>
             </ProfileInfo>

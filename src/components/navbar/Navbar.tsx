@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import {
   Container,
   Logo,
@@ -29,9 +29,11 @@ import { getSignedInUser, getUserProfilePicture } from "../../api/UserApi";
 const Navbar = () => {
   const isLoggedIn = localStorage.getItem("accessToken");
   let location = useLocation();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [userid, setUserId] = useState("");
+  const [userData, setUserData] = useState({
+    id: "",
+    firstName: "",
+    lastName: "",
+  });
   const [isBurgerMenuOpen, setIsBurgerMenuOpen] = useState<boolean>(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] =
     useState<boolean>(false);
@@ -43,39 +45,29 @@ const Navbar = () => {
     setIsSettingsModalOpen((prev) => !prev);
   };
 
-  useEffect(() => {
+  const getData = useCallback(async () => {
     if (isLoggedIn) {
-      (async () => {
-        const response = await getSignedInUser(JSON.parse(isLoggedIn));
-        setFirstName(response.name);
-        setLastName(response.surname);
-        setUserId(response.id);
-      })().catch((e) => {
-        if (e.response.status === 401) {
-          console.log("Unauthorized");
-          localStorage.setItem("accessToken", "");
-        } else {
-          console.log("Error: Cant get user. \n" + e);
-        }
+      const [user, profilePicture] = await Promise.all([
+        getSignedInUser(JSON.parse(isLoggedIn)),
+        getUserProfilePicture(userData.id, JSON.parse(isLoggedIn)),
+      ]);
+      setUserData({
+        id: user.id,
+        firstName: user.name,
+        lastName: user.surname,
       });
+
+      const url = window.URL || window.webkitURL;
+      const blobUrl = url.createObjectURL(profilePicture);
+      setImage(blobUrl);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, userData.id]);
 
   useEffect(() => {
-    if (isLoggedIn) {
-      (async () => {
-        const response = await getUserProfilePicture(
-          userid,
-          JSON.parse(isLoggedIn)
-        );
-        const url = window.URL || window.webkitURL;
-        const blobUrl = url.createObjectURL(response);
-        setImage(blobUrl);
-      })().catch((e) => {
-        console.log("Error: Cant get user profile picture. \n" + e);
-      });
-    }
-  }, [updated, userid]);
+    getData().catch((e) => {
+      console.log("Error: Cant get data. \n" + e);
+    });
+  }, [updated, isLoggedIn, getData]);
 
   return (
     <Container>
@@ -111,7 +103,7 @@ const Navbar = () => {
                       <img src={`${image}`} alt="pp" />
                     </ProfilePicture>
                     <h5>
-                      {firstName} {lastName}
+                      {userData.firstName} {userData.lastName}
                     </h5>
                   </MobileLink>
                 </Link>

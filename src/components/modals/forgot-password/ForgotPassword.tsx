@@ -10,7 +10,6 @@ import {
   ConfirmationWrapper,
   Warning,
 } from "./ForgotPassword.style";
-import PlaceholderImage from "../../../assets/default-avatar.svg";
 import { forgotPassword } from "../../../api/UserApi";
 import { Label, Input } from "reactstrap";
 import * as yup from "yup";

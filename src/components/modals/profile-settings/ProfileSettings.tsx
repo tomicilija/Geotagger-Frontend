@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useContext, useEffect, useState, useCallback } from "react";
 import { ProfileSettingsProps } from "../../../interfaces/LocationInterfaces";
 import { UpdateContext } from "../../../utils/UpdateContext";
 import {
@@ -35,9 +35,12 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   setIsSettingsOpen,
 }) => {
   const isLoggedIn = localStorage.getItem("accessToken");
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [userData, setUserData] = useState({
+    id: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+  });
   const [ErrorMessage, setErrorMessage] = useState("");
   const { updated, setUpdated } = useContext(UpdateContext);
   const [showPassword, setShowPassword] = useState(false);
@@ -53,7 +56,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
     useState<boolean>(false);
   const [isUserInfoOpen, setIsUserInfoOpen] = useState<boolean>(true);
   const [errors, setErrors] = useState<{ [field: string]: string }>({});
-  
+
   const [proflePicutreFormData, setProfilePictureFormData] = useState({
     profilePicture: null,
   });
@@ -103,32 +106,33 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
       .required("Profile picture is required"),
   });
 
-  const handleChangeUserInfo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserFormData({ ...userFormData, [e.target.name]: e.target.value });
-  };
-
-  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPasswordFormData({
-      ...passwordFormData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  useEffect(() => {
-    setIsUserInfoOpen(isSettingsOpen);
-  }, [isSettingsOpen]);
-
-  useEffect(() => {
-    getSignedInUser(JSON.parse(isLoggedIn!))
-      .then(({ email, name, surname, id }) => {
-        setEmail(email);
-        setFirstName(name);
-        setLastName(surname);
-      })
-      .catch((e) => {
-        console.log("Error: Cant get user. \n" + e);
+  const getData = useCallback(async () => {
+    if (isLoggedIn) {
+      const [user] = await Promise.all([
+        getSignedInUser(JSON.parse(isLoggedIn)),
+      ]);
+      setUserData({
+        id: user.id,
+        email: user.email,
+        firstName: user.name,
+        lastName: user.surname,
       });
-  });
+    }
+  }, [isLoggedIn]);
+
+  const previewImage = useCallback(() => {
+    if (proflePicutreFormData.profilePicture) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(proflePicutreFormData.profilePicture);
+    }
+  }, [proflePicutreFormData.profilePicture]);
+
+  useEffect(() => {
+    previewImage();
+  }, [previewImage]);
 
   const handleSubmitUserInfo = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -144,7 +148,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
           },
           JSON.parse(isLoggedIn!)
         );
-        if (userFormData.email !== email) {
+        if (userFormData.email !== userData.email) {
           localStorage.clear();
           window.location.href = "/signin";
         } else {
@@ -200,7 +204,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   };
 
   const handleSubmitPassword = async (e: { preventDefault: () => void }) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault();
     try {
       await passwordSchema.validate(passwordFormData, {
         abortEarly: false,
@@ -232,30 +236,30 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   };
 
   const changePassword = () => {
-      setIsUserInfoOpen(false);
-      setIsChangePictureOpen(false);
-      setIsChangePasswordOpen(true);
+    setIsUserInfoOpen(false);
+    setIsChangePictureOpen(false);
+    setIsChangePasswordOpen(true);
   };
 
   const changeProfilePicture = () => {
-      setIsUserInfoOpen(false);
-      setIsChangePasswordOpen(false);
-      setIsChangePictureOpen(true);
+    setIsUserInfoOpen(false);
+    setIsChangePasswordOpen(false);
+    setIsChangePictureOpen(true);
   };
 
   const closeSettingsModal = () => {
-      setIsUserInfoOpen(false);
-      setIsChangePasswordOpen(false);
-      setIsChangePictureOpen(false);
-      setIsInformationChangedOpen(false);
-      setIsSettingsOpen(false);
+    setIsUserInfoOpen(false);
+    setIsChangePasswordOpen(false);
+    setIsChangePictureOpen(false);
+    setIsInformationChangedOpen(false);
+    setIsSettingsOpen(false);
   };
 
   const closePasswordWindow = () => {
-      setIsChangePictureOpen(false);
-      setIsChangePasswordOpen(false);
-      setIsUserInfoOpen(true);
-      setIsSettingsOpen(true);
+    setIsChangePictureOpen(false);
+    setIsChangePasswordOpen(false);
+    setIsUserInfoOpen(true);
+    setIsSettingsOpen(true);
   };
 
   const closePictureWindow = () => {
@@ -282,16 +286,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
     });
   };
 
-  useEffect(() => {
-    if (image) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(image);
-    }
-  }, [image]);
-
   const handleUpload = () => {
     document.getElementById("profilePicture")!.click();
   };
@@ -310,6 +304,24 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
       [event.target.name!]: event.target.files![0]!,
     });
   };
+
+  const handleChangeUserInfo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserFormData({ ...userFormData, [e.target.name]: e.target.value });
+  };
+
+  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPasswordFormData({
+      ...passwordFormData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  useEffect(() => {
+    getData().catch((e) => {
+      console.log("Error: Cant get data. \n" + e);
+    });
+    setIsUserInfoOpen(isSettingsOpen);
+  }, [isSettingsOpen, getData]);
 
   return (
     <>
@@ -333,7 +345,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                       type="email"
                       name="email"
                       id="email"
-                      placeholder={email}
+                      placeholder={userData.email}
                       value={userFormData.email}
                       onChange={handleChangeUserInfo}
                     />
@@ -348,7 +360,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                         id="name"
                         value={userFormData.name}
                         onChange={handleChangeUserInfo}
-                        placeholder={firstName}
+                        placeholder={userData.firstName}
                       />
                     </SettingsSection>
                     <SettingsSection>
@@ -357,7 +369,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
                         type="text"
                         name="surname"
                         id="surname"
-                        placeholder={lastName}
+                        placeholder={userData.lastName}
                         value={userFormData.surname}
                         onChange={handleChangeUserInfo}
                       />

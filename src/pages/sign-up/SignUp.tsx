@@ -15,7 +15,7 @@ import {
   Peek,
   PeekImg,
 } from "./SignUp.style";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProfilePicture from "../../assets/DefaultAvatar.png";
 import { signUp } from "../../api/UserApi";
@@ -74,16 +74,6 @@ const SignUp = () => {
       .required("Profile picture is required"),
   });
 
-  useEffect(() => {
-    if (formData.profilePicture) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(formData.profilePicture);
-    }
-  }, [formData.profilePicture]);
-
   const handleUpload = () => {
     document.getElementById("profilePicture")!.click();
   };
@@ -97,7 +87,7 @@ const SignUp = () => {
     setFormData({ ...formData, [event.target.name]: event.target.files![0]! });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await schema.validate(formData, { abortEarly: false });
@@ -124,7 +114,17 @@ const SignUp = () => {
         setErrors(validationErrors);
       }
     }
-  };
+  }, [formData, image, schema]);
+
+  useEffect(() => {
+    if (formData.profilePicture) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(formData.profilePicture);
+    }
+  }, [formData.profilePicture]);
 
   return (
     <Container>

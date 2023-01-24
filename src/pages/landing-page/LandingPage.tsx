@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import {
   Container,
   Wrapper,
@@ -26,7 +26,7 @@ const LandingPage = () => {
   const [guessedLocations, setGuessedLocations] = useState<string[]>([]);
   const [lockedLocations, setlockedLocations] = useState<string[]>([]);
   const [userBestGuesses, setUserBestGuesses] = useState(false);
-  const [userUploads, setUploads] = useState(false);
+  const [userUploads, setUserUploads] = useState(false);
   const [locationsPage, setLocationsPage] = useState(1);
   const [locationsSize] = useState(3);
   const [guessesPage] = useState(1);
@@ -39,64 +39,40 @@ const LandingPage = () => {
     setUpdated(!updated);
   };
 
-  useEffect(() => {
+  const getLandingData = useCallback(async () => {
+    const locations = await getRandomLocationsId();
+    const locationsId = locations.map((object) => object.id);
+    setlockedLocations(locationsId);
+  }, []);
+
+  const getLoggedInData = useCallback(async () => {
     if (isLoggedIn) {
-      (async () => {
-        const locations = await getLocations(
-          locationsPage,
-          locationsSize,
-          JSON.parse(isLoggedIn)
-        );
-        const locationsId = locations.map((object) => object.id);
-        setNewLocations(locationsId);
-        if (locations.length > 0) {
-          setUploads(true);
-        }
-      })().catch((e) => {
-        if (e.response.status === 401) {
-          console.log("Unauthorized");
-          localStorage.setItem("accessToken", "");
-        } else {
-          console.log("Error: Cant get location. \n" + e);
-        }
-      });
-      (async () => {
-        const locations = await getMyGuesses(
-          guessesPage,
-          guessesSize,
-          JSON.parse(isLoggedIn)
-        );
-        const locationsId = locations.map((object) => object.location_id);
-        setGuessedLocations(locationsId);
-        if (locations.length > 0) {
-          setUserBestGuesses(true);
-        }
-      })().catch((e) => {
-        if (e.response.status === 401) {
-          console.log("Unauthorized");
-          localStorage.setItem("accessToken", "");
-        } else {
-          console.log("Error: Cant get guesses. \n" + e);
-        }
-      });
+      const [locations, guesses] = await Promise.all([
+        getLocations(locationsPage, locationsSize, JSON.parse(isLoggedIn)),
+        getMyGuesses(guessesPage, guessesSize, JSON.parse(isLoggedIn)),
+      ]);
+      const locationsId = locations.map((object) => object.id);
+      setNewLocations(locationsId);
+      if (locations.length > 0) {
+        setUserUploads(true);
+      }
+
+      const guessesId = guesses.map((object) => object.location_id);
+      setGuessedLocations(guessesId);
+      if (guesses.length > 0) {
+        setUserBestGuesses(true);
+      }
     }
-  }, [updated, isLoggedIn]);
+  }, [guessesPage, guessesSize, isLoggedIn, locationsPage, locationsSize]);
 
   useEffect(() => {
-    if (!isLoggedIn) {
-    (async () => {
-      const locations = await getRandomLocationsId();
-      const locationsId = locations.map((object) => object.id);
-      setlockedLocations(locationsId);
-    })().catch((e) => {
-      if (e.response.status === 401) {
-        console.log("Unauthorized");
-        localStorage.setItem("accessToken", "");
-      } else {
-        console.log("Error: Cant get location. \n" + e);
-      }
-    });}
-  }, []);
+    getLandingData().catch((e) => {
+      console.log("Error: Cant get data. \n" + e);
+    });
+    getLoggedInData().catch((e) => {
+      console.log("Error: Cant get data. \n" + e);
+    });
+  }, [updated, isLoggedIn, getLoggedInData, getLandingData]);
 
   return (
     <Container>

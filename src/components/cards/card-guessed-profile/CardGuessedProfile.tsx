@@ -6,7 +6,7 @@ import {
   Button,
   Overlay,
 } from "./CardGuessedProfile.style";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { CardGuessedProps } from "../../../interfaces/LocationInterfaces";
 import { Link } from "react-router-dom";
 import { getLocationImage } from "../../../api/LocationApi";
@@ -19,44 +19,37 @@ const CardGuessedProfile: React.FC<CardGuessedProps> = ({ locationid }) => {
   const [distance, setDistance] = useState<string>();
   const [userid, setUserId] = useState("");
 
-  useEffect(() => {
+  const getData = useCallback(async () => {
     if (isLoggedIn) {
-      (async () => {
-        const response = await getSignedInUser(JSON.parse(isLoggedIn));
-        setUserId(response.id);
-      })().catch((e) => {
-        if (e.response.status === 401) {
-          console.log("Unauthorized");
-        } else {
-          console.log("Error: Cant get user. \n" + e);
-        }
+      const [user, location, guesses] = await Promise.all([
+        getSignedInUser(JSON.parse(isLoggedIn)),
+        getLocationImage(locationid!),
+        getGuessesByLocationId(locationid!, JSON.parse(isLoggedIn)),
+      ]);
+      setUserId(user.id);
+      const url = window.URL || window.webkitURL;
+      const blobUrl = url.createObjectURL(location);
+      setImage(blobUrl);
+      const allDistances = guesses.map((guess) => {
+        if (guess.user.id === userid) {
+          return guess.distance;
+        } else return null;
       });
-      (async () => {
-        const response = await getLocationImage(locationid!);
-        const url = window.URL || window.webkitURL;
-        const blobUrl = url.createObjectURL(response);
-        setImage(blobUrl);
-      })().catch((e) => {
-        console.log("Error: Cant get location image. \n" + e);
-      });
-      (async () => {
-        const response = await getGuessesByLocationId(
-          locationid!,
-          JSON.parse(isLoggedIn)
-        );
-
-        const allDistances = response.map((guess) => {
-          if (guess.user.id === userid) {
-            return guess.distance;
-          } else return null;
-        });
-        const distance = allDistances
-          .filter((val) => val !== null)
-          .map((val) => val);
+      const distance = allDistances
+        .filter((val) => val !== null)
+        .map((val) => val);
+      if (distance[0]) {
         setDistance(distance[0]!.toString());
-      })().catch((e) => {});
+      }
     }
   }, [isLoggedIn, locationid, userid]);
+
+  useEffect(() => {
+    getData().catch((e) => {
+      console.log("Error: Cant get data. \n" + e);
+    });
+  }, [isLoggedIn, userid, getData]);
+
 
   return (
     <Container>

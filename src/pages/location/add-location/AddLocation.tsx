@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Container,
   NotFound,
@@ -40,12 +40,13 @@ const AddLocation = () => {
     longitude: "",
   });
   const [imageData, setImageData] = useState({
-    profilePicture: null,
+    locationImage: null,
   });
   const [errors, setErrors] = useState<{ [field: string]: string }>({});
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: mapsApiKey,
   });
+  const [preview, setPreview] = useState<string>(PlaceholderImage);
 
   const locationSchema = yup.object().shape({
     latitude: yup
@@ -77,25 +78,7 @@ const AddLocation = () => {
       .required("New Location image is required to edit the location!"),
   });
 
-  useEffect(() => {
-    getAddressFromCoordinates().catch((e) => {
-      console.log("Error: Cant get location. \n" + e);
-    });
-  }, [coordinates]);
-
-  const handleMapClick = (e: any) => {
-    setCoordinates({
-      lat: e.latLng?.lat() as number,
-      lng: e.latLng?.lng() as number,
-    });
-    setMarkerVisibility(true);
-    setLocationData({
-      latitude: e.latLng?.lat(),
-      longitude: e.latLng?.lng(),
-    });
-  };
-
-  const getAddressFromCoordinates = async () => {
+  const getAddressFromCoordinates = useCallback(async () => {
     const geocoder = new window.google.maps.Geocoder();
     geocoder.geocode(
       { location: coordinates, language: "en" },
@@ -103,18 +86,25 @@ const AddLocation = () => {
         if (status === "OK") {
           if (results![0]) {
             setAddress(results![0].formatted_address);
-          } else {
-            console.log("No results found");
           }
-        } else {
-          console.log("Geocoder failed due to: " + status);
         }
       }
     );
-  };
+  }, [coordinates]);
+  
+
+  const previewImage = useCallback(() => {
+    if (imageData.locationImage) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(imageData.locationImage);
+    }
+  }, [imageData.locationImage]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault();
     try {
       await imageSchema.validate(imageData, { abortEarly: false });
       await locationSchema.validate(locationData, { abortEarly: false });
@@ -125,7 +115,7 @@ const AddLocation = () => {
             name: addrss,
             latitude: Number(coordinates.lat.toFixed(6)),
             longitude: Number(coordinates.lng.toFixed(6)),
-            image: image!,
+            image: imageData.locationImage!,
           },
           JSON.parse(isLoggedIn!)
         );
@@ -144,18 +134,17 @@ const AddLocation = () => {
     }
   };
 
-  const [image, setImage] = useState<File>();
-  const [preview, setPreview] = useState<string>(PlaceholderImage);
-
-  useEffect(() => {
-    if (image) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(image);
-    }
-  }, [image]);
+  const handleMapClick = (e: any) => {
+    setCoordinates({
+      lat: e.latLng?.lat() as number,
+      lng: e.latLng?.lng() as number,
+    });
+    setMarkerVisibility(true);
+    setLocationData({
+      latitude: e.latLng?.lat(),
+      longitude: e.latLng?.lng(),
+    });
+  };
 
   const handleUpload = async () => {
     document.getElementById("locationImage")!.click();
@@ -164,7 +153,7 @@ const AddLocation = () => {
   const handleDiscard = async () => {
     setPreview(PlaceholderImage);
     document.getElementById("locationImage")!.blur();
-    setImage(undefined);
+    setImageData({locationImage: null});
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -173,9 +162,16 @@ const AddLocation = () => {
 
   const handleChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files![0];
-    setImage(file);
+    setImageData({locationImage: null});
     setImageData({ ...imageData, [event.target.name!]: file });
   };
+
+  useEffect(() => {
+    previewImage();
+    getAddressFromCoordinates().catch((e) => {
+      console.log("Error: Cant get location address. \n" + e);
+    });
+  }, [coordinates, imageData.locationImage, getAddressFromCoordinates, previewImage]);
 
   return (
     <Container>

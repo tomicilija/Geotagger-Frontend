@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import {
   Container,
   NotFound,
@@ -25,11 +25,7 @@ import {
   Form,
   Warning,
 } from "./GuessLocation.style";
-import {
-  useJsApiLoader,
-  GoogleMap,
-  MarkerF,
-} from "@react-google-maps/api";
+import { useJsApiLoader, GoogleMap, MarkerF } from "@react-google-maps/api";
 import { Link, useParams } from "react-router-dom";
 import MapMarker from "../../../assets/icons/map-marker.png";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
@@ -45,13 +41,14 @@ import * as yup from "yup";
 const GuessLocation = () => {
   const isLoggedIn = localStorage.getItem("accessToken");
   const [userid, setUserId] = useState("");
-  const { updated } = useContext(UpdateContext);
   const { id } = useParams();
   const [addrss, setAddress] = useState("");
   const [errorDistance, setErrorDistance] = useState("");
   const [markerVisibility, setMarkerVisibility] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState("");
-  const [locationGuesses, setLocationGuesses] = useState<GuessResponseById[]>([]);
+  const [locationGuesses, setLocationGuesses] = useState<GuessResponseById[]>(
+    []
+  );
   const [errors, setErrors] = useState<{ [field: string]: string }>({});
   const [coordinates, setCoordinates] = useState({
     lat: 37.77414,
@@ -61,7 +58,7 @@ const GuessLocation = () => {
     latitude: "",
     longitude: "",
   });
-
+  const [locationImage, setLocationImage] = useState<string>(PlaceholderImage);
   const mapsApiKey: string = process.env
     .REACT_APP_GOOGLE_MAPS_API_KEY as string;
 
@@ -83,70 +80,83 @@ const GuessLocation = () => {
       .required("Longitude is required")
       .test("is-num", (val) => !isNaN(parseFloat(val!))),
   });
-
-  const fetchGuesses = async (): Promise<GuessResponseById[]> => {
-    const response = await getGuessesByLocationId(id!, JSON.parse(isLoggedIn!));
-    const guesses = Promise.all(
-      response.map(async (guess) => {
-        const diff = moment.duration(
-          moment().diff(moment(guess.createdAt).format("YYYY-MM-DDTHH:mm:ss"))
-        );
-        const profilePicture = await getUserProfilePicture(
-          guess.user.id,
-          JSON.parse(isLoggedIn!)
-        );
-        const url = window.URL || window.webkitURL;
-        const profilePictureUrl = url.createObjectURL(profilePicture);
-        return {
-          ...guess,
-          createdAt:
-            diff.asHours() < 24 && diff.asHours() > 1
-              ? guess.createdAt.replace(
-                  guess.createdAt,
-                  Math.trunc(diff.asHours()) + " hours ago"
-                )
-              : diff.asHours() < 1 && diff.asMinutes() > 1
-              ? guess.createdAt.replace(
-                  guess.createdAt,
-                  Math.trunc(diff.asMinutes()) + " mins ago"
-                )
-              : diff.asMinutes() < 1
-              ? guess.createdAt.replace(guess.createdAt, "Now")
-              : guess.createdAt.replace(
-                  guess.createdAt,
-                  Intl.DateTimeFormat("en-GB", {
-                    timeStyle: "short",
-                    dateStyle: "medium",
-                  }).format(new Date(guess.createdAt))
-                ),
-          profilePicture: guess.user.profilePicture.replace(
-            guess.user.profilePicture,
-            profilePictureUrl
-          ),
-        };
-      })
+  const getAddressFromCoordinates = useCallback(async () => {
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode(
+      { location: coordinates, language: "en" },
+      (results, status) => {
+        if (status === "OK") {
+          if (results![0]) {
+            setAddress(results![0].formatted_address);
+          }
+        }
+      }
     );
-    return guesses;
-  };
-
-  useEffect(() => {
-    (async () => {
-      const response = await getSignedInUser(JSON.parse(isLoggedIn!));
-      setUserId(response.id);
-    })().catch((e) => {
-      console.log("Error: Cant get user. \n" + e);
-    });
-
-    fetchGuesses()
-      .then((data) => setLocationGuesses(data))
-      .catch((e) => {
-        console.log("Error: Can't get location guesses. \n" + e);
-      });
-  }, [isLoggedIn, errorDistance, userid]);
-
-  useEffect(() => {
-    getAddressFromCoordinates();
   }, [coordinates]);
+
+  const fetchGuessData = useCallback(
+    async (data: GuessResponseById[]): Promise<GuessResponseById[]> => {
+      const guesses = Promise.all(
+        data.map(async (guess) => {
+          const diff = moment.duration(
+            moment().diff(moment(guess.createdAt).format("YYYY-MM-DDTHH:mm:ss"))
+          );
+          const profilePicture = await getUserProfilePicture(
+            guess.user.id,
+            JSON.parse(isLoggedIn!)
+          );
+          const url = window.URL || window.webkitURL;
+          const profilePictureUrl = url.createObjectURL(profilePicture);
+          return {
+            ...guess,
+            createdAt:
+              diff.asHours() < 24 && diff.asHours() > 1
+                ? guess.createdAt.replace(
+                    guess.createdAt,
+                    Math.trunc(diff.asHours()) + " hours ago"
+                  )
+                : diff.asHours() < 1 && diff.asMinutes() > 1
+                ? guess.createdAt.replace(
+                    guess.createdAt,
+                    Math.trunc(diff.asMinutes()) + " mins ago"
+                  )
+                : diff.asMinutes() < 1
+                ? guess.createdAt.replace(guess.createdAt, "Now")
+                : guess.createdAt.replace(
+                    guess.createdAt,
+                    Intl.DateTimeFormat("en-GB", {
+                      timeStyle: "short",
+                      dateStyle: "medium",
+                    }).format(new Date(guess.createdAt))
+                  ),
+            profilePicture: guess.user.profilePicture.replace(
+              guess.user.profilePicture,
+              profilePictureUrl
+            ),
+          };
+        })
+      );
+      return guesses;
+    },
+    [isLoggedIn]
+  );
+
+  const fetchLocationGuesses = useCallback(async () => {
+    if (isLoggedIn) {
+      const [user, locationImage, guesses] = await Promise.all([
+        getSignedInUser(JSON.parse(isLoggedIn)),
+        getLocationImage(id!),
+        getGuessesByLocationId(id!, JSON.parse(isLoggedIn!)),
+      ]);
+      setUserId(user.id);
+
+      const url = window.URL || window.webkitURL;
+      const blobUrl = url.createObjectURL(locationImage);
+      setLocationImage(blobUrl);
+
+      setLocationGuesses(await fetchGuessData(guesses));
+    }
+  }, [fetchGuessData, id, isLoggedIn]);
 
   const handleMapClick = (e: any) => {
     setCoordinates({
@@ -159,55 +169,13 @@ const GuessLocation = () => {
     });
     setMarkerVisibility(true);
   };
-
-  const getAddressFromCoordinates = () => {
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode(
-      { location: coordinates, language: "en" },
-      (results, status) => {
-        if (status === "OK") {
-          if (results![0]) {
-            setAddress(results![0].formatted_address);
-          } else {
-            console.log("No results found");
-          }
-        } else {
-          console.log("Geocoder failed due to: " + status);
-        }
-      }
-    );
-  };
-
-  const [locationImage, setLocationImage] = useState<string>(PlaceholderImage);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      (async () => {
-        const response = await getLocationImage(id!);
-        const url = window.URL || window.webkitURL;
-        const blobUrl = url.createObjectURL(response);
-        setLocationImage(blobUrl);
-      })()
-        .catch((e) => {
-          console.log("Error: Cant get location image. \n" + e);
-        })
-        .catch((e) => {
-          if (e.response.status === 401) {
-            console.log("Unauthorized");
-            localStorage.setItem("accessToken", "");
-          } else {
-            console.log("Error: Cant get location. \n" + e);
-          }
-        });
-    }
-  }, [updated, isLoggedIn, id]);
-
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault();
     try {
       await schema.validate(formData, { abortEarly: false });
       setErrors({});
@@ -230,10 +198,19 @@ const GuessLocation = () => {
         err.inner.forEach((error) => {
           validationErrors[error.path!] = error.message;
         });
-        setErrors(validationErrors);        
+        setErrors(validationErrors);
       }
     }
   };
+
+  useEffect(() => {
+    fetchLocationGuesses().catch((e) => {
+      console.log("Error: Cant get data. \n" + e);
+    });
+    getAddressFromCoordinates().catch((e) => {
+      console.log("Error: Cant get location address. \n" + e);
+    });
+  }, [isLoggedIn, coordinates, errorDistance, userid, fetchLocationGuesses, getAddressFromCoordinates]);
 
   return (
     <Container>

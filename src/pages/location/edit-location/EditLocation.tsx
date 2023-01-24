@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect , useCallback} from "react";
 import {
   Container,
   NotFound,
@@ -52,40 +52,35 @@ const EditLocation = () => {
       )
       .required("New Location image is required to edit the location!"),
   });
+  
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      (async () => {
-        const response = await getLocationById(id!, JSON.parse(isLoggedIn!));
-        setAddress(response.name);
+  const previewImage = useCallback(() => {
+    if (image) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(image);
+    }
+  }, [image]);
+
+    const getEditedLocationImage = useCallback(async () => {
+      if (isLoggedIn) {
+        const [locations, locationImage] = await Promise.all([
+          getLocationById(id!, JSON.parse(isLoggedIn)),
+          getLocationImage(id!),
+        ]);
+        setAddress(locations.name);
         setCoordinates({
-          lat: response.latitude as number,
-          lng: response.longitude as number,
+          lat: locations.latitude as number,
+          lng: locations.longitude as number,
         });
-      })().catch((e) => {
-        setErrorMessage(e.response.data.message);
-      });
-
-      (async () => {
-        const response = await getLocationImage(id!);
         const url = window.URL || window.webkitURL;
-        const blobUrl = url.createObjectURL(response);
+        const blobUrl = url.createObjectURL(locationImage);
         setLocationImage(blobUrl);
         setPreview(blobUrl);
-      })()
-        .catch((e) => {
-          console.log("Error: Cant get location image. \n" + e);
-        })
-        .catch((e) => {
-          if (e.response.status === 401) {
-            console.log("Unauthorized");
-            localStorage.setItem("accessToken", "");
-          } else {
-            console.log("Error: Cant get location. \n" + e);
-          }
-        });
-    }
-  }, [isLoggedIn, id]);
+      }
+    }, [id, isLoggedIn]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -135,14 +130,11 @@ const EditLocation = () => {
   };
 
   useEffect(() => {
-    if (image) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(image);
-    }
-  }, [image]);
+    previewImage();
+    getEditedLocationImage().catch((e) => {
+      console.log("Error: Cant get location image. \n" + e);
+    });
+  }, [coordinates, image, getEditedLocationImage, previewImage]);
 
   return (
     <Container>
