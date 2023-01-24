@@ -54,7 +54,7 @@ export const getUserById = async (id: string, token: string): Promise<User> => {
 export const updateUser = async (
   user: UpdateUser,
   token: string
-): Promise<void> => {
+) => {
   const response = await axiosInstance.patch("/me/update-user", user, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -64,7 +64,7 @@ export const updateUser = async (
 export const updateProfilePicture = async (
   user: UpdateProfilePicture,
   token: string
-): Promise<void> => {
+) => {
   const response = await axiosFileInstance.patch(
     "/me/update-profilepicture",
     user,
@@ -78,26 +78,26 @@ export const updateProfilePicture = async (
 export const updatePassword = async (
   user: UpdatePassword,
   token: string
-): Promise<void> => {
+) => {
   const response = await axiosInstance.patch("/me/update-password", user, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
 
-export const deleteUser = async (token: string): Promise<void> => {
+export const deleteUser = async (token: string) => {
   const response = await axiosInstance.delete("/me", {
     headers: { Authorization: `Bearer ${token}` },
   });
   return response.data;
 };
 
-export const forgotPassword = async (forgotPassword: ForgotPassword): Promise<void> => {
+export const forgotPassword = async (forgotPassword: ForgotPassword) => {
   const response = await axiosInstance.post("/me/forgot-password", forgotPassword);
   return response.data;
 };
 
-export const resetPassword = async (resetPassword: ResetPassword): Promise<void> => {
+export const resetPassword = async (resetPassword: ResetPassword) => {
   const response = await axiosInstance.patch("/me/reset-password", resetPassword);
   return response.data;
 };

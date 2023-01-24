@@ -68,7 +68,7 @@ export const getRandomLocationsId = async (): Promise<
 export const postLocation = async (
   location: Location,
   token: string
-): Promise<void> => {
+) => {
   const response = await axiosFileInstance.post("/location", location, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -79,7 +79,7 @@ export const updateLocation = async (
   id: string,
   location: Location,
   token: string
-): Promise<void> => {
+) => {
   const response = await axiosFileInstance.patch(`/location/${id}`, location, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -89,7 +89,7 @@ export const updateLocation = async (
 export const deleteLocation = async (
   id: string,
   token: string
-): Promise<void> => {
+) => {
   const response = await axiosInstance.delete(`/location/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
