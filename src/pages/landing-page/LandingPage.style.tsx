@@ -94,10 +94,10 @@ export const BestGuesses = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  margin-bottom: 100px;
+  margin-bottom: 20px;
 
-  p {
-    margin-top: 50px;
+  h5 {
+    margin-bottom: 50px;
   }
 
   @media (max-width: 900px) {
@@ -105,8 +105,8 @@ export const BestGuesses = styled.div`
     :first-child {
       margin-bottom: 250px;
     }
-    p {
-      margin-top: 20px;
+    h5 {
+      margin-bottom: 20px;
     }
   }
 `;

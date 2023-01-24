@@ -30,31 +30,21 @@ import PeekIconImg from "../../../assets/icons/peek-icon.svg";
 import { Label, Input } from "reactstrap";
 import * as yup from "yup";
 
-// Updating loggedin user information and deleteing loggedin user using modal, that overlays whole page
-
 const ProfileSettings: FC<ProfileSettingsProps> = ({
   isSettingsOpen,
   setIsSettingsOpen,
 }) => {
   const isLoggedIn = localStorage.getItem("accessToken");
   const [email, setEmail] = useState("");
-  const [newEmail, setNewEmail] = useState("");
   const [firstName, setFirstName] = useState("");
-  const [newFirstName, setNewFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [newLastName, setNewLastName] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [newPasswordConfirm, setNewPasswordConfirm] = useState("");
   const [ErrorMessage, setErrorMessage] = useState("");
   const { updated, setUpdated } = useContext(UpdateContext);
   const [showPassword, setShowPassword] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const [image, setImage] = useState<File>();
   const [preview, setPreview] = useState<string>(PlaceholderImage);
-
   const [isChangePasswordOpen, setIsChangePasswordOpen] =
     useState<boolean>(false);
   const [isChangePictureOpen, setIsChangePictureOpen] =
@@ -62,7 +52,27 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   const [isInformationChangedOpen, setIsInformationChangedOpen] =
     useState<boolean>(false);
   const [isUserInfoOpen, setIsUserInfoOpen] = useState<boolean>(true);
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
+  
+  const [proflePicutreFormData, setProfilePictureFormData] = useState({
+    profilePicture: null,
+  });
+  const [passwordFormData, setPasswordFormData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    newPasswordConfirm: "",
+  });
+  const [userFormData, setUserFormData] = useState({
+    email: "",
+    name: "",
+    surname: "",
+  });
 
+  const userSchema = yup.object().shape({
+    email: yup.string().email("Invalid email").required("Email is required"),
+    name: yup.string().required("Name is required"),
+    surname: yup.string().required("Surname is required"),
+  });
   const passwordSchema = yup.object().shape({
     currentPassword: yup.string().required("Current password is required"),
     newPassword: yup
@@ -78,21 +88,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
       .oneOf([yup.ref("newPassword"), null], "Passwords must match")
       .required("Confirm password is required"),
   });
-  const [passwordFormData, setPasswordFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    newPasswordConfirm: "",
-  });
-  const userSchema = yup.object().shape({
-    email: yup.string().email("Invalid email").required("Email is required"),
-    name: yup.string().required("Name is required"),
-    surname: yup.string().required("Surname is required"),
-  });
-  const [userFormData, setUserFormData] = useState({
-    email: "",
-    name: "",
-    surname: "",
-  });
   const proflePicutreSchema = yup.object().shape({
     profilePicture: yup
       .mixed()
@@ -107,11 +102,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
       )
       .required("Profile picture is required"),
   });
-  const [proflePicutreFormData, setProfilePictureFormData] = useState({
-    profilePicture: null,
-  });
-
-  const [errors, setErrors] = useState<{ [field: string]: string }>({});
 
   const handleChangeUserInfo = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserFormData({ ...userFormData, [e.target.name]: e.target.value });
@@ -141,7 +131,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   });
 
   const handleSubmitUserInfo = async (e: { preventDefault: () => void }) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault();
     try {
       await userSchema.validate(userFormData, { abortEarly: false });
       setErrors({});

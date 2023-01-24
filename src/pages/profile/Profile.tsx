@@ -60,7 +60,7 @@ const Profile = () => {
         );
         const locationsId = locations.map((object) => object.id);
         setMyLocations(locationsId);
-        if (locations.length > 1) {
+        if (locations.length > 0) {
           setUploads(true);
         }
       })().catch((e) => {
@@ -79,7 +79,7 @@ const Profile = () => {
         );
         const locationsId = locations.map((object) => object.location_id);
         setGuessedLocations(locationsId);
-        if (locations.length > 1) {
+        if (locations.length > 0) {
           setUserBestGuesses(true);
         }
       })().catch((e) => {
@@ -107,7 +107,7 @@ const Profile = () => {
         console.log("Error: Cant get user profile picture. \n" + e);
       });
     }
-  }, [userid]);
+  }, [updated, userid]);
 
   const loadNewLocations = () => {
     setLocationsPage(locationsPage + 1);

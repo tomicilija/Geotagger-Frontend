@@ -28,63 +28,45 @@ import {
 import {
   useJsApiLoader,
   GoogleMap,
-  Marker,
   MarkerF,
 } from "@react-google-maps/api";
-/*import Card from "../../components/card/Card";
-import CardGrid from "../../components/card-grid/CardGrid";*/
 import { Link, useParams } from "react-router-dom";
 import MapMarker from "../../../assets/icons/map-marker.png";
-import LocationImg from "../../../assets/icons/profile.svg";
-/*import { getSignedInUser, getUserById, getUserVotes } from "../../api/UserApi";
-import { getMyQuote, getUserQuote } from "../../api/QuoteApi";
-import { UpdateContext } from "../../utils/UpdateContext";
-import { QuoteResponse } from "../../interfaces/QuoteInterfaces";*/
-import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
-import * as img from "../../../assets/placeholder-location-image.png";
-import { preProcessFile } from "typescript";
 import { UpdateContext } from "../../../utils/UpdateContext";
 import { getLocationImage } from "../../../api/LocationApi";
 import { getGuessesByLocationId, guessLocation } from "../../../api/GuessApi";
 import { GuessResponseById } from "../../../interfaces/LocationInterfaces";
 import moment from "moment-timezone";
 import { getSignedInUser, getUserProfilePicture } from "../../../api/UserApi";
-import { sign } from "crypto";
 import { Label, Input } from "reactstrap";
 import * as yup from "yup";
-import { number } from "yup/lib/locale";
-
-// On profile page user quote, karma, and liked quotes is displayed
 
 const GuessLocation = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("accessToken")
-  );
+  const isLoggedIn = localStorage.getItem("accessToken");
   const [userid, setUserId] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [userQquote, setUserQquote] = useState("");
-  const [userKarma, setUserKarma] = useState(0);
-  // const [userVotes, setUserVotes] = useState<QuoteResponse[]>([]);
-  const [userHasLikes, setUserHasLikes] = useState(false);
-  const [showedQuotesDesktop, setShowedQuotesDesktop] = useState(9);
-  const [showedQuotesMobile, setShowedQuotesMobile] = useState(4);
-  const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
-    window.innerWidth > 1340
-  );
   const { updated } = useContext(UpdateContext);
   const { id } = useParams();
   const [addrss, setAddress] = useState("");
   const [errorDistance, setErrorDistance] = useState("");
   const [markerVisibility, setMarkerVisibility] = useState(false);
   const [ErrorMessage, setErrorMessage] = useState("");
-  const [locationGuesses, setLocationGuesses] = useState<GuessResponseById[]>(
-    []
-  );
+  const [locationGuesses, setLocationGuesses] = useState<GuessResponseById[]>([]);
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
   const [coordinates, setCoordinates] = useState({
     lat: 37.77414,
     lng: -122.420052,
+  });
+  const [formData, setFormData] = useState({
+    latitude: "",
+    longitude: "",
+  });
+
+  const mapsApiKey: string = process.env
+    .REACT_APP_GOOGLE_MAPS_API_KEY as string;
+
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: mapsApiKey,
   });
 
   const schema = yup.object().shape({
@@ -100,28 +82,6 @@ const GuessLocation = () => {
       .string()
       .required("Longitude is required")
       .test("is-num", (val) => !isNaN(parseFloat(val!))),
-  });
-  const [formData, setFormData] = useState({
-    latitude: "",
-    longitude: "",
-  });
-
-  const [errors, setErrors] = useState<{ [field: string]: string }>({});
-
-  const mapsApiKey: string = process.env
-    .REACT_APP_GOOGLE_MAPS_API_KEY as string;
-
-  const updateScreenSize = () => {
-    setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
-  };
-
-  useEffect(() => {
-    window.addEventListener("resize", updateScreenSize);
-    return () => window.removeEventListener("resize", updateScreenSize);
-  });
-
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: mapsApiKey,
   });
 
   const fetchGuesses = async (): Promise<GuessResponseById[]> => {
@@ -182,7 +142,7 @@ const GuessLocation = () => {
       .catch((e) => {
         console.log("Error: Can't get location guesses. \n" + e);
       });
-  }, [coordinates, id, isLoggedIn, errorDistance, userid]);
+  }, [isLoggedIn, errorDistance, userid]);
 
   useEffect(() => {
     getAddressFromCoordinates();
@@ -234,7 +194,7 @@ const GuessLocation = () => {
         .catch((e) => {
           if (e.response.status === 401) {
             console.log("Unauthorized");
-            setIsLoggedIn(null);
+            localStorage.setItem("accessToken", "");
           } else {
             console.log("Error: Cant get location. \n" + e);
           }

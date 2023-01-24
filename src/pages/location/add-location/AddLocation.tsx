@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   NotFound,
@@ -15,56 +15,37 @@ import {
   Warning,
 } from "./AddLocation.style";
 import { useJsApiLoader, GoogleMap, MarkerF } from "@react-google-maps/api";
-/*import Card from "../../components/card/Card";
-import CardGrid from "../../components/card-grid/CardGrid";*/
-import { Link, useParams, useNavigate } from "react-router-dom";
-import { ReactComponent as DefaultProfileIcon } from "../../../assets/icons/profile.svg";
-import LocationImg from "../../assets/s6L0uQyprpE.png";
-/*import { getSignedInUser, getUserById, getUserVotes } from "../../api/UserApi";
-import { getMyQuote, getUserQuote } from "../../api/QuoteApi";
-import { UpdateContext } from "../../utils/UpdateContext";
-import { QuoteResponse } from "../../interfaces/QuoteInterfaces";*/
+import { Link, useNavigate } from "react-router-dom";
 import MapMarker from "../../../assets/icons/map-marker.png";
 import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
-import { preProcessFile } from "typescript";
-import { UpdateContext } from "../../../utils/UpdateContext";
 import { postLocation } from "../../../api/LocationApi";
 import { Label, Input } from "reactstrap";
 import * as yup from "yup";
 
-// On profile page user quote, karma, and liked quotes is displayed
-
 const AddLocation = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("accessToken")
-  );
+  const isLoggedIn = localStorage.getItem("accessToken");
   const navigate = useNavigate();
-  const [userid, setUserId] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [userQquote, setUserQquote] = useState("");
-  const [userKarma, setUserKarma] = useState(0);
-  // const [userVotes, setUserVotes] = useState<QuoteResponse[]>([]);
-  const [userHasLikes, setUserHasLikes] = useState(false);
-  const [showedQuotesDesktop, setShowedQuotesDesktop] = useState(9);
-  const [showedQuotesMobile, setShowedQuotesMobile] = useState(4);
-  const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
-    window.innerWidth > 1340
-  );
   const [ErrorMessage, setErrorMessage] = useState("");
-  const { updated } = useContext(UpdateContext);
-  const { id } = useParams();
-
   const [coordinates, setCoordinates] = useState({
     lat: 37.77414,
     lng: -122.420052,
   });
   const [addrss, setAddress] = useState("");
   const [markerVisibility, setMarkerVisibility] = useState(false);
-
   const mapsApiKey: string = process.env
     .REACT_APP_GOOGLE_MAPS_API_KEY as string;
+  const [locationData, setLocationData] = useState({
+    latitude: "",
+    longitude: "",
+  });
+  const [imageData, setImageData] = useState({
+    profilePicture: null,
+  });
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
+  const { isLoaded } = useJsApiLoader({
+    googleMapsApiKey: mapsApiKey,
+  });
 
   const locationSchema = yup.object().shape({
     latitude: yup
@@ -96,34 +77,11 @@ const AddLocation = () => {
       .required("New Location image is required to edit the location!"),
   });
 
-  const [locationData, setLocationData] = useState({
-    latitude: "",
-    longitude: "",
-  });
-  const [imageData, setImageData] = useState({
-    profilePicture: null,
-  });
-
-  const [errors, setErrors] = useState<{ [field: string]: string }>({});
-
-  const updateScreenSize = () => {
-    setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
-  };
-
-  useEffect(() => {
-    window.addEventListener("resize", updateScreenSize);
-    return () => window.removeEventListener("resize", updateScreenSize);
-  });
-
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: mapsApiKey,
-  });
-
   useEffect(() => {
     getAddressFromCoordinates().catch((e) => {
       if (e.response.status === 401) {
         console.log("Unauthorized");
-        setIsLoggedIn(null);
+        localStorage.setItem("accessToken", "");
       } else {
         console.log("Error: Cant get location. \n" + e);
       }

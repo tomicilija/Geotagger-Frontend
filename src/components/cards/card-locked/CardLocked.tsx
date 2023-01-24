@@ -5,36 +5,19 @@ import {
   Overlay,
   LockedIcon,
 } from "./CardLocked.style";
-/*import {
-  deleteDownvote,
-  deleteUpvote,
-  downvoteQuote,
-  getUserQuote,
-  upvoteQuote,
-  voteCheck,
-} from "../../api/QuoteApi";
-import { ReactComponent as UpvoteBlack } from "../../assets/arrows/UpVoteBlack.svg";
-import { ReactComponent as DownVoteBlack } from "../../assets/arrows/DownVoteBlack.svg";
-import { ReactComponent as UpvoteOrange } from "../../assets/arrows/UpVoteOrange.svg";
-import { ReactComponent as DownVoteOrange } from "../../assets/arrows/DownVoteOrange.svg";*/
 import { useContext, useEffect, useState } from "react";
 import { UpdateContext } from "../../../utils/UpdateContext";
-import {
-  CardLockedProps,
-  CardNewProps,
-} from "../../../interfaces/LocationInterfaces";
-import { Link, useNavigate } from "react-router-dom";
+import { CardNewProps } from "../../../interfaces/LocationInterfaces";
 import LockedIconImg from "../../../assets/icons/locked-icon.svg";
 import { getLocationImage } from "../../../api/LocationApi";
 
 // Recives user and quote data, displays it, and handles quote voting
 
 const CardLocked: React.FC<CardNewProps> = ({ locationid }) => {
-  const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem("accessToken");
 
   const [image, setImage] = useState<string>();
-  const { updated, setUpdated } = useContext(UpdateContext);
+  const { updated } = useContext(UpdateContext);
 
   useEffect(() => {
     (async () => {

@@ -1,15 +1,11 @@
-import { useRef, useEffect, useState } from "react";
 import { CardWrapper, NotFound } from "./CardGrid.style";
 import Masonry from "react-masonry-css";
-import Card from "../cards/card-new/CardNew";
 import { GridProps } from "../../interfaces/LocationInterfaces";
 import CardNew from "../cards/card-new/CardNew";
 import CardEdit from "../cards/card-edit/CardEdit";
 import CardGuessed from "../cards/card-guessed/CardGuessed";
 import CardLocked from "../cards/card-locked/CardLocked";
 import CardGuessedProfile from "../cards/card-guessed-profile/CardGuessedProfile";
-
-// Recives array of locations and arranges them into collumns
 
 const CardGrid: React.FC<GridProps> = ({ locationId, cardStyle }) => {
   let breakpointColumnsObj;
@@ -108,7 +104,6 @@ const CardGrid: React.FC<GridProps> = ({ locationId, cardStyle }) => {
       </CardWrapper>
     );
   } else {
-    /* If no quotes exist */
     return (
       <NotFound>
         <h1>OOPS!</h1> <p>This is looking a little empty</p>

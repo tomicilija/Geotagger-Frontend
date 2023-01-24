@@ -9,19 +9,19 @@ export const Container = styled.div`
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  justify-content: flex-start; //  flex-start | flex-end | center | space-between | space-around | space-evenly
+  justify-content: flex-start;
   align-items: center;
 `;
 
 export const Wrapper = styled.div`
   position: relative;
   display: flex;
-  flex-direction: column; //  row | row-reverse | column | column-reverse;
-  flex-wrap: wrap; //  nowrap | wrap | wrap-reverse
+  flex-direction: column; 
+  flex-wrap: wrap; 
 
-  justify-content: center; //  flex-start | flex-end | center | space-between | space-around | space-evenly
-  align-items: center; //  stretch | flex-start | flex-end | center | baseline | first baseline | last baseline
-  align-content: center; //  flex-start | flex-end | center | space-between | space-around | space-evenly | stretch
+  justify-content: center; 
+  align-items: center; 
+  align-content: center; 
   text-align: start;
   margin-top: 100px;
   padding: 50px;

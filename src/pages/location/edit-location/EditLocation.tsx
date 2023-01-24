@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useRef } from "react";
+import { useState, useEffect } from "react";
 import {
   Container,
   NotFound,
@@ -10,61 +10,33 @@ import {
   Button,
   Warning,
 } from "./EditLocation.style";
-import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
-/*import Card from "../../components/card/Card";
-import CardGrid from "../../components/card-grid/CardGrid";*/
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ReactComponent as DefaultProfileIcon } from "../../../assets/icons/profile.svg";
-import LocationImg from "../../assets/s6L0uQyprpE.png";
-/*import { getSignedInUser, getUserById, getUserVotes } from "../../api/UserApi";
-import { getMyQuote, getUserQuote } from "../../api/QuoteApi";
-import { UpdateContext } from "../../utils/UpdateContext";
-import { QuoteResponse } from "../../interfaces/QuoteInterfaces";*/
-import DeleteIconImg from "../../../assets/icons/x-delete-icon.svg";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
-import * as img from "../../../assets/placeholder-location-image.png";
-import { preProcessFile } from "typescript";
 import {
   getLocationById,
   getLocationImage,
   updateLocation,
 } from "../../../api/LocationApi";
-import { UpdateContext } from "../../../utils/UpdateContext";
-import { Label, Input } from "reactstrap";
+import {  Input } from "reactstrap";
 import * as yup from "yup";
 
-// On profile page user quote, karma, and liked quotes is displayed
-
 const EditLocation = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("accessToken")
-  );
+  const isLoggedIn = localStorage.getItem("accessToken");
   const navigate = useNavigate();
   const [addrss, setAddress] = useState("");
-  const [userid, setUserId] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [userQquote, setUserQquote] = useState("");
-  const [userKarma, setUserKarma] = useState(0);
-  // const [userVotes, setUserVotes] = useState<QuoteResponse[]>([]);
-  const [userHasLikes, setUserHasLikes] = useState(false);
-  const [showedQuotesDesktop, setShowedQuotesDesktop] = useState(9);
-  const [showedQuotesMobile, setShowedQuotesMobile] = useState(4);
-  const [isThreeCollumnSizeGrid, setIsThreeCollumnSizeGrid] = useState(
-    window.innerWidth > 1340
-  );
-  //const { updated } = useContext(UpdateContext);
   const { id } = useParams();
-
-  const { updated } = useContext(UpdateContext);
   const [ErrorMessage, setErrorMessage] = useState("");
   const [coordinates, setCoordinates] = useState({
     lat: 37.77414,
     lng: -122.420052,
   });
-
-  const mapsApiKey: string = process.env
-    .REACT_APP_GOOGLE_MAPS_API_KEY as string;
+  const [errors, setErrors] = useState<{ [field: string]: string }>({});
+  const [image, setImage] = useState<File>();
+  const [preview, setPreview] = useState<string>(PlaceholderImage);
+  const [locationImage, setLocationImage] = useState<string>(PlaceholderImage);
+  const [formData, setFormData] = useState({
+    profilePicture: null,
+  });
 
   const schema = yup.object().shape({
     locationImage: yup
@@ -80,29 +52,6 @@ const EditLocation = () => {
       )
       .required("New Location image is required to edit the location!"),
   });
-  const [formData, setFormData] = useState({
-    profilePicture: null,
-  });
-
-  const [errors, setErrors] = useState<{ [field: string]: string }>({});
-
-  const updateScreenSize = () => {
-    setIsThreeCollumnSizeGrid(window.innerWidth > 1340);
-  };
-
-  useEffect(() => {
-    window.addEventListener("resize", updateScreenSize);
-    return () => window.removeEventListener("resize", updateScreenSize);
-  });
-
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: mapsApiKey,
-  });
-
-  const [image, setImage] = useState<File>();
-  const [preview, setPreview] = useState<string>(PlaceholderImage);
-
-  const [locationImage, setLocationImage] = useState<string>(PlaceholderImage);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -130,16 +79,16 @@ const EditLocation = () => {
         .catch((e) => {
           if (e.response.status === 401) {
             console.log("Unauthorized");
-            setIsLoggedIn(null);
+            localStorage.setItem("accessToken", "");
           } else {
             console.log("Error: Cant get location. \n" + e);
           }
         });
     }
-  }, [updated, isLoggedIn, id]);
+  }, [isLoggedIn, id]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // To prevent refreshing the page on form submit
+    e.preventDefault();
     try {
       await schema.validate(formData, { abortEarly: false });
       setErrors({});

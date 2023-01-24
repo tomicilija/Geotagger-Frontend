@@ -49,7 +49,7 @@ const LandingPage = () => {
         );
         const locationsId = locations.map((object) => object.id);
         setNewLocations(locationsId);
-        if (locations.length > 1) {
+        if (locations.length > 0) {
           setUploads(true);
         }
       })().catch((e) => {
@@ -68,7 +68,7 @@ const LandingPage = () => {
         );
         const locationsId = locations.map((object) => object.location_id);
         setGuessedLocations(locationsId);
-        if (locations.length > 1) {
+        if (locations.length > 0) {
           setUserBestGuesses(true);
         }
       })().catch((e) => {

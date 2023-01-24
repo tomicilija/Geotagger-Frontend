@@ -37,6 +37,8 @@ const Navbar = () => {
     useState<boolean>(false);
   const [image, setImage] = useState<string>();
 
+  const { updated } = useContext(UpdateContext);
+
   const openSettingsModal = () => {
     setIsSettingsModalOpen((prev) => !prev);
   };
@@ -73,7 +75,7 @@ const Navbar = () => {
         console.log("Error: Cant get user profile picture. \n" + e);
       });
     }
-  }, [userid]);
+  }, [updated, userid]);
 
   return (
     <Container>
