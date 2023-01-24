@@ -1,3 +1,0 @@
-window.env = {
-  "REACT_APP_GOOGLE_MAPS_API_KEY": "AIzaSyAaASs0JCmKgvrOEG1ZIBJXjzozFkA1eFE"
-};
