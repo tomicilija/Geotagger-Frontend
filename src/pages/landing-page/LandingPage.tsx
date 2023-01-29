@@ -8,7 +8,7 @@ import {
   HeroTittle,
   SloganWrapper,
   Slogan,
-  Button,
+  //Button,
   BgMap,
   LoadMore,
 } from "./LandingPage.style";
@@ -18,6 +18,9 @@ import { ReactComponent as BackgroundWorldMap } from "../../assets/background/ba
 import CardGrid from "../../components/card-grid/CardGrid";
 import { getLocations, getRandomLocationsId } from "../../api/LocationApi";
 import { getMyGuesses } from "../../api/GuessApi";
+import { Button } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material";
+import Typography from "@mui/material/Typography";
 
 const LandingPage = () => {
   const isLoggedIn = localStorage.getItem("accessToken");
@@ -74,6 +77,18 @@ const LandingPage = () => {
     });
   }, [updated, isLoggedIn, getLoggedInData, getLandingData]);
 
+  // MUI
+  const theme = createTheme({
+    palette: {
+      primary: {
+        main: "#619b8a",
+      },
+    },
+    typography: {
+      h2: { color: "#619b8a" },
+    },
+  });
+
   return (
     <Container>
       {isLoggedIn ? (
@@ -121,36 +136,54 @@ const LandingPage = () => {
         </Wrapper>
       ) : (
         <>
-          <HeroWrapper>
-            <HeroTittle>
-              <h2>Explore the world with Geotagger!</h2>
+          <ThemeProvider theme={theme}>
+            <HeroWrapper>
+              <HeroTittle>
+                <Typography variant="h2">
+                  Explore the world with Geotagger!
+                </Typography>
+                <Typography>
+                  Geotagger is website that allows you to post picture and tag
+                  it on the map. Other user than try to locate it via Google
+                  Maps.
+                </Typography>
+                {/* <h2>Explore the world with Geotagger!</h2>
               <p>
                 Geotagger is website that allows you to post picture and tag it
                 on the map. Other user than try to locate it via Google Maps.
-              </p>
-              <Link to="/signup" style={{ textDecoration: "none" }}>
-                <Button>Sign up</Button>
-              </Link>
-            </HeroTittle>
-            <BgMap>
-              <BackgroundWorldMap />
-            </BgMap>
-          </HeroWrapper>
-          <SloganWrapper>
-            <Slogan>
-              <h4>Try yourself at Geotagger!</h4>
+              </p> */}
+                <Link to="/signup" style={{ textDecoration: "none" }}>
+                  <Button variant="contained">Sign up</Button>
+                </Link>
+              </HeroTittle>
+              <BgMap>
+                <BackgroundWorldMap />
+              </BgMap>
+            </HeroWrapper>
+            <SloganWrapper>
+              <Slogan>
+                <Typography variant="h2">Try yourself at Geotagger!</Typography>
+                <Typography>
+                  Try to guess the location of image by selecting position on
+                  the map. When you guess it, it gives you the error distance.
+                </Typography>
+                {/* <h4>Try yourself at Geotagger!</h4>
               <p>
                 Try to guess the location of image by selecting position on the
                 map. When you guess it, it gives you the error distance.
-              </p>
-            </Slogan>
-          </SloganWrapper>
-          <BestGuesses>
-            <CardGrid locationId={lockedLocations} cardStyle={"card-locked"} />
-            <Link to="/signup" style={{ textDecoration: "none" }}>
-              <Button>Sign up</Button>
-            </Link>
-          </BestGuesses>
+              </p> */}
+              </Slogan>
+            </SloganWrapper>
+            <BestGuesses>
+              <CardGrid
+                locationId={lockedLocations}
+                cardStyle={"card-locked"}
+              />
+              <Link to="/signup" style={{ textDecoration: "none" }}>
+                <Button variant="contained">Sign up</Button>
+              </Link>
+            </BestGuesses>
+          </ThemeProvider>
         </>
       )}
     </Container>

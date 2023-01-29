@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Container,
   NotFound,
@@ -29,7 +29,6 @@ import { useJsApiLoader, GoogleMap, MarkerF } from "@react-google-maps/api";
 import { Link, useParams } from "react-router-dom";
 import MapMarker from "../../../assets/icons/map-marker.png";
 import PlaceholderImage from "../../../assets/placeholder-location-image.png";
-import { UpdateContext } from "../../../utils/UpdateContext";
 import { getLocationImage } from "../../../api/LocationApi";
 import { getGuessesByLocationId, guessLocation } from "../../../api/GuessApi";
 import { GuessResponseById } from "../../../interfaces/LocationInterfaces";

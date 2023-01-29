@@ -9,7 +9,6 @@ import {
   TwoInRow,
   ConfirmationWrapper,
 } from "./DeleteLocation.style";
-import PlaceholderImage from "../../../assets/default-avatar.svg";
 import { deleteLocation } from "../../../api/LocationApi";
 
 const DeleteLocation = () => {
